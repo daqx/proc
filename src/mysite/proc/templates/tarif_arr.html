@@ -1,0 +1,35 @@
+{%extends "base.html"%}
+{%block content%}
+<script type="text/javascript">
+
+$(function(){
+	$('#tarif_arr tr:odd').css('backgroung-colour','#eeeeee');
+});
+</script>
+<h3>Tarif is : {{tarif.name}}</h2>
+<br/>
+<a href={{add_url}}>Add new</a>
+<br/>
+<table id='tarif_arr'>
+  <tr>
+    <th>SUMMA</th>    
+    <th>MIN</th>
+    <th>MAX</th>
+    <th>PRC</th>
+    <th>TARIF</th>
+    
+  </tr>
+
+{%for s in s_list  %}
+  <tr>
+    <td><a href="{{tr}}/{{s.id}}">{{s.summa}}</a></td>
+    <td>{{s.min}}</td>
+    <td>{{s.max}}</td>
+    <td>{{s.prc}}</td>
+    <td>{{s.tarif.name}}</td>
+  </tr>
+
+{%endfor %}
+</table>
+
+{%endblock%}

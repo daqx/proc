@@ -1,0 +1,244 @@
+body {background: none repeat scroll 0 0 #FFFFFF;
+    color: #333333;
+    font-family: "Lucida Grande","DejaVu Sans","Bitstream Vera Sans",Verdana,Arial,sans-serif;
+    font-size: 12px;
+    margin: 0;
+    padding: 0;}
+text .h1 {padding: 2px 2px; background: #fff4a1}
+text .h2 {color: #bf8ddd; border-top: 1px dotted #fff; margin-top: 2em}
+
+
+table {
+  border-collapse: collapse;
+  border: 1 1 1 1 blue;
+  width: auto;
+  margin: 24px;
+  font-size: 1.1em; 
+}
+
+th {
+  background: #3e83c9;
+  color: #fff;
+  font-weight: bold;
+  padding: 2px 11px;
+  text-align: left;
+  border-right: 1px solid #fff;
+  line-height: 1.2;
+}
+
+td {
+  padding: 6px 11px;
+  border-bottom: 1px solid #95bce2;
+  vertical-align: top;
+}
+
+td * {
+  padding: 2px 2px;
+}
+
+tr.alt td {
+  background: #ecf6fc;
+}
+
+tr.over td, tr:hover td {
+  background: #bcd4ec;
+}
+
+ul.error_list li {
+	color: #FF0000;
+}
+
+#container {
+    min-width: 760px;
+    padding: 0;
+    position: relative;
+    width: 100%;
+}
+
+#content {
+    margin: 10px 15px;
+}
+
+#content-main {
+    float: left;
+    width: 100%;
+}
+#content-related {
+    float: right;
+    margin-right: -19em;
+    position: relative;
+    width: 18em;
+}
+#footer {
+    clear: both;
+    padding: 10px;
+}
+
+#header {
+    background: none repeat scroll 0 0 #417690;
+    color: #FFFFCC;
+    overflow: hidden;
+}
+#header a:link, #header a:visited {
+    color: white;
+}
+#header a:hover {
+    text-decoration: underline;
+}
+
+#user-tools {
+    font-size: 11px;
+    padding: 1.2em 10px;
+    position: absolute;
+    right: 0;
+    text-align: right;
+    top: 0;
+}
+#branding h1 {
+    color: #F4F379;
+    font-size: 18px;
+    font-weight: normal;
+    margin: 8px 0;
+    padding: 0 10px;
+}
+#branding h2 {
+    color: #FFFFCC;
+    font-size: 14px;
+    font-weight: normal;
+    margin: -8px 0 8px;
+    padding: 0 10px;
+}
+
+form {
+    margin: 0;
+    padding: 0;
+}
+input, textarea, select, .form-row p {
+    font-family: "Lucida Grande",Verdana,Arial,sans-serif;
+    font-size: 11px;
+    font-weight: normal;
+    margin: 2px 0;
+    padding: 2px 3px;
+    vertical-align: middle;
+}
+textarea {
+    vertical-align: top !important;
+}
+input[type="text"], input[type="password"], textarea, select, .vTextField {
+    border: 1px solid #CCCCCC;
+}
+
+#header {
+    width: 100%;
+}
+
+/*
+ *  LAYOUT PANE FORMATTING
+ */
+
+.ui-layout-north {
+  border-bottom: none;
+  background-color: FFF4A1;
+  height: 100px;
+}
+
+.ui-layout-west {
+  background-color: #F9F9F9;
+  border:     1px solid #677;
+  border-left:  0;
+  overflow: auto;
+}
+
+.ui-layout-center {
+  background-color: #FFF;
+  border: 1px solid #677;
+  padding: 15px 2em 3em;
+  overflow: auto;
+}
+
+/* inner divs inside Outer East/West panes */
+.header { 
+  background: #eee url(/lib/img/eeeeee_40x100_textures_02_glass_90.png) 0 50% repeat-x;
+  border-bottom: 1px solid #677;
+  font-weight: bold;
+  text-align: center;
+  padding: 2px 0 4px;
+  position: relative;
+  overflow: hidden;
+}
+
+
+/*
+* LAYOUT RESIZERS & TOGGLERS
+*/
+
+.ui-layout-resizer-sliding {
+  opacity: 0.1;
+  filter: alpha(opacity=10);
+  background-color: #999;
+}
+.ui-layout-resizer-sliding:hover {
+  opacity: 1;
+  filter: alpha(opacity=100);
+}
+
+/* north-pane is not resizable*/
+.ui-layout-resizer-north-dragging ,
+.ui-layout-resizer-north:hover    { background: url(/lib/img/resizable-n.gif) repeat-x center; }
+.ui-layout-resizer-south-dragging ,
+.ui-layout-resizer-south:hover    { background: url(/lib/img/resizable-s.gif) repeat-x center; }
+  
+.ui-layout-resizer-west-dragging ,
+.ui-layout-resizer-west-open:hover  { background: url(/lib/img/resizable-w.gif) repeat-y center; }
+.ui-layout-resizer-east-dragging ,
+.ui-layout-resizer-east-open:hover  { background: url(/lib/img/resizable-e.gif) repeat-y center; }
+
+/* IE6 * HACK - always show resizer graphics because IE6 cannot understand elem:hover */
+/** html .ui-layout-resizer-north   { background: url(../lib/img/resizable-n.gif) repeat-x center !important; } */
+* html .ui-layout-resizer-south   { background: url(/lib/img/resizable-s.gif) repeat-x center  !important; }
+* html .ui-layout-resizer-west-open { background: url(/lib/img/resizable-w.gif) repeat-y center  !important; }
+* html .ui-layout-resizer-east-open { background: url(/lib/img/resizable-e.gif) repeat-y center  !important; }
+
+/*
+* SIMPLE TOGGLER BUTTONS
+*/
+
+.ui-layout-toggler-north-open ,
+.ui-layout-toggler-south-closed { background: url(/lib/img/toggle-up.gif) no-repeat center bottom; }
+.ui-layout-toggler-north-closed ,
+.ui-layout-toggler-south-open   { background: url(/lib/img/toggle-dn.gif) no-repeat center top; }
+.ui-layout-toggler-east-closed ,
+.ui-layout-toggler-west-open    { background: url(/lib/img/toggle-lt.gif) no-repeat center right; }
+/*.ui-layout-toggler-west-closed , SEE west-closed BELOW */
+.ui-layout-toggler-east-open    { background: url(/lib/img/toggle-rt.gif) no-repeat center left; }
+
+/* 'CONTENTS' TOC TOGGLER BUTTON */
+.ui-layout-resizer-west-closed {
+  background-color: #DDD;
+  border-top:     1px solid #677;
+  border-bottom:    1px solid #677;
+  border-left:    1px solid #677;
+  }
+  .ui-layout-resizer-west-closed:hover {
+    background-color: #E6E6E6;
+    }
+    .ui-layout-resizer-west-closed:hover .content {
+      color: #C30;
+    }
+  .ui-layout-toggler-west-closed {
+    background-color: #EEE;
+    border-top:     1px solid #FFF;
+    border-left:    1px solid #FFF;
+    border-bottom:    1px solid #677;
+    }
+    .ui-layout-toggler-west-closed:hover {
+      background-color: #F6F6F6;
+    }
+    .ui-layout-toggler-west-closed .content {
+      color:      #033;
+      font-size:    12px !important;
+      font-weight:  bold;
+      text-transform: uppercase;
+      text-align:   center;
+      padding-right:  1px;
+    }

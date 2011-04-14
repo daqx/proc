@@ -1,0 +1,58 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<LINK rel="stylesheet" href="/proc/static/css/main.css" type="text/css">
+<title>Insert title here</title>
+
+<script src="/proc/static/js/jquery.js" type="text/javascript"></script>
+<SCRIPT src="/proc/static/js/jquery.layout.js" type="text/javascript"></SCRIPT>
+<SCRIPT type="text/javascript">
+$(document).ready(function () {
+	$('body').layout({ applyDefaultStyles: true });
+}); 
+</SCRIPT> 
+</head>
+<body>
+	<!-- div id="container">-->	
+		<DIV class="ui-layout-north">
+			
+			<DIV id="header" >
+				<div id="branding">
+					<h1>Processing</h1>
+				</div>
+				<div id="user-tools">
+					{% if user.is_authenticated %}
+			  			<p>Welcome, {{ user.username }}.  
+			  			<a href="/proc/accounts/logout/">loggout</a></p>
+			  		{% else %}
+			  			<a href="/proc/accounts/login/">loggin</a>
+					{% endif %}
+				</div>
+			</DIV>
+		</DIV>
+		
+		<div class="ui-layout-west">
+			<ul>
+				<li><a href="/proc/service_type/">Виды услуг</a></li>
+				<li><a href="/proc/op_service/">Операторы услуг</a></li>
+				<li><a href="/proc/op_service_group/">Группы операторов услуг</a></li>
+				<li><a href="/proc/tarif/">Тарифы</a></li>
+				<li><a href="/proc/tarif_group/">Группы тарифов</a></li>
+				<li><a href="/proc/tarif_profile/">Профили тарифов</a></li>
+				<li><a href="/proc/dealer/">Диллер</a></li>
+				<li><a href="/proc/agent/">Агенты</a></li>
+				<li><a href="/proc/pay/">Пополнение счета</a></li>
+			</ul>
+		
+		</div>
+			
+		<DIV class="ui-layout-center">
+			
+			{% block content %}
+			{% endblock %}
+		</DIV>
+	<!--  /div>-->
+
+</body>
+</html>

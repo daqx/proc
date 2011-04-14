@@ -1,0 +1,36 @@
+
+{% extends "accounts/base_account.html" %}
+
+{% block content %}
+<div id="container">
+	<div id="header">
+		<div id="branding">
+			<h1 id="site-name">Vxod</h1>
+		</div>
+	</div>
+	<div id="content" class="colM">
+	  {% if form.errors %}
+	    <p class="error">Sorry, that's not a valid username or password</p>
+	  {% endif %}
+	  <div id="content-main">
+		  <form id="login-form" action="" method="post">
+		    {% csrf_token %} 
+		    <div class="form-row">
+			    <label for="username">User name:</label>
+			    <input type="text" name="username" value="" id="username">
+			</div>
+			<div class="form-row">
+			    <label for="password">Password:</label>
+			    <input type="password" name="password" value="" id="password">
+			</div>
+			<div class="submit-row">
+			    <input type="submit" value="login" />
+			</div>
+			    <input type="hidden" name="next" value="{{ next|escape }}" />
+			 
+		  </form>
+		</div>	 
+	</div>
+	<div id="footer"></div>
+</div>
+{% endblock %}

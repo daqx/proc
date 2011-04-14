@@ -1,0 +1,30 @@
+{%extends "base.html"%}
+{%block content%}
+<script type="text/javascript">
+
+$(function(){
+	$('#address tr:odd').css('backgroung-colour','#eeeeee');
+});
+</script>
+<a href="add">Add new</a>
+<br/>
+<table id='address'>
+  <tr>
+    <th>ADDRESS</th>
+    <th>TOWN</th>    
+    <th>TYPE</th>
+    
+  </tr>
+
+{%for s in s_list  %}
+  <tr>
+    <td><a href="{{s.id}}">{{s.address}}</a></td>
+    <td>{{s.town}}</td>
+    <td>{{s.type}}</td>
+    
+  </tr>
+
+{%endfor %}
+</table>
+
+{%endblock%}

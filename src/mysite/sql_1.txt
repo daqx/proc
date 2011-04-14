@@ -1,0 +1,241 @@
+BEGIN;
+CREATE TABLE "proc_servicetype" (
+    "id" serial NOT NULL PRIMARY KEY,
+    "code" varchar(20) NOT NULL,
+    "name" varchar(50) NOT NULL,
+    "order" integer NOT NULL,
+    "parent_id" integer,
+    UNIQUE ("parent_id", "order")
+)
+;
+ALTER TABLE "proc_servicetype" ADD CONSTRAINT "parent_id_refs_id_7c8e8bf5" FOREIGN KEY ("parent_id") REFERENCES "proc_servicetype" ("id") DEFERRABLE INITIALLY DEFERRED;
+CREATE TABLE "proc_opservice" (
+    "id" serial NOT NULL PRIMARY KEY,
+    "name" varchar(50) NOT NULL,
+    "code" varchar(20) NOT NULL,
+    "order" integer NOT NULL,
+    "type_id" integer NOT NULL REFERENCES "proc_servicetype" ("id") DEFERRABLE INITIALLY DEFERRED,
+    "need_check" boolean NOT NULL,
+    "mask" varchar(20) NOT NULL
+)
+;
+CREATE TABLE "proc_opservicegroup_opservice" (
+    "id" serial NOT NULL PRIMARY KEY,
+    "opservicegroup_id" integer NOT NULL,
+    "opservice_id" integer NOT NULL REFERENCES "proc_opservice" ("id") DEFERRABLE INITIALLY DEFERRED,
+    UNIQUE ("opservicegroup_id", "opservice_id")
+)
+;
+CREATE TABLE "proc_opservicegroup" (
+    "id" serial NOT NULL PRIMARY KEY,
+    "code" varchar(20) NOT NULL UNIQUE,
+    "name" varchar(50) NOT NULL
+)
+;
+ALTER TABLE "proc_opservicegroup_opservice" ADD CONSTRAINT "opservicegroup_id_refs_id_da63528" FOREIGN KEY ("opservicegroup_id") REFERENCES "proc_opservicegroup" ("id") DEFERRABLE INITIALLY DEFERRED;
+CREATE TABLE "proc_country" (
+    "id" serial NOT NULL PRIMARY KEY,
+    "num_code" varchar(3) NOT NULL,
+    "str_code" varchar(3) NOT NULL,
+    "name" varchar(50) NOT NULL,
+    "full_name" varchar(100) NOT NULL,
+    "inter_name" varchar(50) NOT NULL
+)
+;
+CREATE TABLE "proc_region" (
+    "id" serial NOT NULL PRIMARY KEY,
+    "name" varchar(50) NOT NULL,
+    "city_id" integer,
+    "country_id" integer NOT NULL REFERENCES "proc_country" ("id") DEFERRABLE INITIALLY DEFERRED
+)
+;
+CREATE TABLE "proc_town" (
+    "id" serial NOT NULL PRIMARY KEY,
+    "name" varchar(50) NOT NULL,
+    "type_name" varchar(10) NOT NULL,
+    "region_id" integer NOT NULL REFERENCES "proc_region" ("id") DEFERRABLE INITIALLY DEFERRED
+)
+;
+ALTER TABLE "proc_region" ADD CONSTRAINT "city_id_refs_id_71d01303" FOREIGN KEY ("city_id") REFERENCES "proc_town" ("id") DEFERRABLE INITIALLY DEFERRED;
+CREATE TABLE "proc_addres" (
+    "id" serial NOT NULL PRIMARY KEY,
+    "address" varchar(150) NOT NULL,
+    "town_id" integer NOT NULL REFERENCES "proc_town" ("id") DEFERRABLE INITIALLY DEFERRED,
+    "type" varchar(1) NOT NULL
+)
+;
+CREATE TABLE "proc_state" (
+    "id" serial NOT NULL PRIMARY KEY,
+    "code" varchar(20) NOT NULL,
+    "name" varchar(50) NOT NULL
+)
+;
+CREATE TABLE "proc_ipaddress" (
+    "id" serial NOT NULL PRIMARY KEY,
+    "ip" inet NOT NULL
+)
+;
+CREATE TABLE "proc_kopf" (
+    "id" serial NOT NULL PRIMARY KEY,
+    "code" varchar(5) NOT NULL,
+    "name" varchar(50) NOT NULL,
+    "short_name" varchar(5) NOT NULL
+)
+;
+CREATE TABLE "proc_tarifarr" (
+    "id" serial NOT NULL PRIMARY KEY,
+    "prc" boolean NOT NULL,
+    "summa" double precision NOT NULL,
+    "min" double precision NOT NULL,
+    "max" double precision NOT NULL,
+    "tarif_id" integer NOT NULL
+)
+;
+CREATE TABLE "proc_tarif" (
+    "id" serial NOT NULL PRIMARY KEY,
+    "code" varchar(20) NOT NULL UNIQUE,
+    "name" varchar(50) NOT NULL,
+    "op_service_id" integer NOT NULL REFERENCES "proc_opservice" ("id") DEFERRABLE INITIALLY DEFERRED,
+    "prc" boolean NOT NULL,
+    "summa" double precision NOT NULL,
+    "min" double precision NOT NULL,
+    "max" double precision NOT NULL
+)
+;
+ALTER TABLE "proc_tarifarr" ADD CONSTRAINT "tarif_id_refs_id_195e12b3" FOREIGN KEY ("tarif_id") REFERENCES "proc_tarif" ("id") DEFERRABLE INITIALLY DEFERRED;
+CREATE TABLE "proc_tarifgroup_tarif" (
+    "id" serial NOT NULL PRIMARY KEY,
+    "tarifgroup_id" integer NOT NULL,
+    "tarif_id" integer NOT NULL REFERENCES "proc_tarif" ("id") DEFERRABLE INITIALLY DEFERRED,
+    UNIQUE ("tarifgroup_id", "tarif_id")
+)
+;
+CREATE TABLE "proc_tarifgroup" (
+    "id" serial NOT NULL PRIMARY KEY,
+    "code" varchar(20) NOT NULL UNIQUE,
+    "name" varchar(50) NOT NULL
+)
+;
+ALTER TABLE "proc_tarifgroup_tarif" ADD CONSTRAINT "tarifgroup_id_refs_id_2c0967e" FOREIGN KEY ("tarifgroup_id") REFERENCES "proc_tarifgroup" ("id") DEFERRABLE INITIALLY DEFERRED;
+CREATE TABLE "proc_tarifprofile_tarif_group" (
+    "id" serial NOT NULL PRIMARY KEY,
+    "tarifprofile_id" integer NOT NULL,
+    "tarifgroup_id" integer NOT NULL REFERENCES "proc_tarifgroup" ("id") DEFERRABLE INITIALLY DEFERRED,
+    UNIQUE ("tarifprofile_id", "tarifgroup_id")
+)
+;
+CREATE TABLE "proc_tarifprofile" (
+    "id" serial NOT NULL PRIMARY KEY,
+    "code" varchar(20) NOT NULL UNIQUE,
+    "name" varchar(50) NOT NULL,
+    "date_begin" timestamp with time zone NOT NULL,
+    "date_end" timestamp with time zone NOT NULL
+)
+;
+ALTER TABLE "proc_tarifprofile_tarif_group" ADD CONSTRAINT "tarifprofile_id_refs_id_33475358" FOREIGN KEY ("tarifprofile_id") REFERENCES "proc_tarifprofile" ("id") DEFERRABLE INITIALLY DEFERRED;
+CREATE TABLE "proc_agent_opservices" (
+    "id" serial NOT NULL PRIMARY KEY,
+    "agent_id" integer NOT NULL,
+    "opservice_id" integer NOT NULL REFERENCES "proc_opservice" ("id") DEFERRABLE INITIALLY DEFERRED,
+    UNIQUE ("agent_id", "opservice_id")
+)
+;
+CREATE TABLE "proc_agent_ip_addresses" (
+    "id" serial NOT NULL PRIMARY KEY,
+    "agent_id" integer NOT NULL,
+    "ipaddress_id" integer NOT NULL REFERENCES "proc_ipaddress" ("id") DEFERRABLE INITIALLY DEFERRED,
+    UNIQUE ("agent_id", "ipaddress_id")
+)
+;
+CREATE TABLE "proc_agent_tarif_profile_arr" (
+    "id" serial NOT NULL PRIMARY KEY,
+    "agent_id" integer NOT NULL,
+    "tarifprofile_id" integer NOT NULL REFERENCES "proc_tarifprofile" ("id") DEFERRABLE INITIALLY DEFERRED,
+    UNIQUE ("agent_id", "tarifprofile_id")
+)
+;
+CREATE TABLE "proc_agent_opservice_group" (
+    "id" serial NOT NULL PRIMARY KEY,
+    "agent_id" integer NOT NULL,
+    "opservicegroup_id" integer NOT NULL REFERENCES "proc_opservicegroup" ("id") DEFERRABLE INITIALLY DEFERRED,
+    UNIQUE ("agent_id", "opservicegroup_id")
+)
+;
+CREATE TABLE "proc_agent" (
+    "id" serial NOT NULL PRIMARY KEY,
+    "addres_id" integer NOT NULL REFERENCES "proc_addres" ("id") DEFERRABLE INITIALLY DEFERRED,
+    "check_for_ip" boolean NOT NULL,
+    "date_create" timestamp with time zone NOT NULL,
+    "date_last_visit" timestamp with time zone NOT NULL,
+    "email" varchar(75) NOT NULL,
+    "name" varchar(50) NOT NULL,
+    "imei" varchar(20) NOT NULL,
+    "login" varchar(20) NOT NULL UNIQUE,
+    "password" varchar(100) NOT NULL,
+    "tel" varchar(20) NOT NULL,
+    "type" varchar(1) NOT NULL,
+    "state_id" integer NOT NULL REFERENCES "proc_state" ("id") DEFERRABLE INITIALLY DEFERRED
+)
+;
+ALTER TABLE "proc_agent_opservices" ADD CONSTRAINT "agent_id_refs_id_30f374de" FOREIGN KEY ("agent_id") REFERENCES "proc_agent" ("id") DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE "proc_agent_ip_addresses" ADD CONSTRAINT "agent_id_refs_id_7ccf5207" FOREIGN KEY ("agent_id") REFERENCES "proc_agent" ("id") DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE "proc_agent_tarif_profile_arr" ADD CONSTRAINT "agent_id_refs_id_200bdf16" FOREIGN KEY ("agent_id") REFERENCES "proc_agent" ("id") DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE "proc_agent_opservice_group" ADD CONSTRAINT "agent_id_refs_id_78ba2d80" FOREIGN KEY ("agent_id") REFERENCES "proc_agent" ("id") DEFERRABLE INITIALLY DEFERRED;
+CREATE TABLE "proc_dealer_addres" (
+    "id" serial NOT NULL PRIMARY KEY,
+    "dealer_id" integer NOT NULL,
+    "addres_id" integer NOT NULL REFERENCES "proc_addres" ("id") DEFERRABLE INITIALLY DEFERRED,
+    UNIQUE ("dealer_id", "addres_id")
+)
+;
+CREATE TABLE "proc_dealer_ip_addresses" (
+    "id" serial NOT NULL PRIMARY KEY,
+    "dealer_id" integer NOT NULL,
+    "ipaddress_id" integer NOT NULL REFERENCES "proc_ipaddress" ("id") DEFERRABLE INITIALLY DEFERRED,
+    UNIQUE ("dealer_id", "ipaddress_id")
+)
+;
+CREATE TABLE "proc_dealer_agent" (
+    "id" serial NOT NULL PRIMARY KEY,
+    "dealer_id" integer NOT NULL,
+    "agent_id" integer NOT NULL REFERENCES "proc_agent" ("id") DEFERRABLE INITIALLY DEFERRED,
+    UNIQUE ("dealer_id", "agent_id")
+)
+;
+CREATE TABLE "proc_dealer" (
+    "id" serial NOT NULL PRIMARY KEY,
+    "account" varchar(8) NOT NULL,
+    "check_for_ip" boolean NOT NULL,
+    "date_create" timestamp with time zone NOT NULL,
+    "date_last_visit" timestamp with time zone,
+    "dealer_id" integer,
+    "email" varchar(75) NOT NULL,
+    "inn" varchar(12) NOT NULL,
+    "kopf_id" integer NOT NULL REFERENCES "proc_kopf" ("id") DEFERRABLE INITIALLY DEFERRED,
+    "login" varchar(20) NOT NULL UNIQUE,
+    "name" varchar(50) NOT NULL,
+    "overdraft" double precision NOT NULL,
+    "password" varchar(100) NOT NULL,
+    "tel" varchar(20) NOT NULL,
+    "state_id" integer NOT NULL REFERENCES "proc_state" ("id") DEFERRABLE INITIALLY DEFERRED,
+    "summa" double precision NOT NULL
+)
+;
+ALTER TABLE "proc_dealer_addres" ADD CONSTRAINT "dealer_id_refs_id_5d63576e" FOREIGN KEY ("dealer_id") REFERENCES "proc_dealer" ("id") DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE "proc_dealer_ip_addresses" ADD CONSTRAINT "dealer_id_refs_id_3db13961" FOREIGN KEY ("dealer_id") REFERENCES "proc_dealer" ("id") DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE "proc_dealer_agent" ADD CONSTRAINT "dealer_id_refs_id_43932535" FOREIGN KEY ("dealer_id") REFERENCES "proc_dealer" ("id") DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE "proc_dealer" ADD CONSTRAINT "dealer_id_refs_id_65876b93" FOREIGN KEY ("dealer_id") REFERENCES "proc_dealer" ("id") DEFERRABLE INITIALLY DEFERRED;
+CREATE INDEX "proc_servicetype_parent_id" ON "proc_servicetype" ("parent_id");
+CREATE INDEX "proc_opservice_type_id" ON "proc_opservice" ("type_id");
+CREATE INDEX "proc_region_city_id" ON "proc_region" ("city_id");
+CREATE INDEX "proc_region_country_id" ON "proc_region" ("country_id");
+CREATE INDEX "proc_town_region_id" ON "proc_town" ("region_id");
+CREATE INDEX "proc_addres_town_id" ON "proc_addres" ("town_id");
+CREATE INDEX "proc_tarifarr_tarif_id" ON "proc_tarifarr" ("tarif_id");
+CREATE INDEX "proc_tarif_op_service_id" ON "proc_tarif" ("op_service_id");
+CREATE INDEX "proc_agent_addres_id" ON "proc_agent" ("addres_id");
+CREATE INDEX "proc_agent_state_id" ON "proc_agent" ("state_id");
+CREATE INDEX "proc_dealer_dealer_id" ON "proc_dealer" ("dealer_id");
+CREATE INDEX "proc_dealer_kopf_id" ON "proc_dealer" ("kopf_id");
+CREATE INDEX "proc_dealer_state_id" ON "proc_dealer" ("state_id");
+COMMIT;
