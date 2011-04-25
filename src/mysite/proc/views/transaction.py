@@ -52,6 +52,6 @@ def pay_form_add(request,id_=0):
         else:
             return render_to_response('pay_form.html', {'form': form},context_instance=RequestContext(request))
     else:        
-        #form=AgentForm(initial={'password':'', 'username' : ''})      
+        form=TransactionForm()      
         return render_to_response('pay_form.html', {'form': form},context_instance=RequestContext(request))
           

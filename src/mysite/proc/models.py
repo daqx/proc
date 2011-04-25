@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import datetime
 
 from django.db import models
@@ -75,7 +76,14 @@ class Transaction(models.Model):
     summa_commiss   =models.FloatField()
     summa_pay       =models.FloatField()    
     state           =models.ForeignKey(State)
-    coment          =models.CharField(max_length=100)
+    return_reason   =models.CharField(max_length=100)                           #Причина отказа и служ отметки    
+    date_proc       =models.DateTimeField(null=True, blank=True)                #Дата обработки
+    seans_number    =models.CharField(max_length=20,null=True, blank=True)      #Номер сеанса обработки
+    processed       =models.NullBooleanField(null=True, blank=True)                 #Признак успешной обработки
+    blocked         =models.NullBooleanField(null=True, blank=True)                 #Признак блокировки процессом
+    try_count       =models.FloatField(null=True, blank=True)                   #Количество попыток
+    file_name       =models.CharField(max_length=20,null=True, blank=True)
+    user_proc       =models.OneToOneField(User,null=True, blank=True)
     
     def __unicode__(self):
         return self.summa

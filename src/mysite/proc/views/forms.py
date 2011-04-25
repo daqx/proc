@@ -82,4 +82,4 @@ class TransactionForm(forms.ModelForm):
     
     class Meta:
         model=Transaction
-        exclude=('agent')
+        exclude=('agent','blocked','return_reason','date_proc','seans_number','processed','blocked','try_count','file_name','user_proc')

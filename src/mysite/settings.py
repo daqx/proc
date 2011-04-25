@@ -12,13 +12,25 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'postgresql_psycopg2', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'django_db',                      # Or path to database file if using sqlite3.
-        'USER': 'django_user',                      # Not used with sqlite3.
-        'PASSWORD': 'django',                  # Not used with sqlite3.
-        'HOST': 'localhost',                      # Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+        'NAME': 'django',                      # Or path to database file if using sqlite3.
+        'USER': 'postgres',                      # Not used with sqlite3.
+        'PASSWORD': 'postgres',                  # Not used with sqlite3.
+        'HOST': '192.168.7.225',                      # Set to empty string for localhost. Not used with sqlite3.
+        'PORT': '5432',
+        
     }
 }
+
+
+        #NAME': 'django',                      # Or path to database file if using sqlite3.
+        #'USER': 'postgres',                      # Not used with sqlite3.
+        #'PASSWORD': 'postgres',                  # Not used with sqlite3.
+        #'HOST': '192.168.7.225',  
+        
+        #'NAME': 'django_db',                      # Or path to database file if using sqlite3.
+        #'USER': 'django_user',                      # Not used with sqlite3.
+        #'PASSWORD': 'django',                  # Not used with sqlite3.
+        #'HOST': 'localhost',                      # Set to empty string for localhost. Not used with sqlite3.
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -45,8 +57,10 @@ USE_L10N = True
 
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
-MEDIA_ROOT = r'D:\WORK\PYTHON\mysite\src\mysite\proc\media'
-STATIC_ROOT = r'D:/WORK/PYTHON/mysite/src/mysite/proc/static/'
+#MEDIA_ROOT = r'D:\WORK\PYTHON\mysite\src\mysite\proc\media'
+#STATIC_ROOT = r'D:/WORK/PYTHON/mysite/src/mysite/proc/static/'
+MEDIA_ROOT = r'D:\WORK\PYTHON\proc\src\mysite\proc\media'
+STATIC_ROOT = r'D:/WORK/PYTHON/proc/src/mysite/proc/static/'
 STATIC_URL  = r'/static/'
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).

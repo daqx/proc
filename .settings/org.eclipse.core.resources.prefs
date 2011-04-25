@@ -1,5 +1,6 @@
-#Wed Apr 13 04:44:09 UZT 2011
+#Mon Apr 25 16:39:36 UZT 2011
 eclipse.preferences.version=1
+encoding//src/mysite/proc/models.py=utf-8
 encoding//src/mysite/proc/service_model.py=utf-8
 encoding//src/mysite/proc/views/account.py=utf-8
 encoding//src/mysite/proc/views/address.py=utf-8
