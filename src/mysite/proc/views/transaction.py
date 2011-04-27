@@ -26,16 +26,16 @@ def pay_form(request,id_):
             a = form.save(commit = False)
             
             a.save()
-            return HttpResponseRedirect('/proc/agent/')
+            return HttpResponseRedirect('/proc/pay/')
         else:
-            return render_to_response('agent_form.html', {'form': form},context_instance=RequestContext(request))
-    else:        
+            return render_to_response('pay_form.html', {'form': form},context_instance=RequestContext(request))
+    else:       
 
-        s = Agent.objects.get(id=id_)
-        form=AgentForm(instance=s,initial={'username' : s.user.username ,})
+        s = Transaction.objects.get(id=id_)
+        form=TransactionForm(instance=s)
         del_url="%s/delete" % id_
                 
-        return render_to_response('agent_form.html', {'form': form,'del_url': del_url},context_instance=RequestContext(request))
+        return render_to_response('pay_form.html', {'form': form,'del_url': del_url},context_instance=RequestContext(request))
 
 def pay_delete(request,id_):
         s = Transaction.objects.get(id=id_)

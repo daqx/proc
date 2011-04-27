@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-#Mon Apr 25 16:39:36 UZT 2011
-=======
 #Sun Apr 17 15:12:35 UZT 2011
->>>>>>> refs/remotes/origin/master
 eclipse.preferences.version=1
 encoding//src/mysite/proc/models.py=utf-8
 encoding//src/mysite/proc/service_model.py=utf-8
