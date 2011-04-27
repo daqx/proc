@@ -41,19 +41,7 @@ def pay_delete(request,id_):
         s = Transaction.objects.get(id=id_)
         s.delete()
         return HttpResponseRedirect('/proc/pay')
-    
-def pay_form_add(request,id_=0):
-    if request.method=='POST':
-        form=TransactionForm(request.POST)
-        if form.is_valid():
-            d=form.save(commit=False)            
-            d.save()
-
-        s = Transaction.objects.get(id=id_)
-        form=TransactionForm(instance=s)
-        del_url="%s/delete" % id_
-                
-        return render_to_response('agent_form.html', {'form': form,'del_url': del_url},context_instance=RequestContext(request))
+  
 
 def pay_delete(request,id_):
         s = Transaction.objects.get(id=id_)
