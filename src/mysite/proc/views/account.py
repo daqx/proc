@@ -19,6 +19,23 @@ def login(request):
         if user is not None and user.is_active:
             # Correct password, and the user is marked "active"
             auth.login(request, user)
+            try:
+                d=user.agent
+                request.session["user_type"]="agent"
+            except Agent.DoesNotExist:
+                pass    
+                
+            try:
+                d=user.dealer
+                request.session["user_type"]="dealer"
+            except Dealer.DoesNotExist:
+                pass
+            '''try:
+                request.session["agent"]=Agent.objects.get(user=user)
+            except Agent.DoesNotExist:
+                return
+                '''
+
             # Redirect to a success page.
             #return HttpResponseRedirect("/account/loggedin/")
             return render_to_response('main.html', context_instance=RequestContext(request))

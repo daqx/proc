@@ -8,6 +8,7 @@ from mysite.proc.service_model import *
 from mysite.proc.addres_model import *
 from mysite.proc.sys_model import *
 from mysite.proc.tarif_model import *
+from datetime import datetime
 
 
 AGENT_TYPE = (
@@ -15,7 +16,6 @@ AGENT_TYPE = (
         ('M', 'Mobile'),
         ('W', 'Web'),
     )
-
 
 class Dealer(models.Model):
     account         =models.CharField(max_length=8,blank=True)
@@ -66,6 +66,14 @@ class Agent(models.Model):
     
     def __unicode__(self):
         return self.name
+
+    def calc_commiss(self,op_serv):
+        try:
+            code=op_serv.code
+            tr_arr=TarifProfile.objects.filter(date_begin__lte=datetime.now(), date_end__gte=datetime.now()
+                                           ,tarif_group__tarif__op_service__code__eq=code)[0]
+        except(IndexError, TarifProfile.DoesNotExist) :
+            return 0
     
 class Transaction(models.Model):
     agent           =models.ForeignKey(Agent)    
@@ -87,16 +95,12 @@ class Transaction(models.Model):
     
     def __unicode__(self):
         return self.summa
-    
-class ArcMove(models.Model):
-    date            =models.DateTimeField(auto_now_add=True)
-    dealer          =models.ForeignKey(Dealer)
-    dt              =models.BooleanField()    
-    saldo           =models.FloatField()
-    summa           =models.FloatField()
-    transaction     =models.ForeignKey(Transaction)
 
-    
-    
-    def __unicode__(self):
-        return self.summa
+    def add(self):        
+        self.summa_commiss=0
+        self.summa_pay=0
+        ''' ���������� ��������� ��������'''
+        #//TODO надо изменитть статус
+        self.state=State.objects.all()[0]
+        ''' Сохраним все данные '''
+        super(Transaction, self).save()

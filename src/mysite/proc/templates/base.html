@@ -22,8 +22,8 @@ $(document).ready(function () {
 					<h1>Processing</h1>
 				</div>
 				<div id="user-tools">
-					{% if user.is_authenticated %}
-			  			<p>Welcome, {{ user.username }}.  
+					{% if request.user.is_authenticated %}
+			  			<p>Welcome, {{ request.user.username }}.  
 			  			<a href="/proc/accounts/logout/">loggout</a></p>
 			  		{% else %}
 			  			<a href="/proc/accounts/login/">loggin</a>
