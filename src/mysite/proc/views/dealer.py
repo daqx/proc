@@ -70,7 +70,7 @@ def agent_form(request,id_):
     if request.method=='POST':
         a = Agent.objects.get(pk=id_)
 
-        form=AgentForm(request.POST, instance=a)
+        form=AgentEditForm(request.POST, instance=a)
         #form.type = ServiceType.objects.get(pk= request.POST['type'])
         if form.is_valid():
             a = form.save(commit = False)
@@ -83,7 +83,7 @@ def agent_form(request,id_):
             return render_to_response('agent_form.html', {'form': form},context_instance=RequestContext(request))
     else:        
         s = Agent.objects.get(id=id_)
-        form=AgentForm(instance=s,initial={'username' : s.user.username ,})
+        form=AgentEditForm(instance=s,initial={'username' : s.user.username ,})
         del_url="%s/delete" % id_
                 
         return render_to_response('agent_form.html', {'form': form,'del_url': del_url},context_instance=RequestContext(request))

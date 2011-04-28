@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from django import forms
 from mysite.proc.service_model import *
 from mysite.proc import addres_model
@@ -77,6 +78,17 @@ class AgentForm(forms.ModelForm):
     class Meta:
         model=Agent
         exclude=('user')
+
+class AgentEditForm(forms.ModelForm):    
+    username = forms.RegexField(label=("Username"), max_length=30, regex=r'^[\w.@+-]+$',
+        help_text = ("Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."),
+        error_messages = {'invalid': ("This value may contain only letters, numbers and @/./+/-/_ characters.")})    
+    first_name = forms.CharField(max_length=30)
+    last_name = forms.CharField(max_length=30)
+    class Meta:
+        model=Agent
+        exclude=('user')
+
         
 class TransactionForm(forms.ModelForm):    
     

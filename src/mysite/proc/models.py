@@ -9,6 +9,7 @@ from mysite.proc.addres_model import *
 from mysite.proc.sys_model import *
 from mysite.proc.tarif_model import *
 from datetime import datetime
+from django.db import connection, transaction
 
 
 AGENT_TYPE = (
@@ -67,11 +68,15 @@ class Agent(models.Model):
     def __unicode__(self):
         return self.name
 
-    def calc_commiss(self,op_serv):
+    def calc_commiss(self,op_serv,summa):
         try:
-            code=op_serv.code
-            tr_arr=TarifProfile.objects.filter(date_begin__lte=datetime.now(), date_end__gte=datetime.now()
-                                           ,tarif_group__tarif__op_service__code__eq=code)[0]
+            cursor = connection.cursor()
+            
+            query = 'select t.* from proc_agent_tarif_profile_arr ata, proc_tarifprofile tp, proc_tarifgroup tg,proc_tarifprofile_tarif_group tptg, proc_tarifgroup_tarif tgt, proc_tarif t,proc_opservice os where ata.agent_id=12 and tp.id=ata.tarifprofile_id and tptg.tarifprofile_id=tp.id and tptg.tarifgroup_id=tg.id and tgt.tarifgroup_id=tg.id and tgt.tarif_id=t.id and os.id=t.op_service_id and os.id=%s' % op_serv.id
+            tr = Tarif.objects.raw(query)[0]
+                                           
+            return tr.calc_tarif(summa)
+            
         except(IndexError, TarifProfile.DoesNotExist) :
             return 0
     
@@ -97,6 +102,7 @@ class Transaction(models.Model):
         return self.summa
 
     def add(self):        
+        '''Добавление новой записи'''
         self.summa_commiss=0
         self.summa_pay=0
         ''' ���������� ��������� ��������'''
@@ -104,3 +110,18 @@ class Transaction(models.Model):
         self.state=State.objects.all()[0]
         ''' Сохраним все данные '''
         super(Transaction, self).save()
+        am=ArcMove(dealer=self.agent.dealer,dt=True,summa=self.summa_pay,transaction=self,saldo=0)
+        am.save()
+
+class ArcMove(models.Model):
+    date            =models.DateTimeField(auto_now_add=True)
+    dealer          =models.ForeignKey(Dealer)
+    dt              =models.BooleanField()    
+    saldo           =models.FloatField()
+    summa           =models.FloatField()
+    transaction     =models.ForeignKey(Transaction)
+
+    
+    
+    def __unicode__(self):
+        return self.summa

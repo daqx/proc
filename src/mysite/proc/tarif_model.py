@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 '''
 Created on 01.03.2011
 
@@ -41,8 +42,29 @@ class Tarif(models.Model):
     def __unicode__(self):
         return self.name
     
+    def calc_tarif(self,summa):
+        s=0
+        if self.prc==True:              #Расчет по процентам
+           s=summa*self.prc
+           if s < self.min:
+               s=self.min
+           if s > self.max:
+               s=self.max
+               
+        else:
+            if self.summa!=0:           #Расчет по сумме
+                s=self.summa
+            else:                       #Если сумма 0 тариф вычисляется по массиву сумм тарифа                
+                pass
+                ''' TODO Здесь необходимо реализовать расчет по массиву сумм'''
+        
+        return s;   
+        
+    
     class Meta:
         app_label = "proc"
+        
+        
         
 class TarifGroup(models.Model):
     code        =models.CharField(max_length=20,unique=True)

@@ -5,12 +5,8 @@ from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('',
-    # Example:
-    # (r'^mysite/', include('mysite.foo.urls')),
-    (r'^$', include('mysite.proc.urls')),
-    #(r'^blog/', include('mysite.blog.urls')),
-    #(r'^ordercard/', include('mysite.ordercard.urls')),
-    #(r'^kiosk/', include('mysite.kiosk.urls')),
+    
+    (r'^$', include('mysite.proc.urls')),    
     (r'^proc/', include('mysite.proc.urls')),
 
     # Uncomment the admin/doc line below and add 'django.contrib.admindocs' 

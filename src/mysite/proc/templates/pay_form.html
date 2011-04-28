@@ -17,8 +17,9 @@
         </table>
         {% if del_url %}
         	<div><a href="{{del_url}}">Delete</a></div>
+        {% else %}	
+        	<input type="submit" value="Submit">
         {% endif %}
-        <input type="submit" value="Submit">
     </form>
 
 {%endblock%}
