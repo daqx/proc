@@ -41,12 +41,7 @@ def pay_delete(request,id_):
         s = Transaction.objects.get(id=id_)
         s.delete()
         return HttpResponseRedirect('/proc/pay')
-  
 
-def pay_delete(request,id_):
-        s = Transaction.objects.get(id=id_)
-        s.delete()
-        return HttpResponseRedirect('/proc/pay')
     
 def pay_form_add(request,id_=0):
     if request.method=='POST':

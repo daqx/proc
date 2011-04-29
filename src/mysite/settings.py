@@ -92,7 +92,13 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'mysite.middleware.RequireLogin',
 )
+
+LOGIN_REQUIRED_URLS = (
+        r'/proc/login(.*)$', 
+        r'/proc/logout(.*)$',
+    )
 
 ROOT_URLCONF = 'mysite.urls'
 
