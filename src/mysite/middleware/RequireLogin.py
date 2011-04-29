@@ -43,6 +43,6 @@ class RequireLoginMiddleware(object):
         # Requests matching a restricted URL pattern are returned 
         # wrapped with the login_required decorator
         for url in self.required:
-            if url.match(request.path): return login_required(view_func)(request,*view_args,**view_kwargs)
+            if url.match(request.path): return login_required(view_func,login_url='/proc/accounts/login/')(request,*view_args,**view_kwargs)
         # Explicitly return None for all non-matching requests
         return None

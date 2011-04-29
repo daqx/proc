@@ -16,6 +16,6 @@ def to_main(request):
     return HttpResponseRedirect("main/")
 
 
-@login_required(login_url='/proc/accounts/login/')
+
 def main(request):
     return render_to_response('main.html', context_instance=RequestContext(request))
