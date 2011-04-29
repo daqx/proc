@@ -70,7 +70,7 @@ class Agent(models.Model):
 
     def calc_commiss(self,op_serv,summa):
         try:
-            cursor = connection.cursor()
+            #cursor = connection.cursor()
             
             query = 'select t.* from proc_agent_tarif_profile_arr ata, proc_tarifprofile tp, proc_tarifgroup tg,proc_tarifprofile_tarif_group tptg, proc_tarifgroup_tarif tgt, proc_tarif t,proc_opservice os where ata.agent_id=12 and tp.id=ata.tarifprofile_id and tptg.tarifprofile_id=tp.id and tptg.tarifgroup_id=tg.id and tgt.tarifgroup_id=tg.id and tgt.tarif_id=t.id and os.id=t.op_service_id and os.id=%s' % op_serv.id
             tr = Tarif.objects.raw(query)[0]
@@ -103,8 +103,10 @@ class Transaction(models.Model):
 
     def add(self):        
         '''Добавление новой записи'''
-        self.summa_commiss=0
-        self.summa_pay=0
+        ag=self.agent
+        com=ag.calc_commiss(self.opservices,self.summa)
+        self.summa_commiss=com
+        self.summa_pay=self.summa-self.summa_commiss
         ''' ���������� ��������� ��������'''
         #//TODO надо изменитть статус
         self.state=State.objects.all()[0]

@@ -43,22 +43,21 @@ class Tarif(models.Model):
         return self.name
     
     def calc_tarif(self,summa):
-        s=0
+        
         if self.prc==True:              #Расчет по процентам
-           s=summa*self.prc
-           if s < self.min:
-               s=self.min
-           if s > self.max:
-               s=self.max
-               
+           s=summa*self.summa/100
+           if s < self.min and self.min!=0:
+               s=self.min               
+           if s > self.max and self.max!=0:
+               s=self.max               
         else:
             if self.summa!=0:           #Расчет по сумме
-                s=self.summa
+                s=self.summa                
             else:                       #Если сумма 0 тариф вычисляется по массиву сумм тарифа                
                 pass
                 ''' TODO Здесь необходимо реализовать расчет по массиву сумм'''
         
-        return s;   
+        return s
         
     
     class Meta:

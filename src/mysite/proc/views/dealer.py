@@ -24,7 +24,9 @@ def dealer_form(request,id_):
         if form.is_valid():
             a = form.save(commit = False)
             u=User.objects.get(pk=a.user.id)
-            u.username=form.cleaned_data["username"]
+            u.username =form.cleaned_data["username"]
+            u.first_name =form.cleaned_data["first_name"]
+            u.last_name =form.cleaned_data["last_name"]
             u.save()
             a.save()
             return HttpResponseRedirect('/proc/dealer/')
@@ -32,7 +34,7 @@ def dealer_form(request,id_):
             return render_to_response('dealer_form.html', {'form': form},context_instance=RequestContext(request))
     else:        
         s = Dealer.objects.get(id=id_)
-        form=DealerEditForm(instance=s,initial={'username' : s.user.username ,})
+        form=DealerEditForm(instance=s,initial={'username' : s.user.username ,'first_name' : s.user.first_name ,'last_name' : s.user.last_name })
         
         del_url="%s/delete" % id_
         
@@ -75,7 +77,9 @@ def agent_form(request,id_):
         if form.is_valid():
             a = form.save(commit = False)
             u=User.objects.get(pk=a.user.id)
-            u.username=form.cleaned_data["username"]
+            u.username=form.cleaned_data["username"]            
+            u.first_name =form.cleaned_data["first_name"]
+            u.last_name =form.cleaned_data["last_name"]
             u.save()
             a.save()
             return HttpResponseRedirect('/proc/agent/')
@@ -83,7 +87,7 @@ def agent_form(request,id_):
             return render_to_response('agent_form.html', {'form': form},context_instance=RequestContext(request))
     else:        
         s = Agent.objects.get(id=id_)
-        form=AgentEditForm(instance=s,initial={'username' : s.user.username ,})
+        form=AgentEditForm(instance=s,initial={'username' : s.user.username ,'first_name' : s.user.first_name ,'last_name' : s.user.last_name})
         del_url="%s/delete" % id_
                 
         return render_to_response('agent_form.html', {'form': form,'del_url': del_url},context_instance=RequestContext(request))
