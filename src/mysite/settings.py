@@ -105,6 +105,8 @@ LOGIN_REQUIRED_URLS_EXCEPTIONS = (
         
     )
 
+LOGIN_URL='/proc/accounts/login/'
+
 ROOT_URLCONF = 'mysite.urls'
 
 TEMPLATE_DIRS = (
