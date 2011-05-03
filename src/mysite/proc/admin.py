@@ -47,6 +47,10 @@ class DealerAdmin(admin.ModelAdmin):
     
 class KopfAdmin(admin.ModelAdmin):
     list_display=('code','short_name','name')
+
+class MenuAdmin(admin.ModelAdmin):
+    list_display=('code','name','order')
+
     
 class TarifArrAdmin(admin.ModelAdmin):
     list_display=('tarif','summa','min','max',"prc")
@@ -67,6 +71,7 @@ admin.site.register(Addres, AddresAdmin)
 admin.site.register(Country, CountryAdmin)
 admin.site.register(Dealer, DealerAdmin)
 admin.site.register(Kopf, KopfAdmin)
+admin.site.register(Menu, MenuAdmin)
 admin.site.register(OpService, OpServiceAdmin)
 admin.site.register(OpServiceGroup, OpServiceGroupAdmin)
 admin.site.register(ServiceType, ServiceTypeAdmin)

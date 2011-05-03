@@ -36,11 +36,12 @@ class Kopf(models.Model):
         app_label = "proc"
 
 class Menu(models.Model):
-#Klasifikator organizatsionno pravovix form
+#Menu dlya razgranicheniya prav v site
     code        =models.CharField(max_length=20)
     name        =models.CharField(max_length=50)
     order       =models.IntegerField()
-    perms       =models.ForeignKey(Permission)        
+    perms       =models.ForeignKey(Permission)
+    url         =models.CharField(max_length=50,null=True, blank=True)
     
     def __unicode__(self):
         return self.name
