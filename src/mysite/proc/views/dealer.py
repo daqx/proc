@@ -7,14 +7,15 @@ Created on 21.03.2011
 from django.template import loader,Context,RequestContext
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.context_processors import request
-from django.shortcuts import render_to_response
+from django.contrib.auth.decorators import permission_required
+from django.shortcuts import *
 from mysite.proc.models import *
 from mysite.proc.views.forms import *
 
 ''' ================================ DEALER ========================'''
 def dealer(request):
     s_list = Dealer.objects.all()   
-    return render_to_response('dealer.html', {'s_list': s_list})
+    return render(request,'dealer.html', {'s_list': s_list})
 
 def dealer_form(request,id_):
     if request.method=='POST':
@@ -31,14 +32,14 @@ def dealer_form(request,id_):
             a.save()
             return HttpResponseRedirect('/proc/dealer/')
         else:
-            return render_to_response('dealer_form.html', {'form': form},context_instance=RequestContext(request))
+            return render(request,'dealer_form.html', {'form': form})
     else:        
         s = Dealer.objects.get(id=id_)
         form=DealerEditForm(instance=s,initial={'username' : s.user.username ,'first_name' : s.user.first_name ,'last_name' : s.user.last_name })
         
         del_url="%s/delete" % id_
         
-        return render_to_response('dealer_form.html', {'form': form,'del_url': del_url},context_instance=RequestContext(request))
+        return render(request,'dealer_form.html', {'form': form,'del_url': del_url})
 
 def dealer_delete(request,id_):
         s = Dealer.objects.get(id=id_)
@@ -56,17 +57,18 @@ def dealer_form_add(request,id_=0):
             d.save()
             return HttpResponseRedirect('/proc/dealer/')
         else:
-            return render_to_response('dealer_form.html', {'form': form},context_instance=RequestContext(request))
+            return render(request,'dealer_form.html', {'form': form})
     else:
         '''���������� ������ �������'''
         form=DealerForm(initial={'password':'', 'username' : ''})      
-        return render_to_response('dealer_form.html', {'form': form},context_instance=RequestContext(request))
+        return render(request,'dealer_form.html', {'form': form})
     
 ''' ================================ AGENT ========================'''
 
+@permission_required('proc.view_agent')
 def agent(request):
     s_list = Agent.objects.all()    
-    return render_to_response('agent.html', {'s_list': s_list})
+    return render(request,'agent.html', {'s_list': s_list})
 
 def agent_form(request,id_):
     if request.method=='POST':
@@ -84,19 +86,20 @@ def agent_form(request,id_):
             a.save()
             return HttpResponseRedirect('/proc/agent/')
         else:
-            return render_to_response('agent_form.html', {'form': form},context_instance=RequestContext(request))
+            return render(request,'agent_form.html', {'form': form})
     else:        
         s = Agent.objects.get(id=id_)
         form=AgentEditForm(instance=s,initial={'username' : s.user.username ,'first_name' : s.user.first_name ,'last_name' : s.user.last_name})
         del_url="%s/delete" % id_
                 
-        return render_to_response('agent_form.html', {'form': form,'del_url': del_url},context_instance=RequestContext(request))
+        return render(request,'agent_form.html', {'form': form,'del_url': del_url})
 
 def agent_delete(request,id_):
         s = Agent.objects.get(id=id_)
         s.delete()
         return HttpResponseRedirect('/proc/agent')
-    
+
+@permission_required('proc.add_agent')
 def agent_form_add(request,id_=0):
     if request.method=='POST':
         form=AgentForm(request.POST)
@@ -108,9 +111,9 @@ def agent_form_add(request,id_=0):
             d.save()
             return HttpResponseRedirect('/proc/agent/')
         else:
-            return render_to_response('agent_form.html', {'form': form},context_instance=RequestContext(request))
+            return render(request,'agent_form.html', {'form': form})
     else:
         
         form=AgentForm(initial={'password':'', 'username' : ''})      
-        return render_to_response('agent_form.html', {'form': form},context_instance=RequestContext(request))
+        return render(request,'agent_form.html', {'form': form})
        

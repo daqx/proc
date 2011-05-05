@@ -2,14 +2,14 @@
 from django.template import loader,Context,RequestContext
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.context_processors import request
-from django.shortcuts import render_to_response
+from django.shortcuts import *
 from mysite.proc.service_model import *
 from mysite.proc.views.forms import *
 
 
 def service_type(request):
     s_list = ServiceType.objects.all()   
-    return render_to_response('service_type.html', {'s_list': s_list})
+    return render( request,'service_type.html', {'s_list': s_list})
 
 def service_type_form(request,id_):
     if request.method=='POST':
@@ -20,13 +20,13 @@ def service_type_form(request,id_):
             form.save()
             return HttpResponseRedirect('/proc/service_type/')
         else:
-            return render_to_response('servicetype_form.html', {'form': form},context_instance=RequestContext(request))
+            return render( request,'servicetype_form.html', {'form': form})
     else:        
         s = ServiceType.objects.get(id=id_)
         form=ServiceTypeForm(instance=s)
         del_url="%s/delete" % id_
         
-        return render_to_response('servicetype_form.html', {'form': form,'del_url': del_url},context_instance=RequestContext(request))
+        return render( request,'servicetype_form.html', {'form': form,'del_url': del_url})
 
 def service_type_delete(request,id_):
         s = ServiceType.objects.get(id=id_)
@@ -41,11 +41,11 @@ def service_type_form_add(request,id_=0):
             form.save()
             return HttpResponseRedirect('/proc/service_type/')
         else:
-            return render_to_response('servicetype_form.html', {'form': form},context_instance=RequestContext(request))
+            return render( request,'servicetype_form.html', {'form': form})
     else:
         '''Добавление нового объекта'''
         form=ServiceTypeForm()      
-        return render_to_response('servicetype_form.html', {'form': form},context_instance=RequestContext(request))
+        return render( request,'servicetype_form.html', {'form': form})
     
     
 ''' ================================ OP_SERVICE ========================'''
@@ -53,7 +53,7 @@ def service_type_form_add(request,id_=0):
 def op_service(request):
     s_list = OpService.objects.all().order_by('type')
     form=OpServiceForm
-    return render_to_response('op_service.html', {'s_list': s_list})
+    return render( request,'op_service.html', {'s_list': s_list})
 
 def op_service_form(request,id_):
     if request.method=='POST':
@@ -65,13 +65,13 @@ def op_service_form(request,id_):
             form.save()
             return HttpResponseRedirect('/proc/op_service/')
         else:
-            return render_to_response('op_service_form.html', {'form': form},context_instance=RequestContext(request))
+            return render( request,'op_service_form.html', {'form': form})
     else:        
         s = OpService.objects.get(id=id_)
         form=OpServiceForm(instance=s)
         del_url="%s/delete" % id_
         
-        return render_to_response('op_service_form.html', {'form': form,'del_url': del_url},context_instance=RequestContext(request))
+        return render( request,'op_service_form.html', {'form': form,'del_url': del_url})
 
 def op_service_delete(request,id_):
         s = OpService.objects.get(id=id_)
@@ -85,18 +85,18 @@ def op_service_form_add(request,id_=0):
             form.save()
             return HttpResponseRedirect('/proc/op_service/')
         else:
-            return render_to_response('op_service_form.html', {'form': form},context_instance=RequestContext(request))
+            return render( request,'op_service_form.html', {'form': form})
     else:
         '''Добавление нового объекта'''
         form=OpServiceForm()      
-        return render_to_response('op_service_form.html', {'form': form},context_instance=RequestContext(request))
+        return render( request,'op_service_form.html', {'form': form})
 
     ''' ================================ OP_SERVICE ========================'''
 
 def op_service_group(request):
     s_list = OpServiceGroup.objects.all()
     form=OpServiceGroupForm
-    return render_to_response('op_service_group.html', {'s_list': s_list})
+    return render( request,'op_service_group.html', {'s_list': s_list})
 
 def op_service_group_form(request,id_):
     if request.method=='POST':
@@ -108,13 +108,13 @@ def op_service_group_form(request,id_):
             form.save()
             return HttpResponseRedirect('/proc/op_service_group/')
         else:
-            return render_to_response('op_service_group_form.html', {'form': form},context_instance=RequestContext(request))
+            return render( request,'op_service_group_form.html', {'form': form})
     else:        
         s = OpServiceGroup.objects.get(id=id_)
         form=OpServiceGroupForm(instance=s)
         del_url="%s/delete" % id_
         
-        return render_to_response('op_service_group_form.html', {'form': form,'del_url': del_url},context_instance=RequestContext(request))
+        return render( request,'op_service_group_form.html', {'form': form,'del_url': del_url})
 
 def op_service_group_delete(request,id_):
         s = OpServiceGroup.objects.get(id=id_)
@@ -128,9 +128,9 @@ def op_service_group_form_add(request,id_=0):
             form.save()
             return HttpResponseRedirect('/proc/op_service_group/')
         else:
-            return render_to_response('op_service_group_form.html', {'form': form},context_instance=RequestContext(request))
+            return render( request,'op_service_group_form.html', {'form': form})
     else:
         '''Добавление нового объекта'''
         form=OpServiceGroupForm()      
-        return render_to_response('op_service_group_form.html', {'form': form},context_instance=RequestContext(request))
+        return render( request,'op_service_group_form.html', {'form': form})
     

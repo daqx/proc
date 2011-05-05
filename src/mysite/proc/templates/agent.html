@@ -6,7 +6,9 @@ $(function(){
 	$('#dealer tr:odd').css('backgroung-colour','#eeeeee');
 });
 </script>
-<a href="add">Add new</a>
+{% if perms.proc.add_agent %}
+	<a href="add">Add new</a>
+{% endif %}
 <br/>
 <table id='dealer'>
   <tr>

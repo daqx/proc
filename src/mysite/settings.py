@@ -89,8 +89,8 @@ TEMPLATE_LOADERS = (
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'mysite.middleware.RequireLogin.RequireLoginMiddleware',
 )
@@ -108,6 +108,8 @@ LOGIN_REQUIRED_URLS_EXCEPTIONS = (
 LOGIN_URL='/proc/accounts/login/'
 
 ROOT_URLCONF = 'mysite.urls'
+SESSION_EXPIRE_AT_BROWSER_CLOSE=True
+
 
 TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
@@ -122,12 +124,9 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.messages',
-    #'mysite.blog',
-    #'mysite.ordercard',
-    #'mysite.kiosk',
     'mysite.proc',
     # Uncomment the next line to enable the admin:
-    # 'django.contrib.admin',
+    'django.contrib.admin',
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = (
@@ -135,9 +134,10 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.i18n',
     'django.core.context_processors.media',
     'django.core.context_processors.static',
-    'django.contrib.auth.context_processors.auth',
+    'django.core.context_processors.request',    
     'django.contrib.messages.context_processors.messages',
-    'mysite.context_processors.user'
+    'django.contrib.auth.context_processors.auth',
+    #'mysite.context_processors.user',
 )
 
-
+#from django.contrib.auth.context_processors.auth

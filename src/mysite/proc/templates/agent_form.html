@@ -15,10 +15,15 @@
         <table>
             {{ form.as_table }}
         </table>
-        {% if del_url %}
-        	<div><a href="{{del_url}}">Delete</a></div>
+        {% if perms.proc.delete_agent %}
+        	{% if del_url %}
+        		<div><a href="{{del_url}}">Delete</a></div>
+        	{% endif %}
         {% endif %}
-        <input type="submit" value="Submit">
+        
+        {% if perms.proc.change_agent %}
+        	<input type="submit" value="Submit">
+        {% endif %}
     </form>
 
 {%endblock%}

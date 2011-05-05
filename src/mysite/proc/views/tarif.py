@@ -7,7 +7,7 @@ Created on 17.03.2011
 from django.template import loader,Context,RequestContext
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.context_processors import request
-from django.shortcuts import render_to_response
+from django.shortcuts import *
 from mysite.proc.tarif_model import *
 from mysite.proc.views.forms import *
 
@@ -18,7 +18,7 @@ def tarif_arr(request,tr):
     s_list = TarifArr.objects.filter(tarif=tr)
     add_url='%s/add' %tr
     tarif = Tarif.objects.get(pk=tr)
-    return render_to_response('tarif_arr.html', {'s_list': s_list,'add_url': add_url,'tr':tr,'tarif':tarif})
+    return render( request,'tarif_arr.html', {'s_list': s_list,'add_url': add_url,'tr':tr,'tarif':tarif})
 
 def tarif_arr_form(request,tr,id_):
     if request.method=='POST':
@@ -30,13 +30,13 @@ def tarif_arr_form(request,tr,id_):
             form.save()
             return HttpResponseRedirect('/proc/tarif_arr/%s'%tr)
         else:
-            return render_to_response('tarif_arr_form.html', {'form': form},context_instance=RequestContext(request))
+            return render( request,'tarif_arr_form.html', {'form': form})
     else:        
         s = TarifArr.objects.get(id=id_)
         form=TarifArrForm(instance=s)
         del_url="%s/delete" % id_
         
-        return render_to_response('tarif_arr_form.html', {'form': form,'del_url': del_url,'tr':tr,'id':id_},context_instance=RequestContext(request))
+        return render( request,'tarif_arr_form.html', {'form': form,'del_url': del_url,'tr':tr,'id':id_})
 
 def tarif_arr_delete(request,tr,id_):
         s = TarifArr.objects.get(id=id_)
@@ -50,19 +50,19 @@ def tarif_arr_form_add(request,tr,id_=0):
             form.save()
             return HttpResponseRedirect('/proc/tarif_arr/%s'%tr)
         else:
-            return render_to_response('tarif_arr_form.html', {'form': form},context_instance=RequestContext(request))
+            return render( request,'tarif_arr_form.html', {'form': form})
     else:
         a = Tarif.objects.get(pk=tr)
         form=TarifArrForm(initial={'tarif':a})
            
-        return render_to_response('tarif_arr_form.html', {'form': form},context_instance=RequestContext(request))
+        return render( request,'tarif_arr_form.html', {'form': form})
     
 ''' ================================ TARIF ========================'''
 
 def tarif(request):
     s_list = Tarif.objects.all()
     form=TarifForm
-    return render_to_response('tarif.html', {'s_list': s_list})
+    return render( request,'tarif.html', {'s_list': s_list})
 
 def tarif_form(request,id_):
     if request.method=='POST':
@@ -74,14 +74,14 @@ def tarif_form(request,id_):
             form.save()
             return HttpResponseRedirect('/proc/tarif/')
         else:
-            return render_to_response('tarif_form.html', {'form': form},context_instance=RequestContext(request))
+            return render( request,'tarif_form.html', {'form': form})
     else:        
         s = Tarif.objects.get(id=id_)
         form=TarifForm(instance=s)
         del_url="%s/delete" % id_
         arr_url="/proc/tarif_arr/%s" % id_
         
-        return render_to_response('tarif_form.html', {'form': form,'del_url': del_url,'arr_url': arr_url},context_instance=RequestContext(request))
+        return render( request,'tarif_form.html', {'form': form,'del_url': del_url,'arr_url': arr_url})
 
 def tarif_delete(request,id_):
         s = Tarif.objects.get(id=id_)
@@ -95,18 +95,18 @@ def tarif_form_add(request,id_=0):
             form.save()
             return HttpResponseRedirect('/proc/tarif/')
         else:
-            return render_to_response('tarif_form.html', {'form': form},context_instance=RequestContext(request))
+            return render( request,'tarif_form.html', {'form': form})
     else:
         
         form=TarifForm()      
-        return render_to_response('tarif_form.html', {'form': form},context_instance=RequestContext(request))
+        return render( request,'tarif_form.html', {'form': form})
     
     ''' ================================ TARIF GROUP ========================'''
 
 def tarif_group(request):
     s_list = TarifGroup.objects.all()
     form=TarifGroupForm
-    return render_to_response('tarif_group.html', {'s_list': s_list})
+    return render( request,'tarif_group.html', {'s_list': s_list})
 
 def tarif_group_form(request,id_):
     if request.method=='POST':
@@ -118,14 +118,14 @@ def tarif_group_form(request,id_):
             form.save()
             return HttpResponseRedirect('/proc/tarif_group/')
         else:
-            return render_to_response('tarif_group_form.html', {'form': form},context_instance=RequestContext(request))
+            return render( request,'tarif_group_form.html', {'form': form})
     else:        
         s = TarifGroup.objects.get(id=id_)
         form=TarifGroupForm(instance=s)
         del_url="%s/delete" % id_
        
         
-        return render_to_response('tarif_group_form.html', {'form': form,'del_url': del_url},context_instance=RequestContext(request))
+        return render( request,'tarif_group_form.html', {'form': form,'del_url': del_url})
 
 def tarif_group_delete(request,id_):
         s = TarifGroup.objects.get(id=id_)
@@ -139,18 +139,18 @@ def tarif_group_form_add(request,id_=0):
             form.save()
             return HttpResponseRedirect('/proc/tarif_group/')
         else:
-            return render_to_response('tarif_group_form.html', {'form': form},context_instance=RequestContext(request))
+            return render( request,'tarif_group_form.html', {'form': form})
     else:
         
         form=TarifGroupForm()      
-        return render_to_response('tarif_group_form.html', {'form': form},context_instance=RequestContext(request))
+        return render( request,'tarif_group_form.html', {'form': form})
     
 ''' ================================ TARIF profile ========================'''
 
 def tarif_profile(request):
     s_list = TarifProfile.objects.all()
     form=TarifProfileForm
-    return render_to_response('tarif_profile.html', {'s_list': s_list})
+    return render( request,'tarif_profile.html', {'s_list': s_list})
 
 def tarif_profile_form(request,id_):
     if request.method=='POST':
@@ -162,13 +162,13 @@ def tarif_profile_form(request,id_):
             form.save()
             return HttpResponseRedirect('/proc/tarif_profile/')
         else:
-            return render_to_response('tarif_profile_form.html', {'form': form},context_instance=RequestContext(request))
+            return render( request,'tarif_profile_form.html', {'form': form})
     else:        
         s = TarifProfile.objects.get(id=id_)
         form=TarifProfileForm(instance=s)
         del_url="%s/delete" % id_
         
-        return render_to_response('tarif_profile_form.html', {'form': form,'del_url': del_url},context_instance=RequestContext(request))
+        return render( request,'tarif_profile_form.html', {'form': form,'del_url': del_url})
 
 def tarif_profile_delete(request,id_):
         s = TarifProfile.objects.get(id=id_)
@@ -182,8 +182,8 @@ def tarif_profile_form_add(request,id_=0):
             form.save()
             return HttpResponseRedirect('/proc/tarif_profile/')
         else:
-            return render_to_response('tarif_profile_form.html', {'form': form},context_instance=RequestContext(request))
+            return render( request,'tarif_profile_form.html', {'form': form})
     else:
         
         form=TarifProfileForm()      
-        return render_to_response('tarif_profile_form.html', {'form': form},context_instance=RequestContext(request))
+        return render( request,'tarif_profile_form.html', {'form': form})
