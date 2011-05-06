@@ -8,6 +8,7 @@ urlpatterns = patterns('',
     
     (r'^$', include('mysite.proc.urls')),    
     (r'^proc/', include('mysite.proc.urls')),
+    (r'^api/', include('mysite.api.urls')),
 
     # Uncomment the admin/doc line below and add 'django.contrib.admindocs' 
     # to INSTALLED_APPS to enable admin documentation:
