@@ -13,10 +13,12 @@ from mysite.proc.models import *
 from mysite.proc.views.forms import *
 
 ''' ================================ DEALER ========================'''
+@permission_required('proc.view_dealer')
 def dealer(request):
     s_list = Dealer.objects.all()   
     return render(request,'dealer.html', {'s_list': s_list})
 
+@permission_required('proc.change_dealer')
 def dealer_form(request,id_):
     if request.method=='POST':
         a = Dealer.objects.get(pk=id_)
@@ -41,11 +43,13 @@ def dealer_form(request,id_):
         
         return render(request,'dealer_form.html', {'form': form,'del_url': del_url})
 
+@permission_required('proc.delete_dealer')
 def dealer_delete(request,id_):
         s = Dealer.objects.get(id=id_)
         s.delete()
         return HttpResponseRedirect('/proc/dealer')
 
+@permission_required('proc.add_dealer')
 def dealer_form_add(request,id_=0):
     if request.method=='POST':
         form=DealerForm(request.POST)
@@ -70,6 +74,7 @@ def agent(request):
     s_list = Agent.objects.all()    
     return render(request,'agent.html', {'s_list': s_list})
 
+@permission_required('proc.change_agent')
 def agent_form(request,id_):
     if request.method=='POST':
         a = Agent.objects.get(pk=id_)
@@ -94,6 +99,7 @@ def agent_form(request,id_):
                 
         return render(request,'agent_form.html', {'form': form,'del_url': del_url})
 
+@permission_required('proc.delete_agent')
 def agent_delete(request,id_):
         s = Agent.objects.get(id=id_)
         s.delete()
