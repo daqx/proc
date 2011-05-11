@@ -47,18 +47,13 @@ class Dealer(models.Model):
 
 class Agent(models.Model):
     addresses = generic.GenericRelation( Addres, null=True, blank=True )    
-    check_for_ip    =models.BooleanField(default=False)
-    #date_create     =models.DateTimeField(auto_now_add=True)
-    #date_last_visit =models.DateTimeField(auto_now_add=True)
-    dealer          =models.ForeignKey(Dealer, null=True, blank= True)
-    #email           =models.EmailField(blank=True)
+    check_for_ip    =models.BooleanField(default=False)    
+    dealer          =models.ForeignKey(Dealer, null=True, blank= True)    
     name            =models.CharField(max_length=50)
     imei            =models.CharField(max_length=20,blank=True)
-    ipaddresses     = generic.GenericRelation( IpAddress, null=True, blank=True )
-    #login           =models.CharField(max_length=20,unique=True)
+    ipaddresses     = generic.GenericRelation( IpAddress, null=True, blank=True )    
     opservices      =models.ManyToManyField(OpService, null=True, blank=True)
-    opservice_group =models.ManyToManyField(OpServiceGroup)
-    #password        =models.CharField(max_length=100)
+    opservice_group =models.ManyToManyField(OpServiceGroup)    
     tarif_profile_arr=models.ManyToManyField(TarifProfile)
     tel             =models.CharField(max_length=20,blank=True)
     type            =models.CharField(max_length=1,choices=AGENT_TYPE)
@@ -89,12 +84,12 @@ class Transaction(models.Model):
     summa_commiss   =models.FloatField()
     summa_pay       =models.FloatField()    
     state           =models.ForeignKey(State)
-    return_reason   =models.CharField(max_length=100)                           #Причина отказа и служ отметки    
-    date_proc       =models.DateTimeField(null=True, blank=True)                #Дата обработки
-    seans_number    =models.CharField(max_length=20,null=True, blank=True)      #Номер сеанса обработки
-    processed       =models.NullBooleanField(null=True, blank=True)                 #Признак успешной обработки
-    blocked         =models.NullBooleanField(null=True, blank=True)                 #Признак блокировки процессом
-    try_count       =models.FloatField(null=True, blank=True)                   #Количество попыток
+    return_reason   =models.CharField(max_length=100)                           # Причина отказа и служ отметки    
+    date_proc       =models.DateTimeField(null=True, blank=True)                # Дата обработки
+    seans_number    =models.CharField(max_length=20,null=True, blank=True)      # Номер сеанса обработки
+    processed       =models.NullBooleanField(null=True, blank=True)             # Признак успешной обработки
+    blocked         =models.NullBooleanField(null=True, blank=True)             # Признак блокировки процессом
+    try_count       =models.FloatField(null=True, blank=True)                   # Количество попыток
     file_name       =models.CharField(max_length=20,null=True, blank=True)
     user_proc       =models.OneToOneField(User,null=True, blank=True)
     

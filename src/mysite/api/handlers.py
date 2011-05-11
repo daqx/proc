@@ -7,8 +7,8 @@ class AgentHandler(BaseHandler):
    allowed_methods = ('GET',)
    model= Agent
    
-   def read( self, request, expression ):
-        return eval( expression )
+   def read( self, request ):
+        return Agent.objects.all()
     
 
 class CalcHandler( BaseHandler ):

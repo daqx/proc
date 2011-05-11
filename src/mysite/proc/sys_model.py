@@ -3,6 +3,7 @@ from django.db import models
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 from django.contrib.auth.models import Permission
+from mysite.proc.models import *
 
 class State(models.Model):
     code=models.CharField(max_length=20)
@@ -49,3 +50,36 @@ class Menu(models.Model):
     class Meta:             
         app_label = "proc"
     
+    
+CLASS_SOST = (
+        ('T', 'Terminal'),
+        ('C', 'CashCode'),
+        ('P', 'Printer'),
+    )    
+    
+class SostAgent(models.Model):
+#Spravochnik sostoyaniy agenta
+    type        =models.CharField(max_length=1,choices=CLASS_SOST)
+    code        =models.CharField(max_length=50)
+    name        =models.CharField(max_length=50)    
+    
+    def __unicode__(self):
+        return self.name
+    class Meta:             
+        app_label = "proc"
+
+    
+class JourSostAgent(models.Model):
+#Jurnal sostoyaniy terminalov
+    agent       =models.ForeignKey(Agent)
+    date        =models.DateTimeField()    
+    cash_count  =models.IntegerField()                                      # Количество купюр
+    link        =models.BooleanField(default=True)                          # Состояние связи
+    cash_code   =models.ForeignKey(SostAgent, null=True, blank=True)        # Состояние купюроприёмника
+    printer     =models.ForeignKey(SostAgent, null=True, blank=True)        # Состояние термопринтера
+    terminal    =models.ForeignKey(SostAgent, null=True, blank=True)        # Состояние терминала
+    
+    def __unicode__(self):
+        return self.name
+    class Meta:             
+        app_label = "proc"
