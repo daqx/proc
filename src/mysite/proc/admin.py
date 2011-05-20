@@ -65,6 +65,14 @@ class TarifGroupAdmin(admin.ModelAdmin):
     
 class TarifProfileAdmin(admin.ModelAdmin):
     list_display=('name','code','date_begin','date_end')
+    
+class SostAgentAdmin(admin.ModelAdmin):
+    list_display=('name','code','type',)
+    
+
+class JourSostAgentAdmin(admin.ModelAdmin):
+    list_display=('date','agent')
+    
 
 admin.site.register(Agent, AgentAdmin)
 admin.site.register(Addres, AddresAdmin)
@@ -82,3 +90,5 @@ admin.site.register(TarifArr, TarifArrAdmin)
 admin.site.register(TarifGroup, TarifGroupAdmin)
 admin.site.register(TarifProfile, TarifProfileAdmin)
 admin.site.register(Town, TownAdmin)
+admin.site.register(SostAgent, SostAgentAdmin)
+admin.site.register(JourSostAgent, JourSostAgentAdmin)
