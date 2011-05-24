@@ -117,8 +117,7 @@ class ArcMove(models.Model):
     saldo           =models.FloatField()
     summa           =models.FloatField()
     transaction     =models.ForeignKey(Transaction)
-
-    
     
     def __unicode__(self):
         return self.summa
+    
