@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # Django settings for mysite project.
-
+#chi xel hamasha girifti mi?
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
