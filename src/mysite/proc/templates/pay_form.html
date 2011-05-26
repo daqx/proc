@@ -12,8 +12,51 @@
 
 	<form action="" method="post">
     	{% csrf_token %}       
-        <table>
-            {{ form.as_table }}
+        <table>	
+        	{% if request.session.is_admin %}
+        	<tr><th><label for="id_agent">Agent:</label></th>
+            	<td>
+            		<ul>
+						{% for err in form.agent.errors %}
+						<li>{{ err|striptags }}</li>
+						{% endfor %}
+					</ul>
+            		{{ form.agent }}
+				</td>
+			</tr>	
+			{% endif %}
+            <tr><th><label for="id_opservices">Opservices:</label></th>
+            	<td>
+            		<ul>
+						{% for err in form.opservices.errors %}
+						<li>{{ err|striptags }}</li>
+						{% endfor %}
+					</ul>            		
+            		{{ form.opservices }}
+				</td>
+			</tr>
+			<tr><th><label for="id_number_key">Number key:</label></th>
+				<td>
+					<ul>
+						{% for err in form.number_key.errors %}
+						<li>{{ err|striptags }}</li>
+						{% endfor %}
+					</ul>
+					{{ form.number_key }}
+				</td>
+			</tr>
+			<tr><th><label for="id_summa">Summa:</label></th>
+				<td>
+					<ul>
+						{% for err in form.summa.errors %}
+						<li>{{ err }}</li>
+						{% endfor %}
+					</ul>
+					{{ form.summa }}
+				</td>
+			</tr>
+                    
+        
         </table>
         {% if del_url %}
         	<div><a href="{{del_url}}">Delete</a></div>

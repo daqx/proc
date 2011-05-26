@@ -21,6 +21,7 @@ def pay_form(request,id_):
         a = Transaction.objects.get(pk=id_)
 
         form=TransactionForm(request.POST, instance=a)
+        
         #form.type = ServiceType.objects.get(pk= request.POST['type'])
         if form.is_valid():
             a = form.save(commit = False)
@@ -49,8 +50,11 @@ def pay_form_add(request,id_=0):
         if form.is_valid():
             d=form.save(commit=False)            
             user=request.user
-            agent=user.agent
-            d.agent=agent
+            
+            if not request.session["is_admin"]:                         # Если пользователь не АДМИН то
+                agent=user.agent                                        # агент берется с юзера
+                d.agent=agent
+                                                                        # Иначе агент берется с формы
             d.add()
             return HttpResponseRedirect('/proc/pay/')
         else:

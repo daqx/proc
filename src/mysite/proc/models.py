@@ -94,7 +94,7 @@ class Transaction(models.Model):
     user_proc       =models.OneToOneField(User,null=True, blank=True)
     
     def __unicode__(self):
-        return self.summa
+        return '%s %s' % self.summa, self.agent 
 
     def add(self):        
         '''Добавление новой записи'''

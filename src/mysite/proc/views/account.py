@@ -39,6 +39,13 @@ def login(request):
                 request.session["user_type"]="dealer"
             except Dealer.DoesNotExist:
                 pass
+            
+            #s=request.session["user_type"]
+            
+            if "user_type" not in request.session:
+                request.session["user_type"]="admin"
+                request.session["is_admin"] = True
+            
             '''try:
                 request.session["agent"]=Agent.objects.get(user=user)
             except Agent.DoesNotExist:

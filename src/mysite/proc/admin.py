@@ -7,6 +7,9 @@ from mysite.proc.tarif_model import *
 class AddresAdmin(admin.ModelAdmin):
     list_display=('address',)
 
+class ArcMoveAdmin(admin.ModelAdmin):
+    list_display=('date','dealer','dt','summa','saldo')
+
 class ServiceTypeAdmin(admin.ModelAdmin):
     list_display=('code','name','parent')
     search_fields = ('code', 'name')
@@ -75,6 +78,7 @@ class JourSostAgentAdmin(admin.ModelAdmin):
     
 
 admin.site.register(Agent, AgentAdmin)
+admin.site.register(ArcMove, ArcMoveAdmin)
 admin.site.register(Addres, AddresAdmin)
 admin.site.register(Country, CountryAdmin)
 admin.site.register(Dealer, DealerAdmin)
