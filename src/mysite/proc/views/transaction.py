@@ -62,3 +62,28 @@ def pay_form_add(request,id_=0):
     else:        
         form=TransactionForm()      
         return render( request,'pay_form.html', {'form': form})          
+
+''' ================================ FILL_AC ========================
+пополнение счета диллера
+'''
+'''   
+def fill_ac_list(request):
+    s_list = Transaction.objects.all()
+    return render( request,'pay.html', {'s_list': s_list})
+'''    
+def fill_ac_form_add(request,id_=0):
+    if request.method=='POST':
+        form=FillAcForm(request.POST)
+        if form.is_valid():
+            d=form.save(commit=False)            
+                        
+            d.dt=False
+                                                                        # Иначе агент берется с формы
+            d.save()
+            return HttpResponseRedirect('/proc/fill_ac/')
+        else:
+            return render( request,'fill_ac_form.html', {'form': form})
+    else:        
+        form=FillAcForm()      
+        return render( request,'fill_ac_form.html', {'form': form})          
+

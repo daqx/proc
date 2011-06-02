@@ -31,6 +31,8 @@ urlpatterns=patterns('',
     (r'^pay/add/(\d+)$', transaction.pay_form),
     (r'^pay/add/(\d+)/delete$', transaction.pay_delete),
     
+    (r'^fill_ac/add$', transaction.fill_ac_form_add),
+    
     (r'^service_type/$', service.service_type),
     (r'^service_type/(\d+)$', service.service_type_form),
     (r'^service_type/(\d+)/delete$', service.service_type_delete),
