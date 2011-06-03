@@ -75,12 +75,12 @@ def fill_ac_form_add(request,id_=0):
     if request.method=='POST':
         form=FillAcForm(request.POST)
         if form.is_valid():
-            d=form.save(commit=False)            
+            fa=form.save(commit=False)            
                         
-            d.dt=False
+            d=fa.dealer
                                                                         # Иначе агент берется с формы
-            d.save()
-            return HttpResponseRedirect('/proc/fill_ac/')
+            d.fill_ac(fa)
+            return HttpResponseRedirect('/proc/main/')
         else:
             return render( request,'fill_ac_form.html', {'form': form})
     else:        

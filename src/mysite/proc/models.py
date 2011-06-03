@@ -44,9 +44,37 @@ class Dealer(models.Model):
     
     def __str__(self):
         return self.user.username
+    
+    def fill_ac(self, arc):        
+        '''Пополнение счета диллера'''
+        arc.dt = False
+        arc.saldo = self.get_saldo(datetime.now()) 
+        arc.save()
+        
+        super(Dealer, self).save()
+    
+    def get_saldo(self, cdate):
+        try:
+            arc= self.arcmove_set.order_by('-date')[0]
+        except IndexError:
+            return 0
+
+        sum=0
+        ''' Если нет каких записей то это означает что выписка пуста
+            и возвратим 0
+        '''
+        if arc is None:
+            return 0
+        
+        if arc.dt:
+            return arc.saldo+arc.summa
+        else:
+            return arc.saldo-arc.summa
+            
+        
 
 class Agent(models.Model):
-    addresses = generic.GenericRelation( Addres, null=True, blank=True )    
+    addresses       = generic.GenericRelation( Addres, null=True, blank=True )    
     check_for_ip    =models.BooleanField(default=False)    
     dealer          =models.ForeignKey(Dealer, null=True, blank= True)    
     name            =models.CharField(max_length=50)
@@ -59,6 +87,7 @@ class Agent(models.Model):
     type            =models.CharField(max_length=1,choices=AGENT_TYPE)
     state           =models.ForeignKey(State)
     user            =models.OneToOneField(User, blank=True)
+    key_hash        =models.CharField(max_length=10, blank=True, null=True)
     
     def __unicode__(self):
         return self.name
@@ -94,7 +123,7 @@ class Transaction(models.Model):
     user_proc       =models.OneToOneField(User,null=True, blank=True)
     
     def __unicode__(self):
-        return '%s %s' % self.summa, self.agent 
+        return '%s  %s  %s' % (self.agent.user.username, self.summa , self.date) 
 
     def add(self):        
         '''Добавление новой записи'''
@@ -110,6 +139,12 @@ class Transaction(models.Model):
         am=ArcMove(dealer=self.agent.dealer,dt=True,summa=self.summa_pay,transaction=self,saldo=0)
         am.save()
 
+    def delete(self):
+        for item in self.arcmove_set.all():                                 # удалим сначала выписку
+            item.delete()
+        super(Transaction, self).delete()                                   # потом и сам документ
+        
+
 class ArcMove(models.Model):
     date            =models.DateTimeField(auto_now_add=True)
     dealer          =models.ForeignKey(Dealer)
@@ -119,5 +154,5 @@ class ArcMove(models.Model):
     transaction     =models.ForeignKey(Transaction,null=True, blank=True)
     
     def __unicode__(self):
-        return self.summa
+        return '%s  %s  %s' % (self.dealer.user.username, self.summa , self.date)
     
