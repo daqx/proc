@@ -20,7 +20,10 @@ def pay_form(request,id_):
     if request.method=='POST':
         a = Transaction.objects.get(pk=id_)
 
-        form=TransactionForm(request.POST, instance=a)
+        if request.session["is_admin"]:
+            form=TransactionAdminForm(request.POST, instance=a)
+        else:
+            form=TransactionForm(request.POST, instance=a)
         
         #form.type = ServiceType.objects.get(pk= request.POST['type'])
         if form.is_valid():
@@ -33,7 +36,12 @@ def pay_form(request,id_):
     else:       
 
         s = Transaction.objects.get(id=id_)
-        form=TransactionForm(instance=s)
+        
+        if request.session["is_admin"]:
+            form=TransactionAdminForm(instance=s)
+        else:
+            form=TransactionForm(instance=s)
+            
         del_url="%s/delete" % id_
                 
         return render( request,'pay_form.html', {'form': form,'del_url': del_url})
@@ -46,7 +54,13 @@ def pay_delete(request,id_):
     
 def pay_form_add(request,id_=0):
     if request.method=='POST':
-        form=TransactionForm(request.POST)
+        
+        if request.session["is_admin"]:
+            form=TransactionAdminForm(request.POST)
+        else:
+            form=TransactionForm()
+            
+            
         if form.is_valid():
             d=form.save(commit=False)            
             user=request.user
@@ -60,7 +74,11 @@ def pay_form_add(request,id_=0):
         else:
             return render( request,'pay_form.html', {'form': form})
     else:        
-        form=TransactionForm()      
+        if request.session["is_admin"]:
+            form=TransactionAdminForm()
+        else:
+            form=TransactionForm()
+            
         return render( request,'pay_form.html', {'form': form})          
 
 ''' ================================ FILL_AC ========================

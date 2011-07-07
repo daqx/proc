@@ -125,16 +125,20 @@ class Transaction(models.Model):
     def __unicode__(self):
         return '%s  %s  %s' % (self.agent.user.username, self.summa , self.date) 
 
-    def add(self):        
+    def add(self, api = False):        
         '''Добавление новой записи'''
-        ag=self.agent
-        com=ag.calc_commiss(self.opservices,self.summa)
-        self.summa_commiss=com
-        self.summa_pay=self.summa-self.summa_commiss
-        ''' ���������� ��������� ��������'''
+        
+        #  Если не используем API то вычисляем комиссию и сумму платежа
+        if not api:
+            ag=self.agent
+            com=ag.calc_commiss(self.opservices,self.summa)
+            self.summa_commiss=com
+            self.summa_pay=self.summa-self.summa_commiss
+        
         #//TODO надо изменитть статус
         self.state=State.objects.all()[0]
-        ''' Сохраним все данные '''
+        
+        # Сохраним все данные
         super(Transaction, self).save()
         am=ArcMove(dealer=self.agent.dealer,dt=True,summa=self.summa_pay,transaction=self,saldo=0)
         am.save()

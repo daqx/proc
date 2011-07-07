@@ -94,7 +94,14 @@ class TransactionForm(forms.ModelForm):
     
     class Meta:
         model=Transaction
+        exclude=('agent','state','summa_commiss','summa_pay','blocked','return_reason','date_proc','seans_number','processed','blocked','try_count','file_name','user_proc')
+
+class TransactionAdminForm(forms.ModelForm):    
+    
+    class Meta:
+        model=Transaction
         exclude=('state','summa_commiss','summa_pay','blocked','return_reason','date_proc','seans_number','processed','blocked','try_count','file_name','user_proc')
+
 
 class FillAcForm(forms.ModelForm):    
     class Meta:
