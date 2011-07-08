@@ -28,6 +28,9 @@ def login(request):
         if user is not None and user.is_active:
             # Correct password, and the user is marked "active"
             auth.login(request, user)
+            
+            request.session["is_admin"] = False
+            
             try:
                 d=user.agent
                 request.session["user_type"]="agent"

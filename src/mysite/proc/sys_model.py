@@ -16,6 +16,19 @@ class State(models.Model):
     def __unicode__(self):
         return self.name
     
+class Status(models.Model):
+    ''' Статусы документов по продуктам '''
+    code = models.CharField(max_length=20, unique=True)
+    name = models.CharField(max_length=50)
+    product = models.CharField(max_length=50,null=True, blank=True)
+            
+    class Meta:             
+        app_label = "proc"
+        
+    def __unicode__(self):
+        return self.name
+
+    
 class IpAddress(models.Model):
     content_type = models.ForeignKey(ContentType, related_name='ipaddresses')
     object_id = models.IntegerField()
@@ -27,8 +40,9 @@ class IpAddress(models.Model):
         return self.ip
     class Meta:             
         app_label = "proc"
+        
 class Kopf(models.Model):
-#Klasifikator organizatsionno pravovix form
+    ''' Klasifikator organizatsionno pravovix form '''
     code        =models.CharField(max_length=5)
     name        =models.CharField(max_length=50)
     short_name  =models.CharField(max_length=5)        

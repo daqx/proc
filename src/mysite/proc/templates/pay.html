@@ -1,3 +1,4 @@
+
 {%extends "base.html"%}
 {%block content%}
 <script type="text/javascript">
@@ -10,13 +11,14 @@ $(function(){
 <br/>
 <table id='pay'>
   <tr>
-    <th>AGENT</th>
-    <th>NUMBER</th>
-    <th>SUMMA</th>
-    <th>SUM_PAY</th>
-    <th>COMMISS</th>
-    <th>DATA</th>    
-    <th>DEALER</th>
+    <th>агент</th>
+    <th>номер</th>
+    <th>сумма</th>
+    <th>сумма платежа</th>
+    <th>комиссия</th>
+    <th>дата</th>    
+    <th>диллер</th>
+    <th>статус</th>
     
   </tr>
 
@@ -29,6 +31,7 @@ $(function(){
     <td>{{s.summa_commiss}}</td>
     <td>{{s.date|date:"j F Y"}}</td>
     <td>{{s.agent.dealer.user.username}}</td>
+    <td>{{s.status.name}}</td>
     
   </tr>
 

@@ -39,6 +39,9 @@ class TownAdmin(admin.ModelAdmin):
     
 class StateAdmin(admin.ModelAdmin):
     list_display=('code','name')
+
+class StatusAdmin(admin.ModelAdmin):
+    list_display=('code','name', 'product')
     
 class AgentAdmin(admin.ModelAdmin):
     list_display=('user','state')
@@ -89,10 +92,11 @@ admin.site.register(OpServiceGroup, OpServiceGroupAdmin)
 admin.site.register(ServiceType, ServiceTypeAdmin)
 admin.site.register(Region, RegionAdmin)
 admin.site.register(State, StateAdmin)
+admin.site.register(Status, StatusAdmin)
+admin.site.register(SostAgent, SostAgentAdmin)
 admin.site.register(Tarif, TarifAdmin)
 admin.site.register(TarifArr, TarifArrAdmin)
 admin.site.register(TarifGroup, TarifGroupAdmin)
 admin.site.register(TarifProfile, TarifProfileAdmin)
 admin.site.register(Town, TownAdmin)
-admin.site.register(SostAgent, SostAgentAdmin)
 admin.site.register(JourSostAgent, JourSostAgentAdmin)

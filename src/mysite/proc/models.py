@@ -112,7 +112,7 @@ class Transaction(models.Model):
     summa           =models.FloatField()
     summa_commiss   =models.FloatField()
     summa_pay       =models.FloatField()    
-    state           =models.ForeignKey(State)
+    status          =models.ForeignKey(Status)
     return_reason   =models.CharField(max_length=100)                           # Причина отказа и служ отметки    
     date_proc       =models.DateTimeField(null=True, blank=True)                # Дата обработки
     seans_number    =models.CharField(max_length=20,null=True, blank=True)      # Номер сеанса обработки
@@ -136,7 +136,7 @@ class Transaction(models.Model):
             self.summa_pay=self.summa-self.summa_commiss
         
         #//TODO надо изменитть статус
-        self.state=State.objects.all()[0]
+        self.status=Status.objects.get(code="REGISTERED")
         
         # Сохраним все данные
         super(Transaction, self).save()
@@ -144,6 +144,7 @@ class Transaction(models.Model):
         am.save()
 
     def delete(self):
+        ''' Удаление транзакций '''
         for item in self.arcmove_set.all():                                 # удалим сначала выписку
             item.delete()
         super(Transaction, self).delete()                                   # потом и сам документ

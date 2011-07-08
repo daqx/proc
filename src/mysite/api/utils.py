@@ -17,6 +17,10 @@ def transfer(body_):
         tr.number_key = body_["nomer"]
         tr.summa = body_["summa"]
         tr.summa_pay = body_["summa_zachis"]
+        
+        # TODO Пока оставим это так
+        tr.summa_commiss = tr.summa - tr.summa_pay 
+        
         tr.agent = ag 
         
         tr.add(api = True)
