@@ -94,6 +94,7 @@ class JourSostAgent(models.Model):
     printer     =models.ForeignKey(SostAgent, related_name="printer", null=True, blank=True)         # Состояние термопринтера
     terminal    =models.ForeignKey(SostAgent, related_name="terminal", null=True, blank=True)        # Состояние терминала
     
+    
     def __unicode__(self):
         return "%s" % self.date
     
