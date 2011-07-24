@@ -100,3 +100,23 @@ class JourSostAgent(models.Model):
     
     class Meta:             
         app_label = "proc"
+
+
+class ActualState(models.Model):
+    ''' В этом типе хранится самое последнее состояние агента
+        используется для мониторинга состояния терминалов
+    '''
+    agent       =models.ForeignKey("Agent")
+    date        =models.DateTimeField()    
+    cash_count  =models.IntegerField()                                      # Количество купюр
+    link        =models.BooleanField(default=True)                          # Состояние связи
+    cash_code   =models.ForeignKey(SostAgent, related_name="ac_cash_code" ,null=True, blank=True)       # Состояние купюроприёмника
+    printer     =models.ForeignKey(SostAgent, related_name="ac_printer", null=True, blank=True)         # Состояние термопринтера
+    terminal    =models.ForeignKey(SostAgent, related_name="ac_terminal", null=True, blank=True)        # Состояние терминала
+    
+    
+    def __unicode__(self):
+        return "%s" % self.date
+    
+    class Meta:             
+        app_label = "proc"

@@ -3,20 +3,41 @@
 from piston.handler import BaseHandler
 from mysite.proc.models import *
 from mysite.proc.sys_class import *
-#from django.utils import simplejson
+from django.utils import simplejson
 
-def transfer( body_, login_):
-    ''' Функция вставки нового платежа '''
-    print body_
+def isNoneId(obj):
+    ''' Возвращает ID объекта если он не пустой(None)
+        иначе возвращает None
+    '''
+    if obj is not None:
+        return obj.id
+    else:
+        return None
+
+def transfer( body_, login_, retval_):
+    ''' Функция вставки нового платежа '''    
+    retval_["status"] = "0"
+        
     tr = Transaction()                          # Инициируем новый объект Transaction
+    
     
     try:
         ag = Agent.objects.filter(user__username = login_)[0]           # Достанем Агента
+    
+        # проверить есть ли перевод с таким же hesh_id от этого терминала
+        try:
+            trans = Transaction.objects.filter(agent=ag.id, hesh_id=body_["hesh_id"])
+        except(Transaction.DoesNotExist):
+            pass
+        else:
+            retval_["status"] = "-1"
+            return
             
         tr.opservices = OpService.objects.get(id= body_["id_uslugi"])
         tr.number_key = body_["nomer"]
         tr.summa = body_["summa"]
         tr.summa_pay = body_["summa_zachis"]
+        tr.hesh_id = body_["hesh_id"]
         
         #TODO: Пока оставим это так
         tr.summa_commiss = tr.summa - tr.summa_pay 
@@ -25,52 +46,64 @@ def transfer( body_, login_):
         
         tr.add(api = True)
     except(IndexError, Agent.DoesNotExist, OpService.DoesNotExist) :
-        return "-1"
+        retval_["status"] = "-1"
     
-    return "0"                                  # Если все нормально прошло то возвращается 0
+    #return retval                                  # Если все нормально прошло то возвращается 0
 
 
 
-def get_opservices(login_):
+def get_opservices(login_, retval_):
     ''' Функция возвращает все доступные операторы услуг для заданного агента '''
     
+    retval_["status"] = "0"
+    
     try:
         id = Agent.objects.filter(user__username = login_)[0].id        # Достанем id Агента
     except(IndexError, Agent.DoesNotExist) :
+        retval_["status"]="-1"
         return "-1"
     
-    query="select o.* from proc_opservice o, proc_agent_opservices ao where o.id=ao.opservice_id and ao.agent_id= %s  union   select o.* from proc_opservice o, proc_agent_opservice_group aog, proc_opservicegroup_opservice ogo where  aog.opservicegroup_id=ogo.opservicegroup_id and aog.agent_id = %s" % (12, 12)
+    query="select o.* from proc_opservice o, proc_agent_opservices ao where o.id=ao.opservice_id and ao.agent_id= %s  union   select o.* from proc_opservice o, proc_agent_opservice_group aog, proc_opservicegroup_opservice ogo where  aog.opservicegroup_id=ogo.opservicegroup_id and aog.agent_id = %s" % (id, id)
     
     op = OpService.objects.raw(query)[0:]
-
-    return op
+    data = simplejson.dumps([{"code": o.code, "name": o.name, "need_check": o.need_check, "mask": o.mask, "state": o.state.id, "type": o.type.id, "order": o.order} for o in op])
+    retval_["body"] = data
+    return 0
      
 
-def get_optype(login_):
-    ''' Функция возвращает все типы '''
+def get_optype(login_, retval_):
+    ''' Функция возвращает все типы услуг'''
+    
+    retval_["status"] = "0"
     
     try:
         id = Agent.objects.filter(user__username = login_)[0].id        # Достанем id Агента
     except(IndexError, Agent.DoesNotExist) :
+        retval_["status"]="-1"
         return "-1"
            
     opt = ServiceType.objects.all()
+    data = simplejson.dumps([{"code": o.code, "name": o.name, "parent": isNoneId(o.parent), "order": o.order} for o in opt])
+    retval_["body"] = data
+    return 0
 
-    return opt
 
 
 
-
-def do_job(act_, body_, login_):
+def do_job(act_, body_, login_, retval_):
     ''' Функция обработки команд '''        
-    ret = "-1"
-    if act_ == "0":                             # Новый платеж
-        ret = transfer( body_, login_)
-    if act_ == "5":                             # Запрос доступных операторов услуг
-        ret = get_optype(login_);
-    if act_ == "6":                             # Запрос доступных операторов услуг
-        ret = get_opservices(login_);
     
+    retval_["status"] = "0"
     
-    return ret
+    if act_ == "0":                                 # Новый платеж
+        transfer( body_, login_, retval_)
+    elif act_ == "1":                               # Для журналирования состояния
+        ret = "0"
+        #TODO: мониторинг состояния
+    elif act_ == "5":                               # Запрос типов операторов услуг
+        ret = get_optype(login_, retval_);
+    elif act_ == "6":                               # Запрос доступных операторов услуг
+        ret = get_opservices(login_, retval_);
+        
+    
     

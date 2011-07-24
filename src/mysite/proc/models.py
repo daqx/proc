@@ -121,6 +121,7 @@ class Transaction(models.Model):
     try_count       =models.FloatField(null=True, blank=True)                   # Количество попыток
     file_name       =models.CharField(max_length=20,null=True, blank=True)
     user_proc       =models.OneToOneField(User,null=True, blank=True)
+    hesh_id         =models.CharField(max_length=40,null=True, blank=True)
     
     def __unicode__(self):
         return '%s  %s  %s' % (self.agent.user.username, self.summa , self.date) 
