@@ -15,7 +15,9 @@ def isNoneId(obj):
         return None
 
 def transfer( body_, login_, retval_):
-    ''' Функция вставки нового платежа '''    
+    ''' Функция вставки нового платежа 
+        ACT = 0
+    '''    
     retval_["status"] = "0"
         
     tr = Transaction()                          # Инициируем новый объект Transaction
@@ -51,6 +53,48 @@ def transfer( body_, login_, retval_):
     #return retval                                  # Если все нормально прошло то возвращается 0
 
 
+def reg_sost( body_, login_, retval_):
+    ''' Регистрация состояния терминала
+        ACT = 1
+    '''
+    try:
+        ag = Agent.objects.filter(user__username = login_)[0]           # Достанем Агента
+    except(IndexError, Agent.DoesNotExist) :
+        try:
+            ag = Agent.objects.filter(key_hash = login_)[0]           # Достанем Агента по хешу ключа
+        except(IndexError, Agent.DoesNotExist) :
+            retval_["status"] = "-1"
+            return 0
+    
+    js = JourSostAgent()
+    actS = ActualState()    
+    
+    if "cash_count" in body_:
+        js.cash_count = body_["cash_count"]
+        actS.cash_count = js.cash_count
+        
+    if "link" in body_:
+        js.link = body_["link"]
+        actS.link = js.link
+        
+    if "cash_code" in body_:
+        sa = SostAgent.objects.filter(type = "C", code = body_["cash_code"])
+        js.cash_code = sa
+        actS.cash_code = js.cash_code
+        
+    if "printer" in body_:
+        sa = SostAgent.objects.filter(type = "P", code = body_["printer"])        
+        js.printer = sa
+        actS.printer = js.printer
+        
+    if "terminal" in body_:
+        sa = SostAgent.objects.filter(type = "T", code = body_["terminal"])
+        js.terminal = sa
+        actS.terminal = js.terminal
+    
+    
+
+    
 
 def get_opservices(login_, retval_):
     ''' Функция возвращает все доступные операторы услуг для заданного агента '''
@@ -98,6 +142,7 @@ def do_job(act_, body_, login_, retval_):
     if act_ == "0":                                 # Новый платеж
         transfer( body_, login_, retval_)
     elif act_ == "1":                               # Для журналирования состояния
+        reg_sost( body_, login_, retval_)
         ret = "0"
         #TODO: мониторинг состояния
     elif act_ == "5":                               # Запрос типов операторов услуг

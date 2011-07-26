@@ -88,6 +88,8 @@ class Agent(models.Model):
     state           =models.ForeignKey(State)
     user            =models.OneToOneField(User, blank=True)
     key_hash        =models.CharField(max_length=10, blank=True, null=True)
+    hardware        =models.CharField(max_length=150, blank=True, null=True)
+    cashcode_capacity=models.IntegerField(blank=True, null=True)
     
     def __unicode__(self):
         return self.name
