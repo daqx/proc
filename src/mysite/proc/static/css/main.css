@@ -242,3 +242,43 @@ input[type="text"], input[type="password"], textarea, select, .vTextField {
       text-align:   center;
       padding-right:  1px;
     }
+
+.object-tools {
+    float: right;
+    font-family: Arial,Helvetica,sans-serif;
+    font-size: 10px;
+    font-weight: bold;
+    margin-bottom: -2em;
+    /*margin-top: -2.4em;*/
+    padding-left: 0;
+    position: relative;
+}
+.form-row .object-tools {
+    float: none;
+    height: 2em;
+    margin-bottom: 5px;
+    margin-top: 5px;
+    padding-left: 3.5em;
+}
+.object-tools li {
+    background: url("/proc/static/img/tool-left.gif") no-repeat scroll 0 0 transparent;
+    display: block;
+    float: left;
+    height: 16px;
+    margin-left: 2px;
+    padding: 0 0 0 8px;
+}
+.object-tools li:hover {
+    background: url("/proc/static/img/tool-left_over.gif") no-repeat scroll 0 0 transparent;
+}
+.object-tools a:link, .object-tools a:visited {
+    background: url("/proc/static/img/tool-right.gif") no-repeat scroll 100% 0 #999999;
+    color: white;
+    display: block;
+    float: left;
+    height: 14px;
+    padding: 0.1em 14px 0.1em 8px;
+}
+.object-tools a:hover, .object-tools li:hover a {
+    background: url("/proc/static/img/tool-right_over.gif") no-repeat scroll 100% 0 #5B80B2;
+}

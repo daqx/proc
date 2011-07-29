@@ -57,6 +57,9 @@ def reg_sost( body_, login_, retval_):
     ''' Регистрация состояния терминала
         ACT = 1
     '''
+    
+    retval_["status"] = "0"
+    
     try:
         ag = Agent.objects.filter(user__username = login_)[0]           # Достанем Агента
     except(IndexError, Agent.DoesNotExist) :
@@ -67,32 +70,47 @@ def reg_sost( body_, login_, retval_):
             return 0
     
     js = JourSostAgent()
-    actS = ActualState()    
+    actS = ActualState()
+    
+    js.agent = ag
+    actS.agent = ag
+    
+    
+    if "date" in body_:
+        js.date = body_["date"]
+        actS.date = js.date
     
     if "cash_count" in body_:
         js.cash_count = body_["cash_count"]
         actS.cash_count = js.cash_count
         
     if "link" in body_:
-        js.link = body_["link"]
+        js.link = bool(int(body_["link"]))
         actS.link = js.link
         
     if "cash_code" in body_:
-        sa = SostAgent.objects.filter(type = "C", code = body_["cash_code"])
+        sa = SostAgent.objects.filter(type = "C", code = body_["cash_code"])[0]
         js.cash_code = sa
         actS.cash_code = js.cash_code
         
     if "printer" in body_:
-        sa = SostAgent.objects.filter(type = "P", code = body_["printer"])        
+        sa = SostAgent.objects.filter(type = "P", code = body_["printer"])[0]      
         js.printer = sa
         actS.printer = js.printer
         
     if "terminal" in body_:
-        sa = SostAgent.objects.filter(type = "T", code = body_["terminal"])
+        sa = SostAgent.objects.filter(type = "T", code = body_["terminal"])[0]
         js.terminal = sa
         actS.terminal = js.terminal
     
+    # сохраним новый статус агента в журнале состояний
+    js.save()
     
+    # Очистим статус этого агента в таблице для мониторинга
+    ActualState.objects.filter(agent=ag).delete()
+    
+    # И сохраним новый статус агента
+    actS.save()
 
     
 
@@ -143,8 +161,7 @@ def do_job(act_, body_, login_, retval_):
         transfer( body_, login_, retval_)
     elif act_ == "1":                               # Для журналирования состояния
         reg_sost( body_, login_, retval_)
-        ret = "0"
-        #TODO: мониторинг состояния
+        ret = "0"        
     elif act_ == "5":                               # Запрос типов операторов услуг
         ret = get_optype(login_, retval_);
     elif act_ == "6":                               # Запрос доступных операторов услуг

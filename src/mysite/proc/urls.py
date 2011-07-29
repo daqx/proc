@@ -11,6 +11,7 @@ from mysite.proc.views import dealer
 from mysite.proc.views import account
 from mysite.proc.views import system
 from mysite.proc.views import transaction
+from mysite.proc.views import monitor
 
 urlpatterns=patterns('',
     #url(r'^$',archive),
@@ -105,6 +106,9 @@ urlpatterns=patterns('',
     (r'^agent/add$', dealer.agent_form_add),
     (r'^agent/add/(\d+)$', dealer.agent_form),
     (r'^agent/add/(\d+)/delete$', dealer.agent_delete),
+    # ============== MONITORING ===============
+    (r'^monitor/$', monitor.show),
+    (r'^monitor/logs/(\d+)$', monitor.journal),
     #(r'^login/$', login_view),
     #(r'^contact/$', contact),
     #(r'^contact_form/$', contact_form),

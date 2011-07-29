@@ -78,6 +78,9 @@ class SostAgentAdmin(admin.ModelAdmin):
 
 class JourSostAgentAdmin(admin.ModelAdmin):
     list_display=('date','agent')
+
+class ActualStateAdmin(admin.ModelAdmin):
+    list_display=('date','agent')
     
 
 admin.site.register(Agent, AgentAdmin)
@@ -100,3 +103,4 @@ admin.site.register(TarifGroup, TarifGroupAdmin)
 admin.site.register(TarifProfile, TarifProfileAdmin)
 admin.site.register(Town, TownAdmin)
 admin.site.register(JourSostAgent, JourSostAgentAdmin)
+admin.site.register(ActualState, ActualStateAdmin)

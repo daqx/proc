@@ -1,0 +1,41 @@
+{%extends "base.html"%} {%block content%}
+<script type="text/javascript">
+
+$(function(){
+	$('#dealer tr:odd').css('backgroung-colour','#eeeeee');
+});
+</script>
+
+<br />
+<table id='dealer'>
+	<tr>
+		<th>Агент</th>
+		<th>Дата</th>
+		<th>Связь</th>
+		<th>Количество купюр</th>
+		<th>Состояние купюроприемника</th>
+		<th>Состояние принтера</th>
+		<th>Состояние терминала</th>
+
+	</tr>
+
+	{%for s in s_list %}
+	<tr>
+		<td>{{s.agent.user.username}}</a>
+		</td>
+		<td>{{s.date|date:"d.m.y H:i:s"}}</td>
+		<td>{% if s.link %} <img src="/proc/static/img/icon-yes.gif" />
+			{% else %} <img src="/proc/static/img/icon-no.gif" /> {% endif %}</td>
+
+		<td>{{s.cash_count}}</td>
+		<td>{{s.cash_code.name}}</td>
+		<td>{{s.printer.name}}</td>
+		<td>{{s.terminal.name}}</td>
+
+
+	</tr>
+
+	{%endfor %}
+</table>
+
+{%endblock%}

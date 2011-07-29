@@ -1,4 +1,4 @@
-#Thu Jul 07 09:53:41 UZT 2011
+#Fri Jul 29 15:08:36 UZT 2011
 eclipse.preferences.version=1
 encoding//src/mysite/api/handlers.py=utf-8
 encoding//src/mysite/api/utils.py=utf-8
@@ -11,6 +11,8 @@ encoding//src/mysite/proc/views/account.py=utf-8
 encoding//src/mysite/proc/views/address.py=utf-8
 encoding//src/mysite/proc/views/dealer.py=utf-8
 encoding//src/mysite/proc/views/forms.py=utf-8
+encoding//src/mysite/proc/views/grids.py=utf-8
+encoding//src/mysite/proc/views/monitor.py=utf-8
 encoding//src/mysite/proc/views/service.py=utf-8
 encoding//src/mysite/proc/views/system.py=utf-8
 encoding//src/mysite/proc/views/tarif.py=utf-8

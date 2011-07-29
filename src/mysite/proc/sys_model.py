@@ -85,11 +85,11 @@ class SostAgent(models.Model):
 
     
 class JourSostAgent(models.Model):
-#Jurnal sostoyaniy terminalov
+    ''' Jurnal sostoyaniy terminalov '''
     agent       =models.ForeignKey("Agent")
     date        =models.DateTimeField()    
-    cash_count  =models.IntegerField()                                      # Количество купюр
-    link        =models.BooleanField(default=True)                          # Состояние связи
+    cash_count  =models.IntegerField(null=True, blank=True)                                          # Количество купюр
+    link        =models.BooleanField(default=True)                                                   # Состояние связи
     cash_code   =models.ForeignKey(SostAgent, related_name="cash_code" ,null=True, blank=True)       # Состояние купюроприёмника
     printer     =models.ForeignKey(SostAgent, related_name="printer", null=True, blank=True)         # Состояние термопринтера
     terminal    =models.ForeignKey(SostAgent, related_name="terminal", null=True, blank=True)        # Состояние терминала
@@ -108,8 +108,8 @@ class ActualState(models.Model):
     '''
     agent       =models.ForeignKey("Agent")
     date        =models.DateTimeField()    
-    cash_count  =models.IntegerField()                                      # Количество купюр
-    link        =models.BooleanField(default=True)                          # Состояние связи
+    cash_count  =models.IntegerField(null=True, blank=True)                                             # Количество купюр
+    link        =models.BooleanField(default=True)                                                      # Состояние связи
     cash_code   =models.ForeignKey(SostAgent, related_name="ac_cash_code" ,null=True, blank=True)       # Состояние купюроприёмника
     printer     =models.ForeignKey(SostAgent, related_name="ac_printer", null=True, blank=True)         # Состояние термопринтера
     terminal    =models.ForeignKey(SostAgent, related_name="ac_terminal", null=True, blank=True)        # Состояние терминала

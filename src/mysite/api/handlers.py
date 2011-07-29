@@ -28,7 +28,7 @@ class ListenHandler(BaseHandler):
         try:
             j_data = simplejson.loads(expression)               # Зачитаем в переменную объект сообщения (Message)
             
-            user = auth.authenticate(username = j_data["login"], password = j_data["password"])
+            user = auth.authenticate(username = j_data["login"], password = j_data["passw"])
             
                         
             if j_data["body"]!="":
@@ -50,10 +50,10 @@ class ListenHandler(BaseHandler):
         
             ret = do_job(j_data["act"], j_body, j_data["login"], retval)                 # Отправим тело сообщения на обработку
 
-        except: #Exception as inst:
-            #print type(inst)     # the exception instance
-            #print inst.args      # arguments stored in .args
-            #print inst
+        except Exception as inst:
+            print type(inst)     # the exception instance
+            print inst.args      # arguments stored in .args
+            print inst
             retval["status"]  = "-1"
         
         return retval

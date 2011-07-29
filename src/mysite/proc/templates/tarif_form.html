@@ -22,9 +22,11 @@
 	        {% endif %}
         </table>
         {% if del_url %}
-        	<div><a href="{{del_url}}">Delete</a></div>
+        	<ul class="object-tools">
+				<li><a href="{{del_url}}">Удалить</a></li>
+			</ul>
         {% endif %}
-        <input type="submit" value="Submit">
+        <input type="submit" value="Сохранить">
     </form>
 
 {%endblock%}

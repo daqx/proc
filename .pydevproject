@@ -12,5 +12,6 @@
 </pydev_variables_property>
 <pydev_pathproperty name="org.python.pydev.PROJECT_SOURCE_PATH">
 <path>/proc/src</path>
+<path>/proc/mysite.proc.utils</path>
 </pydev_pathproperty>
 </pydev_project>

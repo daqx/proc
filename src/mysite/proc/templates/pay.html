@@ -7,8 +7,13 @@ $(function(){
 	$('#dealer tr:odd').css('backgroung-colour','#eeeeee');
 });
 </script>
-<a href="add">Add new</a>
-<br/>
+{% if perms.proc.add_transaction %}
+	<ul class="object-tools">
+		<li>
+			<a href="add">	Добавить</a>
+		</li>
+	</ul>
+{% endif %}<br/>
 <table id='pay'>
   <tr>
     <th>агент</th>

@@ -7,7 +7,11 @@ $(function(){
 });
 </script>
 {% if perms.proc.add_agent %}
-	<a href="add">Add new</a>
+	<ul class="object-tools">
+		<li>
+			<a href="add">	Добавить</a>
+		</li>
+	</ul>
 {% endif %}
 <br/>
 <table id='dealer'>
