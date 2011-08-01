@@ -6,7 +6,7 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
     
-    (r'^$', include('mysite.proc.urls')),    
+    #(r'^$', include('mysite.proc.urls')),    
     (r'^proc/', include('mysite.proc.urls')),
     (r'^api/', include('mysite.api.urls')),
 

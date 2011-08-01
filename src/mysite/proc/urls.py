@@ -3,7 +3,7 @@ from django.conf.project_template.urls import urlpatterns
 from django.conf import settings
 #from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
-from mysite.proc.views import *
+#from mysite.proc.views import *
 from mysite.proc.views import service
 from mysite.proc.views import address
 from mysite.proc.views import tarif
@@ -12,11 +12,14 @@ from mysite.proc.views import account
 from mysite.proc.views import system
 from mysite.proc.views import transaction
 from mysite.proc.views import monitor
+#from mysite.proc.views import monitor
+
 
 urlpatterns=patterns('',
-    #url(r'^$',archive),
-    #(r'', include('staticfiles.urls')),
-    
+    #url(r'^$', system.main),    
+    #url(r'^examplegrid/$', monitor.grid_handler, name='grid_handler'),
+    #url(r'^examplegrid/cfg/$', monitor.grid_config, name='grid_config'),
+        
     (r'^static/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.STATIC_ROOT}),
 
     (r'^accounts/login/$',  account.login),
@@ -30,8 +33,8 @@ urlpatterns=patterns('',
     (r'^pay/(\d+)/delete$', transaction.pay_delete),
     (r'^pay/add$', transaction.pay_form_add),
     (r'^pay/add/(\d+)$', transaction.pay_form),
-    (r'^pay/add/(\d+)/delete$', transaction.pay_delete),
-    
+    (r'^pay/add/(\d+)/delete$', transaction.pay_delete),        
+
     (r'^fill_ac/add$', transaction.fill_ac_form_add),
     
     (r'^service_type/$', service.service_type),
@@ -109,8 +112,11 @@ urlpatterns=patterns('',
     # ============== MONITORING ===============
     (r'^monitor/$', monitor.show),
     (r'^monitor/logs/(\d+)$', monitor.journal),
+    
     #(r'^login/$', login_view),
     #(r'^contact/$', contact),
     #(r'^contact_form/$', contact_form),
+    
+    
                      
 )
