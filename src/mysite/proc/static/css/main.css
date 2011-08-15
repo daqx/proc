@@ -8,7 +8,7 @@ text .h1 {padding: 2px 2px; background: #fff4a1}
 text .h2 {color: #bf8ddd; border-top: 1px dotted #fff; margin-top: 2em}
 
 
-table {
+.tbl table {
   border-collapse: collapse;
   border: 1 1 1 1 blue;
   width: auto;
@@ -16,7 +16,7 @@ table {
   font-size: 1.1em; 
 }
 
-th {
+.tbl th {
   background: #3e83c9;
   color: #fff;
   font-weight: bold;
@@ -26,21 +26,21 @@ th {
   line-height: 1.2;
 }
 
-td {
+.tbl td {
   padding: 6px 11px;
   border-bottom: 1px solid #95bce2;
   vertical-align: top;
 }
 
-td * {
+.tbl td * {
   padding: 2px 2px;
 }
 
-tr.alt td {
+.tbl tr.alt td {
   background: #ecf6fc;
 }
 
-tr.over td, tr:hover td {
+.tbl tr.over td, .tbl tr:hover td {
   background: #bcd4ec;
 }
 

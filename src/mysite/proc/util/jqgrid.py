@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright (c) 2009, Gerry Eisenhaur
 # All rights reserved.
 #
@@ -34,9 +35,8 @@ from django.core.paginator import Paginator, InvalidPage
 from django.utils import simplejson as json
 from django.utils.encoding import smart_str
 from django.http import Http404
-from mysite.proc.util.json import json_encode
+from mysite.proc.helpers import json_encode
 from mysite.proc.models import *
-
 
 class JqGrid(object):
     queryset = None
@@ -129,7 +129,14 @@ class JqGrid(object):
         for rule in _filters['rules']:
             op, field, data = rule['op'], rule['field'], rule['data']
             # FIXME: Restrict what lookups performed against RelatedFields
-            field_class = self.get_model()._meta.get_field_by_name(field)[0]
+# Daler edited            
+            #field_class = self.get_model()._meta.get_field_by_name(field)[0]
+            if '__' in field:
+                tmp = field.split('__')[0]
+                field_class = self.get_model()._meta.get_field_by_name(tmp)[0]
+            else: 
+                field_class = self.get_model()._meta.get_field_by_name(field)[0]
+# end Daler edited                
             if isinstance(field_class, models.related.RelatedField):
                 op = 'eq'
             filter_fmt, exclude = filter_map[op]
@@ -202,8 +209,8 @@ class JqGrid(object):
             'forcefit': True,
             'shrinkToFit': True,
             'jsonReader': { 'repeatitems': False },
-            'rowNum': 10,
-            'rowList': [10, 25, 50, 100],
+            'rowNum': 2,
+            'rowList': [4,10, 25, 50, 100],
             'sortname': 'id',
             'viewrecords': True,
             'sortorder': "asc",
@@ -239,6 +246,19 @@ class JqGrid(object):
         })
         if as_json:
             config = json_encode(config)
+            #Begin Daler editted
+            # esli Formatter custom (samopisniy) то он начинается с extFormat
+            # и у него с двух сторон надо убрать кавычки " , иначе он небудет восприниматся как
+            # функция JavaScript
+            '''i=0
+            while i!=-1:
+                i=config.find('extFormat',i)
+                if i!=-1:
+                    end=config.find('"',i)                    
+                    config='%s%s%s' % (config[:i-1],config[i:end],config[end+1:])
+                    i = end
+            '''
+            #End Daler editted    
         return config
 
     def lookup_foreign_key_field(self, options, field_name):

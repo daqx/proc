@@ -1,12 +1,14 @@
-#Fri Jul 29 15:08:36 UZT 2011
+#Fri Aug 12 14:09:33 UZT 2011
 eclipse.preferences.version=1
 encoding//src/mysite/api/handlers.py=utf-8
 encoding//src/mysite/api/utils.py=utf-8
+encoding//src/mysite/proc/addres_model.py=utf-8
 encoding//src/mysite/proc/models.py=utf-8
 encoding//src/mysite/proc/service_model.py=utf-8
 encoding//src/mysite/proc/sys_class.py=utf-8
 encoding//src/mysite/proc/sys_model.py=utf-8
 encoding//src/mysite/proc/tarif_model.py=utf-8
+encoding//src/mysite/proc/util/jqgrid.py=utf-8
 encoding//src/mysite/proc/views/account.py=utf-8
 encoding//src/mysite/proc/views/address.py=utf-8
 encoding//src/mysite/proc/views/dealer.py=utf-8

@@ -9,6 +9,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.core.context_processors import request
 from django.contrib.auth.decorators import permission_required
 from django.shortcuts import *
+from django.utils import simplejson
 from mysite.proc.models import *
 from mysite.proc.views.forms import *
 
@@ -78,15 +79,35 @@ def agent(request):
 def agent_form(request,id_):
     if request.method=='POST':
         a = Agent.objects.get(pk=id_)
-
+        
+        hardware = ''
+        
         form=AgentEditForm(request.POST, instance=a)
         #form.type = ServiceType.objects.get(pk= request.POST['type'])
         if form.is_valid():
             a = form.save(commit = False)
+            
+            a.opservices = form.cleaned_data["opservices"]
+            
+            # Прочитаем номера HDD и Купюроприемника и запишем в JSON формате в переменную hardware
+            if len(form.cleaned_data["hdd_id"])>0 :
+                hardware = '"hdd_id": "%s"' % form.cleaned_data["hdd_id"]
+            
+            if len(form.cleaned_data["cashcode_id"])>0 :
+                if len(hardware)>0:
+                    hardware = '%s, "cashcode_id": "%s"' % (hardware, form.cleaned_data["cashcode_id"])
+                else:
+                    hardware = '"cashcode_id": "%s"' % form.cleaned_data["cashcode_id"]
+            
+            if len(hardware)>0:
+                hardware = '{ %s }' % hardware
+                a.hardware = hardware
+            
+            
             u=User.objects.get(pk=a.user.id)
             u.username=form.cleaned_data["username"]            
             u.first_name =form.cleaned_data["first_name"]
-            u.last_name =form.cleaned_data["last_name"]
+            u.last_name =form.cleaned_data["last_name"]            
             u.save()
             a.save()
             return HttpResponseRedirect('/proc/agent/')
@@ -94,7 +115,19 @@ def agent_form(request,id_):
             return render(request,'agent_form.html', {'form': form})
     else:        
         s = Agent.objects.get(id=id_)
-        form=AgentEditForm(instance=s,initial={'username' : s.user.username ,'first_name' : s.user.first_name ,'last_name' : s.user.last_name})
+        
+        hdd_id = None
+        cashcode_id = None
+        
+        if s.hardware != None:
+            hardware = simplejson.loads(s.hardware)
+            if "hdd_id" in hardware:
+                hdd_id = hardware["hdd_id"]
+                
+            if "cashcode_id" in hardware:
+                cashcode_id = hardware["cashcode_id"]
+            
+        form=AgentEditForm(instance=s,initial={'username' : s.user.username ,'first_name' : s.user.first_name ,'last_name' : s.user.last_name, 'hdd_id':hdd_id, "cashcode_id": cashcode_id})
         del_url="%s/delete" % id_
                 
         return render(request,'agent_form.html', {'form': form,'del_url': del_url})
@@ -111,6 +144,21 @@ def agent_form_add(request,id_=0):
         form=AgentForm(request.POST)
         if form.is_valid():
             d=form.save(commit=False)
+            
+            # Прочитаем номера HDD и Купюроприемника и запишем в JSON формате в переменную hardware
+            if len(form.cleaned_data["hdd_id"])>0 :
+                hardware = '"hdd_id" = "%s"' % form.cleaned_data["hdd_id"]
+            
+            if len(form.cleaned_data["cashcode_id"])>0 :
+                if len(hardware)>0:
+                    hardware = '%s, "cashcode_id"= "%s"' % (hardware, form.cleaned_data["cashcode_id"])
+                else:
+                    hardware = '"cashcode_id" = "%s"' % form.cleaned_data["cashcode_id"]
+            
+            if len(hardware)>0:
+                hardware = '{ %s }' % hardware
+                d.hardware = hardware
+            
             u=User.objects.create_user(form.cleaned_data["username"], '', form.cleaned_data["password"])
             u.save()
             d.user = u

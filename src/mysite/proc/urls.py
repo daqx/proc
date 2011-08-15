@@ -12,14 +12,13 @@ from mysite.proc.views import account
 from mysite.proc.views import system
 from mysite.proc.views import transaction
 from mysite.proc.views import monitor
-#from mysite.proc.views import monitor
+from mysite.proc.views import grids
+
 
 
 urlpatterns=patterns('',
-    #url(r'^$', system.main),    
-    #url(r'^examplegrid/$', monitor.grid_handler, name='grid_handler'),
-    #url(r'^examplegrid/cfg/$', monitor.grid_config, name='grid_config'),
-        
+    #url(r'^$', system.main),
+    (r'^grid/', include('mysite.proc.urls_grid')),    
     (r'^static/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.STATIC_ROOT}),
 
     (r'^accounts/login/$',  account.login),
@@ -112,6 +111,9 @@ urlpatterns=patterns('',
     # ============== MONITORING ===============
     (r'^monitor/$', monitor.show),
     (r'^monitor/logs/(\d+)$', monitor.journal),
+    
+    url (r'^gridmonitor/$', grids.grid_handler, name='grid_handler'), 
+    url (r'^gridmonitor/cfg/$', grids.grid_config, name='grid_config'),
     
     #(r'^login/$', login_view),
     #(r'^contact/$', contact),

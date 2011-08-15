@@ -1,65 +1,77 @@
 {%extends "base.html"%} 
-{% block head %}
-<script src="/proc/static/js/jquery.jqGrid.js" type="text/javascript"></script>
-{% endblock %}
 
-{%block content%}
+{% block head %}
+<META HTTP-EQUIV="Refresh" CONTENT="500" >
+  	<link rel="stylesheet" type="text/css" media="screen" href="/proc/static/js/themes/jquery-ui.custom.css" />
+	<link rel="stylesheet" type="text/css" media="screen" href="/proc/static/js/themes/ui.jqgrid.css" />
+  	<script src="/proc/static/js/i18n/grid.locale-ru.js" type="text/javascript"></script>
+  	<script src="/proc/static/js/jquery.jqGrid.min.js" type="text/javascript"></script> 
 
 <script type="text/javascript">
-
-$(function(){
-	$('#dealer tr:odd').css('backgroung-colour','#eeeeee');
-});
-
 $(function () {
-    $.getJSON("{% url grid_config %}", function(data){
-        $("#mygrid")
-            .jqGrid(data)
-            .navGrid('#pager', 
+	        $("#mygrid").jqGrid({
+            	"altRows": true, 
+            	"rowList": [4, 10, 25, 50, 100], 
+            	"sortname": "id", 
+            	"viewrecords": true, 
+            	"autowidth": false,            	
+            	"forcefit": true, 
+            	"shrinkToFit": true, 
+            	"height": "auto", 
+            	"caption": "Состояния агента", 
+            	"datatype": "json", 
+            	"gridview": true, 
+            	"colModel": [
+            	             {"index": "id", "name": "id", "editable": false, "label": "\u2116", 
+            	            	 "formatoptions": {"baseLinkUrl": "jur/"}, "width": 100, 
+            	            	 "formatter": "showlink"}, 
+            	             {"index": "agent__user__username", "width": 350, "editable": false, 
+            	            		 "name": "agent__user__username", "label": "\u0410\u0433\u0435\u043d\u0442"}, 
+            	             {"index": "link", "name": "link", "editable": false, 
+            	            		"label": "\u041a\u0430\u043d\u0430\u043b", "width": 80, 
+            	            		"formatter": extFormatBoolLink},
+            	            {"index": "cash_count", "width": 120, "editable": false, 
+                	            		 "name": "cash_count", "label": "количество купюр"},
+                	        {"index": "cash_code__name", "width": 120, "editable": false, 
+                    	            		 "name": "cash_code__name", "label": "купюроприемник"},
+                    	    {"index": "printer__name", "width": 120, "editable": false, 
+                        	            		 "name": "printer__name", "label": "принтер"},
+                        	{"index": "terminal__name", "width": 120, "editable": false, 
+                            	            		 "name": "terminal__name", "label": "терминал"}
+            	            ], 
+            	 "sortorder": "asc", 
+            	 "url": "/proc/grid/monitor/", 
+            	 "rowNum": 4, 
+            	 "pager": "#pager", 
+            	 "jsonReader": {"repeatitems": false}
+            }).navGrid('#pager', 
                 {add: false, edit: false, del: false, view: true},
         {}, // edit options
         {}, // add options
         {}, // del options 
         { multipleSearch:true, closeOnEscape:true }, // search options 
-        { jqModal:false, closeOnEscape:true} // view options 
-        );
-    });
+        { jqModal:true, closeOnEscape:true} // view options
+        ).filterToolbar({stringResult: true,searchOnEnter : false});
+    
 });
 
+function extFormatBoolLink(cellvalue, options, rowObject) {
+	var s = '';
+	if (cellvalue)
+		s = '<img src="/proc/static/img/icon-yes.gif" />';
+	else
+		s = '<img src="/proc/static/img/icon-no.gif" />';
+		
+	return s;
+    
+}
 </script>
+{%endblock%}
 
-<br />
-<table id='dealer'>
-	<tr>
-		<th>Агент</th>
-		<th>Дата</th>
-		<th>Связь</th>
-		<th>Количество купюр</th>
-		<th>Состояние купюроприемника</th>
-		<th>Состояние принтера</th>
-		<th>Состояние терминала</th>
-
-	</tr>
-
-	{%for s in s_list %}
-	<tr>
-		<td>{{s.agent.user.username}}</a>
-		</td>
-		<td>{{s.date|date:"d.m.y H:i:s"}}</td>
-		<td>{% if s.link %} <img src="/proc/static/img/icon-yes.gif" />
-			{% else %} <img src="/proc/static/img/icon-no.gif" /> {% endif %}</td>
-
-		<td>{{s.cash_count}}</td>
-		<td>{{s.cash_code.name}}</td>
-		<td>{{s.printer.name}}</td>
-		<td>{{s.terminal.name}}</td>
+{%block content%}
 
 
-	</tr>
-
-	{%endfor %}
-</table>
-
-<table id="mygrid" class="scroll" cellpadding="0" cellspacing="0"></table>
+<table class="grid" id="mygrid"></table>
+<div id="pager"></div>
 
 {%endblock%}

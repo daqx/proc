@@ -3,6 +3,7 @@ from django.contrib import auth
 from django.template import loader,Context,RequestContext
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import *
+from mysite.proc.views.grids import *
 
 def requires_login(view):
     def new_view(request, *args, **kwargs):
@@ -28,3 +29,14 @@ def login_view(request):
     else:
         # Show an error page
         return HttpResponseRedirect("/proc/invalid/")
+
+
+def grid_handler(request):
+    # handles pagination, sorting and searching
+    grid = ExampleGrid()
+    return HttpResponse(grid.get_json(request), mimetype="application/json")
+
+def grid_config(request):
+    # build a config suitable to pass to jqgrid constructor   
+    grid = ExampleGrid()
+    return HttpResponse(grid.get_config(), mimetype="application/json")

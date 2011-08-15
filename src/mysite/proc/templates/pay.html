@@ -14,7 +14,7 @@ $(function(){
 		</li>
 	</ul>
 {% endif %}<br/>
-<table id='pay'>
+<table id='pay' class='tbl'>
   <tr>
     <th>агент</th>
     <th>номер</th>
@@ -36,7 +36,7 @@ $(function(){
     <td>{{s.summa_commiss}}</td>
     <td>{{s.date|date:"j F Y"}}</td>
     <td>{{s.agent.dealer.user.username}}</td>
-    <td>{{s.status.name}}</td>
+    <td>{{s.state.name}}</td>
     
   </tr>
 

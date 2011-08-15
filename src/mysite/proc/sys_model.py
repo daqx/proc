@@ -19,7 +19,7 @@ class State(models.Model):
 class Status(models.Model):
     ''' Статусы документов по продуктам '''
     code = models.CharField(max_length=20, unique=True)
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=200)
     product = models.CharField(max_length=50,null=True, blank=True)
             
     class Meta:             

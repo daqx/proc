@@ -75,9 +75,11 @@ class AgentForm(forms.ModelForm):
     password = forms.CharField(label=("Password"), widget=forms.PasswordInput)
     first_name = forms.CharField(max_length=30)
     last_name = forms.CharField(max_length=30)
+    cashcode_id = forms.CharField(max_length=30, required=False)
+    hdd_id= forms.CharField(max_length=30, required=False)
     class Meta:
         model=Agent
-        exclude=('user')
+        exclude=('user','hardware')
 
 class AgentEditForm(forms.ModelForm):    
     username = forms.RegexField(label=("Username"), max_length=30, regex=r'^[\w.@+-]+$',
@@ -85,9 +87,11 @@ class AgentEditForm(forms.ModelForm):
         error_messages = {'invalid': ("This value may contain only letters, numbers and @/./+/-/_ characters.")})    
     first_name = forms.CharField(max_length=30)
     last_name = forms.CharField(max_length=30)
+    cashcode_id = forms.CharField(max_length=30, required=False)
+    hdd_id= forms.CharField(max_length=30, required=False)
     class Meta:
         model=Agent
-        exclude=('user')
+        exclude=('user','hardware')
 
         
 class TransactionForm(forms.ModelForm):    

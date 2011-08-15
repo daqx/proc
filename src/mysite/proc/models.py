@@ -87,7 +87,7 @@ class Agent(models.Model):
     type            =models.CharField(max_length=1,choices=AGENT_TYPE)
     state           =models.ForeignKey(State)
     user            =models.OneToOneField(User, blank=True)
-    key_hash        =models.CharField(max_length=10, blank=True, null=True)
+    key_hash        =models.CharField(max_length=40, blank=True, null=True)
     hardware        =models.CharField(max_length=150, blank=True, null=True)
     cashcode_capacity=models.IntegerField(blank=True, null=True)
     
@@ -108,15 +108,18 @@ class Agent(models.Model):
     
 class Transaction(models.Model):
     agent           =models.ForeignKey(Agent)    
-    date            =models.DateTimeField(auto_now_add=True)
+    date            =models.DateTimeField(auto_now_add=True)                    # Время появления платежа на сервере
+    date_state      =models.DateTimeField()                                     # Дата последнего изменения статуса
+    date_input      =models.DateTimeField(null=True, blank=True)                # Дата платежа на терминале
+    #encashment      =models.IntegerField()                                     # инкасация TODO: в базу добавить
     opservices      =models.ForeignKey(OpService)
     number_key      =models.CharField(max_length=100)
     summa           =models.FloatField()
     summa_commiss   =models.FloatField()
     summa_pay       =models.FloatField()    
-    status          =models.ForeignKey(Status)
+    state           =models.ForeignKey(Status)
+    ticket          =models.IntegerField(null=True, blank=True)                 # номер чека
     return_reason   =models.CharField(max_length=100)                           # Причина отказа и служ отметки    
-    date_proc       =models.DateTimeField(null=True, blank=True)                # Дата обработки
     seans_number    =models.CharField(max_length=20,null=True, blank=True)      # Номер сеанса обработки
     processed       =models.NullBooleanField(null=True, blank=True)             # Признак успешной обработки
     blocked         =models.NullBooleanField(null=True, blank=True)             # Признак блокировки процессом
@@ -138,8 +141,8 @@ class Transaction(models.Model):
             self.summa_commiss=com
             self.summa_pay=self.summa-self.summa_commiss
         
-        #//TODO надо изменитть статус
-        self.status=Status.objects.get(code="REGISTERED")
+        #TODO: надо изменитть статус
+        self.state=Status.objects.get(code="0")                            # Новый
         
         # Сохраним все данные
         super(Transaction, self).save()
