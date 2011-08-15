@@ -110,7 +110,7 @@ LOGIN_URL='/proc/accounts/login/'
 
 ROOT_URLCONF = 'mysite.urls'
 SESSION_EXPIRE_AT_BROWSER_CLOSE=True
-
+SESSION_COOKIE_AGE = 120
 
 TEMPLATE_DIRS = (
     #"D:/work/python/proc/src/mysite/proc/templates",
