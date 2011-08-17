@@ -28,7 +28,7 @@ class ServiceType(models.Model):
     
     
 class OpService(models.Model):
-    state       =models.ForeignKey(State,blank=False)
+    state       =models.ForeignKey(Status,blank=False)
     name        =models.CharField(max_length=50)
     code        =models.CharField(max_length=20)
     order       =models.IntegerField()

@@ -29,6 +29,8 @@ class ExampleGrid(JqGrid):
 def grid_handler(request):
     # handles pagination, sorting and searching
     grid = ExampleGrid()
+    request.session['test'] = 'test'  
+    request.session.modified = True 
     #grid.model = ActualState
     return HttpResponse(grid.get_json(request), mimetype="application/json")
 

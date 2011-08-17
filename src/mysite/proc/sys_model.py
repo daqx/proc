@@ -6,7 +6,7 @@ from django.contrib.auth.models import Permission
 from mysite.proc.models import *
 
 
-class State(models.Model):
+class Status(models.Model):
     code=models.CharField(max_length=20)
     name=models.CharField(max_length=50)
             
@@ -16,7 +16,7 @@ class State(models.Model):
     def __unicode__(self):
         return self.name
     
-class Status(models.Model):
+class State(models.Model):
     ''' Статусы документов по продуктам '''
     code = models.CharField(max_length=20, unique=True)
     name = models.CharField(max_length=200)
@@ -108,11 +108,11 @@ class ActualState(models.Model):
     '''
     agent       =models.ForeignKey("Agent")
     date        =models.DateTimeField()    
-    cash_count  =models.IntegerField(null=True, blank=True)                                             # Количество купюр
-    link        =models.BooleanField(default=True)                                                      # Состояние связи
-    cash_code   =models.ForeignKey(SostAgent, related_name="ac_cash_code" ,null=True, blank=True)       # Состояние купюроприёмника
-    printer     =models.ForeignKey(SostAgent, related_name="ac_printer", null=True, blank=True)         # Состояние термопринтера
-    terminal    =models.ForeignKey(SostAgent, related_name="ac_terminal", null=True, blank=True)        # Состояние терминала
+    cash_count  =models.IntegerField(null=True, blank=True)                                          # Количество купюр
+    link        =models.BooleanField(default=True)                                                   # Состояние связи
+    cash_code   =models.ForeignKey(SostAgent, related_name="ac_cash_code" ,null=True, blank=True)    # Состояние купюроприёмника
+    printer     =models.ForeignKey(SostAgent, related_name="ac_printer", null=True, blank=True)      # Состояние термопринтера
+    terminal    =models.ForeignKey(SostAgent, related_name="ac_terminal", null=True, blank=True)     # Состояние терминала
     
     
     def __unicode__(self):
@@ -120,3 +120,37 @@ class ActualState(models.Model):
     
     class Meta:             
         app_label = "proc"
+
+
+class HistoryState(models.Model):
+    ''' История изменения состояний транзакций
+    '''    
+    date        =models.DateTimeField()
+    user        =models.OneToOneField(User, blank=True, null=True)    
+    state       =models.ForeignKey(State)
+    description =models.CharField(max_length=200,null=True, blank=True)
+    transaction =models.ForeignKey(Transaction)
+    
+    def __unicode__(self):
+        return "%s %s" % (self.status.name, self.date)
+    
+    class Meta:             
+        app_label = "proc"
+
+        
+class Encashment(models.Model):
+    ''' Инкасация
+    '''
+    user        =models.OneToOneField(User, blank=True, null=True)
+    date        =models.DateTimeField(auto_now_add=True)                            # Время появления инкасации на сервере
+    date_encash =models.DateTimeField()                                             # Время инкасации    
+    number      =models.IntegerField(null=True, blank=True)                         # Номер инкасации
+    summa       =models.FloatField(blank=True)                                      # Сумма инкасации
+    description =models.CharField(max_length=200,null=True, blank=True)
+    
+    def __unicode__(self):
+        return "%s" % self.date
+    
+    class Meta:             
+        app_label = "proc"        
+

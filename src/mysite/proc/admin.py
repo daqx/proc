@@ -37,11 +37,14 @@ class TownAdmin(admin.ModelAdmin):
         return "%s"%(obj.region.country)
     get_country.short_description="Country"
     
-class StateAdmin(admin.ModelAdmin):
+class StatusAdmin(admin.ModelAdmin):
     list_display=('code','name')
 
-class StatusAdmin(admin.ModelAdmin):
+class StateAdmin(admin.ModelAdmin):
     list_display=('code','name', 'product')
+
+class HistoryStateAdmin(admin.ModelAdmin):
+    list_display=('code','name', 'date')
     
 class AgentAdmin(admin.ModelAdmin):
     list_display=('user','state')
@@ -95,6 +98,7 @@ admin.site.register(OpServiceGroup, OpServiceGroupAdmin)
 admin.site.register(ServiceType, ServiceTypeAdmin)
 admin.site.register(Region, RegionAdmin)
 admin.site.register(State, StateAdmin)
+admin.site.register(HistoryState, HistoryStateAdmin)
 admin.site.register(Status, StatusAdmin)
 admin.site.register(SostAgent, SostAgentAdmin)
 admin.site.register(Tarif, TarifAdmin)

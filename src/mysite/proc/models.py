@@ -35,7 +35,7 @@ class Dealer(models.Model):
     overdraft       =models.FloatField(blank=True)
     #password        =models.CharField(max_length=100)
     tel             =models.CharField(max_length=20,blank=True)    
-    state           =models.ForeignKey(State)
+    state           =models.ForeignKey(Status)
     summa           =models.FloatField(blank=True)
     user            =models.OneToOneField(User, blank=True)
     
@@ -85,7 +85,7 @@ class Agent(models.Model):
     tarif_profile_arr=models.ManyToManyField(TarifProfile)
     tel             =models.CharField(max_length=20,blank=True)
     type            =models.CharField(max_length=1,choices=AGENT_TYPE)
-    state           =models.ForeignKey(State)
+    state           =models.ForeignKey(Status)
     user            =models.OneToOneField(User, blank=True)
     key_hash        =models.CharField(max_length=40, blank=True, null=True)
     hardware        =models.CharField(max_length=150, blank=True, null=True)
@@ -111,13 +111,13 @@ class Transaction(models.Model):
     date            =models.DateTimeField(auto_now_add=True)                    # Время появления платежа на сервере
     date_state      =models.DateTimeField()                                     # Дата последнего изменения статуса
     date_input      =models.DateTimeField(null=True, blank=True)                # Дата платежа на терминале
-    #encashment      =models.IntegerField()                                     # инкасация TODO: в базу добавить
+    encashment      =models.IntegerField(null=True, blank=True)                 # инкасация 
     opservices      =models.ForeignKey(OpService)
     number_key      =models.CharField(max_length=100)
     summa           =models.FloatField()
     summa_commiss   =models.FloatField()
     summa_pay       =models.FloatField()    
-    state           =models.ForeignKey(Status)
+    state           =models.ForeignKey(State)
     ticket          =models.IntegerField(null=True, blank=True)                 # номер чека
     return_reason   =models.CharField(max_length=100)                           # Причина отказа и служ отметки    
     seans_number    =models.CharField(max_length=20,null=True, blank=True)      # Номер сеанса обработки
@@ -142,12 +142,19 @@ class Transaction(models.Model):
             self.summa_pay=self.summa-self.summa_commiss
         
         #TODO: надо изменитть статус
-        self.state=Status.objects.get(code="0")                            # Новый
+        self.state=State.objects.get(code="0")                            # Новый
         
         # Сохраним все данные
         super(Transaction, self).save()
+        
+        # Добавим запись в выписку
         am=ArcMove(dealer=self.agent.dealer,dt=True,summa=self.summa_pay,transaction=self,saldo=0)
         am.save()
+        
+        # Добавим новый статус в историю (HistoryState)
+        h = HistoryState(transaction=self, date=self.date, state=self.state)
+        h.save()
+        
 
     def delete(self):
         ''' Удаление транзакций '''

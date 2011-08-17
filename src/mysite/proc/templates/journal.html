@@ -1,7 +1,7 @@
 {%extends "base.html"%} 
 
 {% block head %}
-<META HTTP-EQUIV="Refresh" CONTENT="500" >
+<!-- META HTTP-EQUIV="Refresh" CONTENT="500" > -->
   	<link rel="stylesheet" type="text/css" media="screen" href="/proc/static/js/themes/jquery-ui.custom.css" />
 	<link rel="stylesheet" type="text/css" media="screen" href="/proc/static/js/themes/ui.jqgrid.css" />
   	<script src="/proc/static/js/i18n/grid.locale-ru.js" type="text/javascript"></script>
@@ -65,6 +65,16 @@ function extFormatBoolLink(cellvalue, options, rowObject) {
 	return s;
     
 }
+
+jQuery(document).ready(function() {
+	refreshGrid();
+});
+
+	function refreshGrid()
+	{		
+		t=setTimeout("refreshGrid()",5000);
+		$("#mygrid").trigger("reloadGrid");
+	}	
 </script>
 {%endblock%}
 
