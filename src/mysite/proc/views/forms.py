@@ -6,6 +6,36 @@ from mysite.proc.addres_model import Addres
 from mysite.proc.tarif_model import *
 from mysite.proc.models import *
 
+
+class AddressForm(forms.ModelForm):    
+    class Meta:
+        model=Addres
+
+class AgentForm(forms.ModelForm):    
+    username = forms.RegexField(label=("Username"), max_length=30, regex=r'^[\w.@+-]+$',
+        help_text = ("Обязательный. 30 символов или менньше. Только буквы, цифры и @/./+/-/_ ."),
+        error_messages = {'invalid': ("Обязательный. 30 символов или менньше. Только буквы, цифры и @/./+/-/_ .")})
+    password = forms.CharField(label=("Password"), widget=forms.PasswordInput)
+    first_name = forms.CharField(max_length=30)
+    last_name = forms.CharField(max_length=30)
+    cashcode_id = forms.CharField(max_length=30, required=False)
+    hdd_id= forms.CharField(max_length=30, required=False)
+    class Meta:
+        model=Agent
+        exclude=('user','hardware')
+
+class AgentEditForm(forms.ModelForm):    
+    username = forms.RegexField(label=("Username"), max_length=30, regex=r'^[\w.@+-]+$',
+        help_text = ("Обязательный. 30 символов или менньше. Только буквы, цифры и @/./+/-/_ ."),
+        error_messages = {'invalid': ("Обязательный. 30 символов или менньше. Только буквы, цифры и @/./+/-/_ .")})    
+    first_name = forms.CharField(max_length=30)
+    last_name = forms.CharField(max_length=30)
+    cashcode_id = forms.CharField(max_length=30, required=False)
+    hdd_id= forms.CharField(max_length=30, required=False)
+    class Meta:
+        model=Agent
+        exclude=('user','hardware')
+
 class ServiceTypeForm(forms.ModelForm):   
     parent = forms.ModelChoiceField(queryset=ServiceType.objects.filter(parent=None)
                                     ,widget=forms.Select,required=False)
@@ -21,10 +51,6 @@ class OpServiceForm(forms.ModelForm):
 class OpServiceGroupForm(forms.ModelForm):    
     class Meta:
         model=OpServiceGroup
-        
-class AddressForm(forms.ModelForm):    
-    class Meta:
-        model=Addres
         
 '''=====================TARIFS==========================='''
 class TarifArrForm(forms.ModelForm):    
@@ -47,8 +73,8 @@ class TarifProfileForm(forms.ModelForm):
 '''=====================DEALER==========================='''
 class DealerForm(forms.ModelForm):    
     username = forms.RegexField(label=("Username"), max_length=30, regex=r'^[\w.@+-]+$',
-        help_text = ("Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."),
-        error_messages = {'invalid': ("This value may contain only letters, numbers and @/./+/-/_ characters.")})
+        help_text = ("Обязательный. 30 символов или менньше. Только буквы, цифры и @/./+/-/_ ."),
+        error_messages = {'invalid': ("Это значение может содержать только буквы, цифры и @/./+/-/_ символы.")})
     password = forms.CharField(label=("Password"), widget=forms.PasswordInput)
     first_name = forms.CharField(max_length=30)
     last_name = forms.CharField(max_length=30)
@@ -59,8 +85,8 @@ class DealerForm(forms.ModelForm):
 
 class DealerEditForm(forms.ModelForm):    
     username = forms.RegexField(label=("Username"), max_length=30, regex=r'^[\w.@+-]+$',
-        help_text = ("Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."),
-        error_messages = {'invalid': ("This value may contain only letters, numbers and @/./+/-/_ characters.")})
+        help_text = ("Обязательный. 30 символов или менньше. Только буквы, цифры и @/./+/-/_ ."),
+        error_messages = {'invalid': ("Это значение может содержать только буквы, цифры и @/./+/-/_ символы.")})
     first_name = forms.CharField(max_length=30)
     last_name = forms.CharField(max_length=30)
     
@@ -68,43 +94,20 @@ class DealerEditForm(forms.ModelForm):
         model=Dealer
         exclude=('user')
         
-class AgentForm(forms.ModelForm):    
-    username = forms.RegexField(label=("Username"), max_length=30, regex=r'^[\w.@+-]+$',
-        help_text = ("Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."),
-        error_messages = {'invalid': ("This value may contain only letters, numbers and @/./+/-/_ characters.")})
-    password = forms.CharField(label=("Password"), widget=forms.PasswordInput)
-    first_name = forms.CharField(max_length=30)
-    last_name = forms.CharField(max_length=30)
-    cashcode_id = forms.CharField(max_length=30, required=False)
-    hdd_id= forms.CharField(max_length=30, required=False)
-    class Meta:
-        model=Agent
-        exclude=('user','hardware')
 
-class AgentEditForm(forms.ModelForm):    
-    username = forms.RegexField(label=("Username"), max_length=30, regex=r'^[\w.@+-]+$',
-        help_text = ("Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."),
-        error_messages = {'invalid': ("This value may contain only letters, numbers and @/./+/-/_ characters.")})    
-    first_name = forms.CharField(max_length=30)
-    last_name = forms.CharField(max_length=30)
-    cashcode_id = forms.CharField(max_length=30, required=False)
-    hdd_id= forms.CharField(max_length=30, required=False)
-    class Meta:
-        model=Agent
-        exclude=('user','hardware')
 
         
 class TransactionForm(forms.ModelForm):    
     
     class Meta:
         model=Transaction
-        exclude=('agent','status','summa_commiss','summa_pay','blocked','return_reason','date_proc','seans_number','processed','blocked','try_count','file_name','user_proc')
+        exclude=('agent','state','date_state','summa_commiss','summa_pay','blocked','return_reason','date_proc','seans_number','processed','blocked','try_count','file_name','user_proc')
 
 class TransactionAdminForm(forms.ModelForm):    
     
     class Meta:
         model=Transaction
-        exclude=('status','summa_commiss','summa_pay','blocked','return_reason','date_proc','seans_number','processed','blocked','try_count','file_name','user_proc')
+        exclude=('state','date_state','summa_commiss','summa_pay','blocked','return_reason','date_proc','seans_number','processed','blocked','try_count','file_name','user_proc')
 
 
 class FillAcForm(forms.ModelForm):    

@@ -77,7 +77,7 @@ def reg_sost( body_, login_, retval_):
     
     
     if "date" in body_:
-        js.date = body_["date"]
+        js.date = body_["date"] #datetime.strptime(body_["date"],'YYYY-MM-DD HH:MI:ss')
         actS.date = js.date
     
     if "cash_count" in body_:

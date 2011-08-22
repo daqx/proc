@@ -58,7 +58,7 @@ def pay_form_add(request,id_=0):
         if request.session["is_admin"]:
             form=TransactionAdminForm(request.POST)
         else:
-            form=TransactionForm()
+            form=TransactionForm(request.POST)
             
             
         if form.is_valid():

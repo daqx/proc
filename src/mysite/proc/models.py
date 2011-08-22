@@ -107,16 +107,16 @@ class Agent(models.Model):
             return 0
     
 class Transaction(models.Model):
-    agent           =models.ForeignKey(Agent)    
-    date            =models.DateTimeField(auto_now_add=True)                    # Время появления платежа на сервере
+    agent           =models.ForeignKey(Agent, verbose_name='Агент')    
+    date            =models.DateTimeField(auto_now_add=True, verbose_name='Дата')  # Время появления платежа на сервере
     date_state      =models.DateTimeField()                                     # Дата последнего изменения статуса
     date_input      =models.DateTimeField(null=True, blank=True)                # Дата платежа на терминале
     encashment      =models.IntegerField(null=True, blank=True)                 # инкасация 
     opservices      =models.ForeignKey(OpService)
-    number_key      =models.CharField(max_length=100)
-    summa           =models.FloatField()
-    summa_commiss   =models.FloatField()
-    summa_pay       =models.FloatField()    
+    number_key      =models.CharField(max_length=100, verbose_name='Номер')
+    summa           =models.FloatField(verbose_name='Сумма')
+    summa_commiss   =models.FloatField(verbose_name='Комиссия')
+    summa_pay       =models.FloatField(verbose_name='Сумма платежа')    
     state           =models.ForeignKey(State)
     ticket          =models.IntegerField(null=True, blank=True)                 # номер чека
     return_reason   =models.CharField(max_length=100)                           # Причина отказа и служ отметки    
@@ -141,8 +141,9 @@ class Transaction(models.Model):
             self.summa_commiss=com
             self.summa_pay=self.summa-self.summa_commiss
         
-        #TODO: надо изменитть статус
+        # статус
         self.state=State.objects.get(code="0")                            # Новый
+        self.date_state = datetime.now()
         
         # Сохраним все данные
         super(Transaction, self).save()
@@ -152,7 +153,7 @@ class Transaction(models.Model):
         am.save()
         
         # Добавим новый статус в историю (HistoryState)
-        h = HistoryState(transaction=self, date=self.date, state=self.state)
+        h = HistoryState(trans=self, date=self.date, state=self.state)
         h.save()
         
 
@@ -173,4 +174,30 @@ class ArcMove(models.Model):
     
     def __unicode__(self):
         return '%s  %s  %s' % (self.dealer.user.username, self.summa , self.date)
+
+
+class HistoryState(models.Model):
+    ''' История изменения состояний транзакций
+    '''    
+    date        =models.DateTimeField()
+    user        =models.OneToOneField(User, blank=True, null=True)    
+    state       =models.ForeignKey(State)
+    description =models.CharField(max_length=200,null=True, blank=True)
+    trans       =models.ForeignKey(Transaction, related_name="trans")
     
+    def __unicode__(self):
+        return "%s %s" % (self.status.name, self.date)
+
+class Encashment(models.Model):
+    ''' Инкасация
+    '''
+    user        =models.OneToOneField(User, blank=True, null=True)
+    date        =models.DateTimeField(auto_now_add=True)                            # Время появления инкасации на сервере
+    date_encash =models.DateTimeField()                                             # Время инкасации    
+    number      =models.IntegerField(null=True, blank=True)                         # Номер инкасации
+    summa       =models.FloatField(blank=True)                                      # Сумма инкасации
+    description =models.CharField(max_length=200,null=True, blank=True)
+    agent       =models.ForeignKey(Agent)
+    
+    def __unicode__(self):
+        return "%s" % self.date    

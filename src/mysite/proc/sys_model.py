@@ -2,8 +2,8 @@
 from django.db import models
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
-from django.contrib.auth.models import Permission
-from mysite.proc.models import *
+from django.contrib.auth.models import Permission, User
+
 
 
 class Status(models.Model):
@@ -120,37 +120,5 @@ class ActualState(models.Model):
     
     class Meta:             
         app_label = "proc"
-
-
-class HistoryState(models.Model):
-    ''' История изменения состояний транзакций
-    '''    
-    date        =models.DateTimeField()
-    user        =models.OneToOneField(User, blank=True, null=True)    
-    state       =models.ForeignKey(State)
-    description =models.CharField(max_length=200,null=True, blank=True)
-    transaction =models.ForeignKey(Transaction)
-    
-    def __unicode__(self):
-        return "%s %s" % (self.status.name, self.date)
-    
-    class Meta:             
-        app_label = "proc"
-
-        
-class Encashment(models.Model):
-    ''' Инкасация
-    '''
-    user        =models.OneToOneField(User, blank=True, null=True)
-    date        =models.DateTimeField(auto_now_add=True)                            # Время появления инкасации на сервере
-    date_encash =models.DateTimeField()                                             # Время инкасации    
-    number      =models.IntegerField(null=True, blank=True)                         # Номер инкасации
-    summa       =models.FloatField(blank=True)                                      # Сумма инкасации
-    description =models.CharField(max_length=200,null=True, blank=True)
-    
-    def __unicode__(self):
-        return "%s" % self.date
-    
-    class Meta:             
-        app_label = "proc"        
+      
 

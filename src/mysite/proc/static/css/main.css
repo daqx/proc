@@ -7,7 +7,7 @@ body {background: none repeat scroll 0 0 #FFFFFF;
 text .h1 {padding: 2px 2px; background: #fff4a1}
 text .h2 {color: #bf8ddd; border-top: 1px dotted #fff; margin-top: 2em}
 
-
+/************************************************************/
 .tbl table {
   border-collapse: collapse;
   border: 1 1 1 1 blue;
@@ -43,6 +43,35 @@ text .h2 {color: #bf8ddd; border-top: 1px dotted #fff; margin-top: 2em}
 .tbl tr.over td, .tbl tr:hover td {
   background: #bcd4ec;
 }
+/************************************************************/
+.tbl_frm table {
+  cellspacing: 0;  
+  width: auto;
+  margin: 24px;
+  font-size: 1.1em; 
+}
+
+.tbl_frm th {  
+   background: #3e83c9;
+  color: #fff;
+  font-weight: bold;
+  padding: 2px 11px;
+  text-align: left;
+  
+    
+}
+
+.tbl_frm td {   
+  border-bottom: 1px solid #95bce2;
+  border-top: 1px solid #95bce2;
+  
+}
+
+.tbl_frm tr.alt td {
+  background: #ecf6fc;
+}
+
+/************************************************************/
 
 ul.error_list li {
 	color: #FF0000;

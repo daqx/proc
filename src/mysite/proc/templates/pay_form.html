@@ -11,9 +11,9 @@
 					
 	<form action="" method="post">
     	{% csrf_token %}       
-        <table>	
+        <table class="tbl_frm">	
         	{% if request.session.is_admin %}
-        	<tr><th><label for="id_agent">Agent:</label></th>
+        	<tr><th><label for="id_agent">Агент:</label></th>
             	<td>
             		<ul>
 						{% for err in form.agent.errors %}
@@ -24,7 +24,7 @@
 				</td>
 			</tr>	
 			{% endif %}
-            <tr><th><label for="id_opservices">Opservices:</label></th>
+            <tr><th><label for="id_opservices">Оператор услуг:</label></th>
             	<td>
             		<ul>
 						{% for err in form.opservices.errors %}
@@ -34,7 +34,7 @@
             		{{ form.opservices }}
 				</td>
 			</tr>
-			<tr><th><label for="id_number_key">Number key:</label></th>
+			<tr><th><label for="id_number_key">Номер:</label></th>
 				<td>
 					<ul>
 						{% for err in form.number_key.errors %}
@@ -44,7 +44,7 @@
 					{{ form.number_key }}
 				</td>
 			</tr>
-			<tr><th><label for="id_summa">Summa:</label></th>
+			<tr><th><label for="id_summa">Сумма:</label></th>
 				<td>
 					<ul>
 						{% for err in form.summa.errors %}
@@ -58,7 +58,9 @@
         
         </table>
         {% if del_url %}
-        	<div><a href="{{del_url}}">Delete</a></div>
+        	<ul class="object-tools">
+				<li><a href="{{del_url}}">Удалить</a></li>
+			</ul>
         {% else %}	
         	<input type="submit" value="Сохранить">
         {% endif %}
