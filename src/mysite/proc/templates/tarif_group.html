@@ -6,12 +6,19 @@ $(function(){
 	$('#tarif tr:odd').css('backgroung-colour','#eeeeee');
 });
 </script>
-<a href="add">Add new</a>
+{% if perms.proc.add_tarif %}
+	<ul class="object-tools">
+		<li>
+			<a href="add">	Добавить</a>
+		</li>
+	</ul>
+{% endif %}
 <br/>
-<table id='tarif'>
+
+<table id='tarif' class='tbl'>
   <tr>
-    <th>CODE</th>    
-    <th>NAME</th>
+    <th>Код</th>    
+    <th>Наименование</th>
  
     
   </tr>

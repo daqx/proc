@@ -6,13 +6,18 @@ $(function(){
 	$('#address tr:odd').css('backgroung-colour','#eeeeee');
 });
 </script>
-<a href="add">Add new</a>
-<br/>
-<table id='address'>
+{% if perms.proc.add_address %}
+	<ul class="object-tools">
+		<li>
+			<a href="{% url mysite.proc.views.address.address_form_add id_ 'dealer' %}">	Добавить</a>
+		</li>
+	</ul>
+{% endif %}<br/>
+<table id='address' class='tbl'>
   <tr>
-    <th>ADDRESS</th>
-    <th>TOWN</th>    
-    <th>TYPE</th>
+    <th>Адрес</th>
+    <th>Город</th>    
+    <th>Тип</th>
     
   </tr>
 

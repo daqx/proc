@@ -25,8 +25,7 @@ $(document).ready(function () {
 		//	some resizing/toggling settings
 		,	north__slidable:		false	// OVERRIDE the pane-default of 'slidable=true'
 		,	north__togglerLength_closed: '100%'	// toggle-button is full-width of resizer-bar
-		,	north__spacing_closed:	20		// big resizer-bar when open (zero height)
-		,   noth__size:				50
+		,	north__spacing_closed:	10		// big resizer-bar when open (zero height)		
 		,	south__resizable:		false	// OVERRIDE the pane-default of 'resizable=true'
 		,	south__spacing_open:	0		// no resizer-bar when open (zero height)
 		,	south__spacing_closed:	20		// big resizer-bar when open (zero height)
@@ -48,17 +47,17 @@ $(document).ready(function () {
 <body>
 	<!-- div id="container">-->	
 		<DIV class="ui-layout-north">
-			
+			<!-- DIV id="userbar_container">			</DIV> -->
 			<DIV id="header" >
 				<div id="branding">
 					<h1>Processing</h1>
 				</div>
 				<div id="user-tools">					
 					{% if user.is_authenticated %}
-			  			<p>Welcome, {{ user.username }}.  
-			  			<a href="/proc/accounts/logout/">loggout</a></p>
+			  			<p>Вы вошли как: {{ user.username }}.  
+			  			<a href="/proc/accounts/logout/">[выйти]</a></p>
 			  		{% else %}
-			  			<a href="/proc/accounts/login/">loggin</a>
+			  			<a href="/proc/accounts/login/">[войти]</a>
 					{% endif %}
 				</div>
 			</DIV>
@@ -70,23 +69,7 @@ $(document).ready(function () {
 				{% for s in request.session.menu_list  %}					  					
 			  			<li><a href="{{s.url}}">{{s.name}}</a> </li>					
 				{%endfor %}
-			</ul>
-			
-			
-			все что ниже на снос
-			<ul>
-				<li><a href="/proc/service_type/">Виды услуг</a></li>
-				<li><a href="/proc/op_service/">Операторы услуг</a></li>
-				<li><a href="/proc/op_service_group/">Группы операторов услуг</a></li>
-				<li><a href="/proc/tarif/">Тарифы</a></li>
-				<li><a href="/proc/tarif_group/">Группы тарифов</a></li>
-				<li><a href="/proc/tarif_profile/">Профили тарифов</a></li>
-				<li><a href="/proc/dealer/">Диллер</a></li>
-				<li><a href="/proc/agent/">Агенты</a></li>
-				<li><a href="/proc/pay/">Оплата услуг</a></li>
-				<li><a href="/proc/fill_ac/add">Пополнение счета диллера</a></li>
-				<li><a href="/proc/monitor/">Мониторинг</a></li>
-			</ul>
+			</ul>							
 		
 		</div>
 			

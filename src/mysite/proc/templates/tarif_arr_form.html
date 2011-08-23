@@ -12,7 +12,7 @@
 
 	<form action="{{id}}" method="post">
     	{% csrf_token %}       
-        <table>
+        <table class="tbl_frm">
             {{ form.as_table }}
         </table>
         {% if del_url %}

@@ -8,15 +8,22 @@ $(function(){
 </script>
 <h3>Tarif is : {{tarif.name}}</h2>
 <br/>
-<a href={{add_url}}>Add new</a>
+{% if perms.proc.add_tarif %}
+	<ul class="object-tools">
+		<li>
+			<a href="add">	Добавить</a>
+		</li>
+	</ul>
+{% endif %}
 <br/>
-<table id='tarif_arr'>
+
+<table id='tarif_arr' class='tbl'>
   <tr>
-    <th>SUMMA</th>    
-    <th>MIN</th>
-    <th>MAX</th>
-    <th>PRC</th>
-    <th>TARIF</th>
+    <th>Сумма</th>    
+    <th>Минимум</th>
+    <th>Максимум</th>
+    <th>Процент</th>
+    <th>Тариф</th>
     
   </tr>
 

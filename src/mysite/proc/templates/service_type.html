@@ -6,14 +6,21 @@ $(function(){
 	$('#service_type tr:odd').css('backgroung-colour','#eeeeee');
 });
 </script>
-<a href="add">Add new</a>
+{% if perms.proc.add_servicetype %}
+	<ul class="object-tools">
+		<li>
+			<a href="add">	Добавить</a>
+		</li>
+	</ul>
+{% endif %}
 <br/>
-<table id='service_type'>
+
+<table id='service_type' class='tbl'>
   <tr>
-    <th>CODE</th>
-    <th>NAME</th>
-    <th>ORDER</th>
-    <th>PARENT</th>
+    <th>Код</th>
+    <th>Наименование</th>
+    <th>Порядок</th>
+    <th>Подчиняется</th>
   </tr>
 
 {%for s in s_list  %}

@@ -10,6 +10,7 @@ from mysite.proc.models import *
 class AddressForm(forms.ModelForm):    
     class Meta:
         model=Addres
+        exclude=('content_type', 'object_id')
 
 class AgentForm(forms.ModelForm):    
     username = forms.RegexField(label=("Username"), max_length=30, regex=r'^[\w.@+-]+$',

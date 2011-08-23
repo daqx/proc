@@ -13,13 +13,13 @@ from mysite.proc.models import *
 from mysite.proc.views.forms import *
 
 
-@permission_required('proc.view_monitor')
+@permission_required('proc.view_actualstate')
 def show(request):
     s_list = ActualState.objects.all()   
     return render(request,'monitor.html', {'s_list': s_list})
 
 
-@permission_required('proc.view_monitor')
+@permission_required('proc.view_actualstate')
 def journal(request, id_):
     s_list = JourSostAgent.objects.filter( agent__id = id_).order_by('-date')  
     return render(request,'journal.html', {'s_list': s_list})

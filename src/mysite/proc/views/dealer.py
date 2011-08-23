@@ -145,6 +145,8 @@ def agent_form_add(request,id_=0):
         if form.is_valid():
             d=form.save(commit=False)
             
+            hardware=''
+            
             # Прочитаем номера HDD и Купюроприемника и запишем в JSON формате в переменную hardware
             if len(form.cleaned_data["hdd_id"])>0 :
                 hardware = '"hdd_id" = "%s"' % form.cleaned_data["hdd_id"]

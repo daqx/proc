@@ -39,8 +39,12 @@ class KopfAdmin(admin.ModelAdmin):
     list_display=('code','short_name','name')
 
 class MenuAdmin(admin.ModelAdmin):
-    list_display=('code','name','order')
-
+    list_display=('code','name','order','get_perms_name')
+    
+    def get_perms_name(self,obj):
+        return "proc.%s"%(obj.perms.codename)
+    get_perms_name.short_description="perm"
+    
 class OpServiceAdmin(admin.ModelAdmin):
     list_display=('code','name')
     raw_id_fields = ('type',)

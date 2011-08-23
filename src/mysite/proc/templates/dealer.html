@@ -6,14 +6,19 @@ $(function(){
 	$('#dealer tr:odd').css('backgroung-colour','#eeeeee');
 });
 </script>
-<a href="add">Add new</a>
-<br/>
+{% if perms.proc.add_dealer %}
+	<ul class="object-tools">
+		<li>
+			<a href="add">	Добавить</a>
+		</li>
+	</ul>
+{% endif %}<br/>
 <table id='dealer' class='tbl'>
   <tr>
-    <th>NAME</th>
-    <th>KOPS</th>    
-    <th>PARENT</th>
-    
+    <th>Наименование</th>
+    <th>Копф</th>    
+    <th>Диллер</th>
+    <th>Адрес</th>
   </tr>
 
 {%for s in s_list  %}
@@ -21,7 +26,7 @@ $(function(){
     <td><a href="{{s.id}}">{{s.user.username}}</a></td>
     <td>{{s.kopf.name}}</td>
     <td>{{s.dealer.user.username}}</td>
-    
+    <td><a href="{% url mysite.proc.views.address.address s.id 'dealer' %}">***</a></td>
   </tr>
 
 {%endfor %}

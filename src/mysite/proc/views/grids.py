@@ -16,7 +16,7 @@ formatBoolLink='formatBoolLink'
 
 class ExampleGrid(JqGrid):
     model = JourSostAgent # could also be a queryset
-    fields = ['id', 'agent__user__username', 'link','cash_count', 'cash_code__name','printer__name', 'terminal__name'] # optional 
+    fields = ['id', 'date','agent__user__username', 'link','cash_count', 'cash_code__name','printer__name', 'terminal__name'] # optional 
     url = '/proc/examplegrid/' #reverse('grid_handler')
     caption = 'My First Grid' # optional
     colmodel_overrides = {

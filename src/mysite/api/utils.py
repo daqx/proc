@@ -31,7 +31,10 @@ def transfer( body_, login_, retval_):
             trans = Transaction.objects.filter(agent=ag.id, hesh_id=body_["hesh_id"])
         except(Transaction.DoesNotExist):
             pass
-        else:
+        except Exception as inst:
+            print type(inst)     # the exception instance
+            print inst.args      # arguments stored in .args
+            print inst
             retval_["status"] = "-1"
             return
             
@@ -112,7 +115,10 @@ def reg_sost( body_, login_, retval_):
     # И сохраним новый статус агента
     actS.save()
 
-    
+def get_time(retval_):
+    ''' Возвращает текущую дату '''
+    retval_["status"] = "0"
+    retval_["body"] = str(datetime.now())
 
 def get_opservices(login_, retval_):
     ''' Функция возвращает все доступные операторы услуг для заданного агента '''
@@ -128,7 +134,7 @@ def get_opservices(login_, retval_):
     query="select o.* from proc_opservice o, proc_agent_opservices ao where o.id=ao.opservice_id and ao.agent_id= %s  union   select o.* from proc_opservice o, proc_agent_opservice_group aog, proc_opservicegroup_opservice ogo where  aog.opservicegroup_id=ogo.opservicegroup_id and aog.agent_id = %s" % (id, id)
     
     op = OpService.objects.raw(query)[0:]
-    data = simplejson.dumps([{"code": o.code, "name": o.name, "need_check": o.need_check, "mask": o.mask, "state": o.state.id, "type": o.type.id, "order": o.order} for o in op])
+    data = simplejson.dumps([{"id": o.id,"code": o.code, "name": o.name, "need_check": o.need_check, "mask": o.mask, "state": o.state.id, "type": o.type.id, "order": o.order} for o in op])
     retval_["body"] = data
     return 0
      
@@ -145,7 +151,7 @@ def get_optype(login_, retval_):
         return "-1"
            
     opt = ServiceType.objects.all()
-    data = simplejson.dumps([{"code": o.code, "name": o.name, "parent": isNoneId(o.parent), "order": o.order} for o in opt])
+    data = simplejson.dumps([{"id": o.id,"code": o.code, "name": o.name, "parent": isNoneId(o.parent), "order": o.order} for o in opt])
     retval_["body"] = data
     return 0
 
@@ -162,6 +168,8 @@ def do_job(act_, body_, login_, retval_):
     elif act_ == "1":                               # Для журналирования состояния
         reg_sost( body_, login_, retval_)
         ret = "0"        
+    elif act_ == "2":                               # Запрос текущего времени
+        ret = get_time(retval_);
     elif act_ == "5":                               # Запрос типов операторов услуг
         ret = get_optype(login_, retval_);
     elif act_ == "6":                               # Запрос доступных операторов услуг

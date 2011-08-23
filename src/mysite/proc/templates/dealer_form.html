@@ -12,11 +12,12 @@
 
 	<form action="" method="post">
     	{% csrf_token %}       
-        <table>
+        <table  class="tbl_frm">
             {{ form.as_table }}
         </table>
         {% if del_url %}
         	<ul class="object-tools">
+        		<li><a href="addres">Адреса</a></li>
 				<li><a href="{{del_url}}">Удалить</a></li>
 			</ul>
         {% endif %}

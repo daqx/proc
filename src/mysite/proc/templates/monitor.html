@@ -16,7 +16,7 @@ $(function(){
 <table id='dealer' class='tbl'>
   <tr>
     <th>Агент</th>
-    <th>Дата</th>
+    <!-- th>Дата</th> -->
     <th>Связь</th>    
     <th>Количество купюр</th>
     <th>Состояние купюроприемника</th>
@@ -28,7 +28,7 @@ $(function(){
 {%for s in s_list  %}
   <tr>
     <td><a href="logs/{{s.agent.id}}">{{s.agent.user.username}}</a></td>
-    <td>{{s.date|date:"d.m.Y H:i:s"}}</td>
+    <!-- td>{{s.date|date:"d.m.Y H:i:s"}}</td> -->
     <td>
     	{% if s.link %}
     		<img src="/proc/static/img/icon-yes.gif" />
