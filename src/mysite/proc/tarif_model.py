@@ -43,7 +43,7 @@ class Tarif(models.Model):
         return self.name
     
     def calc_tarif(self,summa):
-        
+        s=0
         if self.prc==True:              #Расчет по процентам
            s=summa*self.summa/100
            if s < self.min and self.min!=0:
