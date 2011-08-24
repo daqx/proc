@@ -3,29 +3,27 @@
 <script type="text/javascript">
 
 $(function(){
-	$('#address tr:odd').css('backgroung-colour','#eeeeee');
+	$('#ipaddress tr:odd').css('backgroung-colour','#eeeeee');
 });
 </script>
 {% if perms.proc.add_address %}
 	<ul class="object-tools">
 		<li>
-			<a href="{% url mysite.proc.views.address.address_form_add id_ content %}">	Добавить</a>
+			<a href="{% url mysite.proc.views.address.ipaddress_form_add id_ content %}">	Добавить</a>
 		</li>
 	</ul>
 {% endif %}<br/>
-<table id='address' class='tbl'>
+<table id='ipaddress' class='tbl'>
   <tr>
-    <th>Адрес</th>
-    <th>Город</th>    
-    <th>Тип</th>
+    <th>IP адрес</th>    
     
   </tr>
 
 {%for s in s_list  %}
   <tr>
-    <td><a href="{% url mysite.proc.views.address.address_form id_ content s.id %}">{{s.address}}</a></td>
-    <td>{{s.town}}</td>
-    <td>{{s.get_type_display}}</td>
+    <td><a href="{% url mysite.proc.views.address.ipaddress_form id_ content s.id %}">{{s.ip}}</a></td>
+    
+    
     
   </tr>
 

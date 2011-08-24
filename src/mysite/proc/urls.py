@@ -64,10 +64,12 @@ urlpatterns=patterns('',
     (r'^address/add/(?P<id_>\d+)/(?P<content>\w+)$', address.address_form_add),                 # add
     (r'^address/(?P<id_>\d+)/(?P<content>\w+)/(?P<aid_>\d+)$', address.address_form),           # edit
     (r'^address/(?P<id_>\d+)/(?P<content>\w+)/(?P<aid_>\d+)/delete$', address.address_delete),  # delete
-    #(r'^address/agent/(?P<id_>\d+)$', address.address),
-    #(r'^address/(\d+)$', address.address_form),
-    #(r'^address/add/(\d+)$', address.address_form_add),
-    #(r'^address/add/(\d+)/delete$', address.address_delete),
+    # ============== IP ADDRESS ============
+    (r'^ipaddress/(?P<id_>\d+)/(?P<content>\w+)$', address.ipaddress),                              # view
+    (r'^ipaddress/add/(?P<id_>\d+)/(?P<content>\w+)$', address.ipaddress_form_add),                 # add
+    (r'^ipaddress/(?P<id_>\d+)/(?P<content>\w+)/(?P<aid_>\d+)$', address.ipaddress_form),           # edit
+    (r'^ipaddress/(?P<id_>\d+)/(?P<content>\w+)/(?P<aid_>\d+)/delete$', address.ipaddress_delete),  # delete
+    
     # ============== TARIF_ARR ============
     (r'^tarif_arr/(\d+)$', tarif.tarif_arr),
     (r'^tarif_arr/(\d+)/(\d+)$', tarif.tarif_arr_form),

@@ -6,7 +6,8 @@
 
 <form action="" method="post">
 	{% csrf_token %}
-	<table>{{ form.as_table }}
+	<table class="tbl_frm">
+		{{ form.as_table }}
 	</table>
 	{% if del_url %}
 	<ul class="object-tools">

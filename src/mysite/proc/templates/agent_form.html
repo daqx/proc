@@ -14,6 +14,13 @@
     	{% csrf_token %}       
         <table class="tbl_frm">
             {{ form.as_table }}
+            
+            {% if del_url %}
+            	<td>IP адреса</td>
+            	<td>
+            		<a href="{% url mysite.proc.views.address.ipaddress form.instance.id 'agent' %}">***</a>
+            	</td>
+            {% endif %}
         </table>
         {% if perms.proc.delete_agent %}
         	{% if del_url %}

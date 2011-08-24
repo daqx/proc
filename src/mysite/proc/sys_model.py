@@ -38,6 +38,7 @@ class IpAddress(models.Model):
     
     def __unicode__(self):
         return self.ip
+    
     class Meta:             
         app_label = "proc"
         
