@@ -14,5 +14,5 @@ tr=Transaction.objects.all()
 
 for i in tr:
 	print i
-	#time.sleep(1)
+	time.sleep(1)
 	
