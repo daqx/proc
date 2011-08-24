@@ -19,27 +19,29 @@ def address(request, id_, content):
     s_list = Addres.objects.filter(content_type = c, object_id = id_)    
     return render( request,'address.html', {'s_list': s_list,'content':content, 'id_':id_})
 
-def address_form(request,id_):
+def address_form(request,id_, content, aid_):
     if request.method=='POST':
-        a = Addres.objects.get(pk=id_)
+        a = Addres.objects.get(pk=aid_)
 
         form=AddressForm(request.POST, instance=a)
         if form.is_valid():
             form.save()
-            return HttpResponseRedirect('/proc/address/')
+            url_='/proc/address/%s/%s' % (id_, content)
+            return HttpResponseRedirect(url_)
         else:
             return render( request,'address_form.html', {'form': form})
     else:        
-        s = Addres.objects.get(id=id_)
+        s = Addres.objects.get(id=aid_)
         form=AddressForm(instance=s)
-        del_url="%s/delete" % id_
+        del_url="%s/delete" % aid_
         
         return render( request,'address_form.html', {'form': form,'del_url': del_url})
 
-def address_delete(request,id_):
-        s = Addres.objects.get(id=id_)
+def address_delete(request,id_, content, aid_):
+        s = Addres.objects.get(id=aid_)
         s.delete()
-        return HttpResponseRedirect('/proc/address')
+        url_='/proc/address/%s/%s' % (id_, content)
+        return HttpResponseRedirect(url_)
 
 def address_form_add(request, id_, content):
     if request.method=='POST':

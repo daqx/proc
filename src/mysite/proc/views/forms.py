@@ -37,6 +37,37 @@ class AgentEditForm(forms.ModelForm):
         model=Agent
         exclude=('user','hardware')
 
+'''=====================DEALER==========================='''
+class DealerForm(forms.ModelForm):    
+    username = forms.RegexField(label=("Username"), max_length=30, regex=r'^[\w.@+-]+$',
+        help_text = ("Обязательный. 30 символов или менньше. Только буквы, цифры и @/./+/-/_ ."),
+        error_messages = {'invalid': ("Это значение может содержать только буквы, цифры и @/./+/-/_ символы.")})
+    password = forms.CharField(label=("Password"), widget=forms.PasswordInput)
+    first_name = forms.CharField(max_length=30)
+    last_name = forms.CharField(max_length=30)
+    
+    class Meta:
+        model=Dealer
+        exclude=('user')
+
+class DealerEditForm(forms.ModelForm):    
+    username = forms.RegexField(label=("Username"), max_length=30, regex=r'^[\w.@+-]+$',
+        help_text = ("Обязательный. 30 символов или менньше. Только буквы, цифры и @/./+/-/_ ."),
+        error_messages = {'invalid': ("Это значение может содержать только буквы, цифры и @/./+/-/_ символы.")})
+    first_name = forms.CharField(max_length=30)
+    last_name = forms.CharField(max_length=30)
+    
+    class Meta:
+        model=Dealer
+        exclude=('user')
+        
+class IpAddressForm(forms.ModelForm):
+    
+    class Meta:
+        model=IpAddress
+        exclude=('content_type', 'object_id')
+
+
 class ServiceTypeForm(forms.ModelForm):   
     parent = forms.ModelChoiceField(queryset=ServiceType.objects.filter(parent=None)
                                     ,widget=forms.Select,required=False)
@@ -71,30 +102,6 @@ class TarifProfileForm(forms.ModelForm):
     class Meta:
         model=TarifProfile
 
-'''=====================DEALER==========================='''
-class DealerForm(forms.ModelForm):    
-    username = forms.RegexField(label=("Username"), max_length=30, regex=r'^[\w.@+-]+$',
-        help_text = ("Обязательный. 30 символов или менньше. Только буквы, цифры и @/./+/-/_ ."),
-        error_messages = {'invalid': ("Это значение может содержать только буквы, цифры и @/./+/-/_ символы.")})
-    password = forms.CharField(label=("Password"), widget=forms.PasswordInput)
-    first_name = forms.CharField(max_length=30)
-    last_name = forms.CharField(max_length=30)
-    
-    class Meta:
-        model=Dealer
-        exclude=('user')
-
-class DealerEditForm(forms.ModelForm):    
-    username = forms.RegexField(label=("Username"), max_length=30, regex=r'^[\w.@+-]+$',
-        help_text = ("Обязательный. 30 символов или менньше. Только буквы, цифры и @/./+/-/_ ."),
-        error_messages = {'invalid': ("Это значение может содержать только буквы, цифры и @/./+/-/_ символы.")})
-    first_name = forms.CharField(max_length=30)
-    last_name = forms.CharField(max_length=30)
-    
-    class Meta:
-        model=Dealer
-        exclude=('user')
-        
 
 
         

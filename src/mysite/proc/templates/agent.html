@@ -19,7 +19,7 @@ $(function(){
     <th>Наименование</th>
     <th>Логин</th>    
     <th>Диллер</th>
-    
+    <th>Адрес</th>
   </tr>
 
 {%for s in s_list  %}
@@ -27,7 +27,7 @@ $(function(){
     <td><a href="{{s.id}}">{{s.user.username}}</a></td>
     <td>{{s.login}}</td>
     <td>{{s.dealer.user.username}}</td>
-    
+    <td><a href="{% url mysite.proc.views.address.address s.id 'agent' %}">***</a></td>
   </tr>
 
 {%endfor %}

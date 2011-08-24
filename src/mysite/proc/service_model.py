@@ -10,7 +10,7 @@ from mysite.proc.sys_model import *
 
 # Create your models here.
 class ServiceType(models.Model):
-    code    =models.CharField(max_length=20)
+    code    =models.CharField(max_length=20, unique = True)
     name    =models.CharField(max_length=50)
     order   =models.IntegerField()
     parent  =models.ForeignKey('self', related_name='parent_type',null=True,blank=True)
@@ -30,7 +30,7 @@ class ServiceType(models.Model):
 class OpService(models.Model):
     state       =models.ForeignKey(Status,blank=False)
     name        =models.CharField(max_length=50)
-    code        =models.CharField(max_length=20)
+    code        =models.CharField(max_length=20, unique = True)
     order       =models.IntegerField()
     type        =models.ForeignKey(ServiceType)
     need_check  =models.BooleanField(default=False)
