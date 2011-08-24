@@ -53,8 +53,16 @@ class Tarif(models.Model):
         else:
             if self.summa!=0:           #Расчет по сумме
                 s=self.summa                
-            else:                       #Если сумма 0 тариф вычисляется по массиву сумм тарифа                
-                pass
+            else:                       #Если сумма 0 тариф вычисляется по массиву сумм тарифа
+                try:                
+                    ta = TarifArr.objects.filter( tarif=self, min__lte = summa, max__gt = summa)[0]
+                    
+                    if ta.prc:
+                        s = summa * ta.summa/100
+                    else:
+                        s = ta.summa
+                except(IndexError, TarifArr.DoesNotExist) :
+                    pass
                 #TODO: Здесь необходимо реализовать расчет по массиву сумм
         
         return s
