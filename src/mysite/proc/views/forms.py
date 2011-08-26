@@ -13,49 +13,49 @@ class AddressForm(forms.ModelForm):
         exclude=('content_type', 'object_id')
 
 class AgentForm(forms.ModelForm):    
-    username = forms.RegexField(label=("Username"), max_length=30, regex=r'^[\w.@+-]+$',
+    username = forms.RegexField(label=("Имя пользователя"), max_length=30, regex=r'^[\w.@+-]+$',
         help_text = ("Обязательный. 30 символов или менньше. Только буквы, цифры и @/./+/-/_ ."),
         error_messages = {'invalid': ("Обязательный. 30 символов или менньше. Только буквы, цифры и @/./+/-/_ .")})
-    password = forms.CharField(label=("Password"), widget=forms.PasswordInput)
-    first_name = forms.CharField(max_length=30)
-    last_name = forms.CharField(max_length=30)
-    cashcode_id = forms.CharField(max_length=30, required=False)
-    hdd_id= forms.CharField(max_length=30, required=False)
+    password = forms.CharField(label=("Пароль"), widget=forms.PasswordInput)
+    first_name = forms.CharField(label='Имя', max_length=30)
+    last_name = forms.CharField(label='Фамилия',max_length=30)
+    cashcode_id = forms.CharField(label='№ купюроприемника', max_length=30, required=False)
+    hdd_id= forms.CharField(label='№ жесткого диска', max_length=30, required=False)
     class Meta:
         model=Agent
         exclude=('user','hardware')
 
 class AgentEditForm(forms.ModelForm):    
-    username = forms.RegexField(label=("Username"), max_length=30, regex=r'^[\w.@+-]+$',
+    username = forms.RegexField(label=("Имя пользователя"), max_length=30, regex=r'^[\w.@+-]+$',
         help_text = ("Обязательный. 30 символов или менньше. Только буквы, цифры и @/./+/-/_ ."),
         error_messages = {'invalid': ("Обязательный. 30 символов или менньше. Только буквы, цифры и @/./+/-/_ .")})    
-    first_name = forms.CharField(max_length=30)
-    last_name = forms.CharField(max_length=30)
-    cashcode_id = forms.CharField(max_length=30, required=False)
-    hdd_id= forms.CharField(max_length=30, required=False)
+    first_name = forms.CharField(label='Имя', max_length=30)
+    last_name = forms.CharField(label='Фамилия',max_length=30)
+    cashcode_id = forms.CharField(label='№ купюроприемника', max_length=30, required=False)
+    hdd_id= forms.CharField(label='№ жесткого диска', max_length=30, required=False)
     class Meta:
         model=Agent
         exclude=('user','hardware')
 
 '''=====================DEALER==========================='''
 class DealerForm(forms.ModelForm):    
-    username = forms.RegexField(label=("Username"), max_length=30, regex=r'^[\w.@+-]+$',
+    username = forms.RegexField(label=("Имя пользователя"), max_length=30, regex=r'^[\w.@+-]+$',
         help_text = ("Обязательный. 30 символов или менньше. Только буквы, цифры и @/./+/-/_ ."),
         error_messages = {'invalid': ("Это значение может содержать только буквы, цифры и @/./+/-/_ символы.")})
-    password = forms.CharField(label=("Password"), widget=forms.PasswordInput)
-    first_name = forms.CharField(max_length=30)
-    last_name = forms.CharField(max_length=30)
+    password = forms.CharField(label=("Пароль"), widget=forms.PasswordInput)
+    first_name = forms.CharField(label='Имя', max_length=30)
+    last_name = forms.CharField(label='Фамилия',max_length=30)
     
     class Meta:
         model=Dealer
         exclude=('user')
 
 class DealerEditForm(forms.ModelForm):    
-    username = forms.RegexField(label=("Username"), max_length=30, regex=r'^[\w.@+-]+$',
+    username = forms.RegexField(label=("Имя пользователя"), max_length=30, regex=r'^[\w.@+-]+$',
         help_text = ("Обязательный. 30 символов или менньше. Только буквы, цифры и @/./+/-/_ ."),
-        error_messages = {'invalid': ("Это значение может содержать только буквы, цифры и @/./+/-/_ символы.")})
-    first_name = forms.CharField(max_length=30)
-    last_name = forms.CharField(max_length=30)
+        error_messages = {'invalid': ("Это значение может содержать только буквы, цифры и @/./+/-/_ символы.")})    
+    first_name = forms.CharField(label='Имя', max_length=30)
+    last_name = forms.CharField(label='Фамилия',max_length=30)
     
     class Meta:
         model=Dealer

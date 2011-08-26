@@ -14,6 +14,16 @@ def isNoneId(obj):
     else:
         return None
 
+def get_tarif_arr(t):
+    ''' Возвращает в виде JSON строки массив тарифа'''
+    
+    ar = TarifArr.objects.filter(tarif=t)           # выберем массив тарифа
+    
+    data = simplejson.dumps([{"id": tr.id, "prc": tr.prc, "summa": tr.summa, "min": tr.min, "max": tr.max} for tr in ar])
+    
+    return data
+
+
 def transfer( body_, login_, retval_):
     ''' Функция вставки нового платежа 
         ACT = 0
@@ -52,8 +62,6 @@ def transfer( body_, login_, retval_):
         tr.add(api = True)
     except(IndexError, Agent.DoesNotExist, OpService.DoesNotExist) :
         retval_["status"] = "-1"
-    
-    #return retval                                  # Если все нормально прошло то возвращается 0
 
 
 def reg_sost( body_, login_, retval_):
@@ -115,13 +123,36 @@ def reg_sost( body_, login_, retval_):
     # И сохраним новый статус агента
     actS.save()
 
+
 def get_time(retval_):
     ''' Возвращает текущую дату '''
     retval_["status"] = "0"
     retval_["body"] = str(datetime.now())
 
+
+def get_optype(login_, retval_):
+    ''' Функция возвращает все типы услуг
+        ACT = 5
+    '''
+    
+    retval_["status"] = "0"
+    
+    try:
+        id = Agent.objects.filter(user__username = login_)[0].id        # Достанем id Агента
+    except(IndexError, Agent.DoesNotExist) :
+        retval_["status"]="-1"
+        return "-1"
+           
+    opt = ServiceType.objects.all()
+    data = simplejson.dumps([{"id": o.id,"code": o.code, "name": o.name, "parent": isNoneId(o.parent), "order": o.order} for o in opt])
+    retval_["body"] = data
+    return 0
+
+
 def get_opservices(login_, retval_):
-    ''' Функция возвращает все доступные операторы услуг для заданного агента '''
+    ''' Функция возвращает все доступные операторы услуг для заданного агента 
+        ACT = 6
+    '''
     
     retval_["status"] = "0"
     
@@ -139,8 +170,10 @@ def get_opservices(login_, retval_):
     return 0
      
 
-def get_optype(login_, retval_):
-    ''' Функция возвращает все типы услуг'''
+def get_tarif_all(login_, retval_):
+    ''' Функция возвращает все тарифы для доступных операторов услуг, для заданного агента 
+        ACT = 7
+    '''
     
     retval_["status"] = "0"
     
@@ -149,14 +182,64 @@ def get_optype(login_, retval_):
     except(IndexError, Agent.DoesNotExist) :
         retval_["status"]="-1"
         return "-1"
-           
-    opt = ServiceType.objects.all()
-    data = simplejson.dumps([{"id": o.id,"code": o.code, "name": o.name, "parent": isNoneId(o.parent), "order": o.order} for o in opt])
+    
+    query="select o.* from proc_opservice o, proc_agent_opservices ao where o.id=ao.opservice_id and ao.agent_id= %s  union   select o.* from proc_opservice o, proc_agent_opservice_group aog, proc_opservicegroup_opservice ogo where  aog.opservicegroup_id=ogo.opservicegroup_id and aog.agent_id = %s" % (id, id)
+    
+    # Выберем список доступных операторов
+    op = OpService.objects.raw(query)
+    ar=[]
+    
+    # В цикле по операторам заполним массив ar[] тарифами этих операторов
+    for o in op:
+        query = 'select t.* from proc_agent_tarif_profile_arr ata, proc_tarifprofile tp, proc_tarifgroup tg,proc_tarifprofile_tarif_group tptg, proc_tarifgroup_tarif tgt, proc_tarif t,proc_opservice os where ata.agent_id=12 and tp.id=ata.tarifprofile_id and tptg.tarifprofile_id=tp.id and tptg.tarifgroup_id=tg.id and tgt.tarifgroup_id=tg.id and tgt.tarif_id=t.id and os.id=t.op_service_id and os.id=%s' % o.id
+    
+        try:
+            tr =Tarif.objects.raw(query)[0]
+            ar.append(tr)
+        except(IndexError) :
+            pass
+    
+    # сконвертируем выбранные тарифы в JSON строку
+    data = simplejson.dumps([{"id": tr.id, "name": tr.name, "op_service_id": tr.op_service.id, "prc": tr.prc,
+                             "summa": tr.summa, "min": tr.min, "max": tr.max, "arr" : get_tarif_arr(tr)} for tr in ar])
     retval_["body"] = data
     return 0
 
 
-
+def get_tarif( body_, login_, retval_):
+    ''' Функция возвращает тарифы для оператора услуг, для заданного агента 
+        ACT = 7
+    '''
+    
+    retval_["status"] = "0"
+    
+    try:
+        id = Agent.objects.filter(user__username = login_)[0].id        # Достанем id Агента
+    except(IndexError, Agent.DoesNotExist) :
+        retval_["status"]="-1"
+        return "-1"
+    
+    query="select o.* from proc_opservice o, proc_agent_opservices ao where o.id=ao.opservice_id and ao.agent_id= %s  union   select o.* from proc_opservice o, proc_agent_opservice_group aog, proc_opservicegroup_opservice ogo where  aog.opservicegroup_id=ogo.opservicegroup_id and aog.agent_id = %s" % (id, id)
+    
+    # Выберем список доступных операторов
+    op = OpService.objects.get(body_)
+    ar=[]
+    
+    # В цикле по операторам заполним массив ar[] тарифами этих операторов
+    for o in op:
+        query = 'select t.* from proc_agent_tarif_profile_arr ata, proc_tarifprofile tp, proc_tarifgroup tg,proc_tarifprofile_tarif_group tptg, proc_tarifgroup_tarif tgt, proc_tarif t,proc_opservice os where ata.agent_id=12 and tp.id=ata.tarifprofile_id and tptg.tarifprofile_id=tp.id and tptg.tarifgroup_id=tg.id and tgt.tarifgroup_id=tg.id and tgt.tarif_id=t.id and os.id=t.op_service_id and os.id=%s' % o.id
+    
+        try:
+            tr =Tarif.objects.raw(query)[0]
+            ar.append(tr)
+        except(IndexError) :
+            pass
+    
+    # сконвертируем выбранные тарифы в JSON строку
+    data = simplejson.dumps([{"id": tr.id, "name": tr.name, "op_service_id": tr.op_service.id, "prc": tr.prc,
+                             "summa": tr.summa, "min": tr.min, "max": tr.max, "arr" : get_tarif_arr(tr)} for tr in ar])
+    retval_["body"] = data
+    return 0
 
 def do_job(act_, body_, login_, retval_):
     ''' Функция обработки команд '''        
@@ -165,15 +248,25 @@ def do_job(act_, body_, login_, retval_):
     
     if act_ == "0":                                 # Новый платеж
         transfer( body_, login_, retval_)
+    
     elif act_ == "1":                               # Для журналирования состояния
         reg_sost( body_, login_, retval_)
         ret = "0"        
+    
     elif act_ == "2":                               # Запрос текущего времени
         ret = get_time(retval_);
+    
     elif act_ == "5":                               # Запрос типов операторов услуг
         ret = get_optype(login_, retval_);
+    
     elif act_ == "6":                               # Запрос доступных операторов услуг
         ret = get_opservices(login_, retval_);
+    
+    elif act_ == "7":                               # Запрос списка тарифов доступных операторов услуг
+        ret = get_tarif_all(login_, retval_);
+    
+    elif act_ == "8":                               # Запрос тарифа для оператора услуг
+        ret = get_tarif( body_, login_, retval_);
         
     
     

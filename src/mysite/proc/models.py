@@ -19,25 +19,19 @@ AGENT_TYPE = (
     )
 
 class Dealer(models.Model):
-    account         =models.CharField(max_length=8,blank=True)
+    account         =models.CharField('Счет',max_length=8,blank=True)
     addresses       = generic.GenericRelation( Addres, null=True, blank=True )        
-    check_for_ip    =models.BooleanField(default=False)
-    #date_create     =models.DateTimeField(auto_now_add=True)
-    #date_last_visit =models.DateTimeField( null=True, blank=True)
-    dealer          =models.ForeignKey('self',related_name='parent', null=True, blank=True)
-    #email           =models.EmailField(blank=True)    
-    inn             =models.CharField(max_length=12,blank=True)
+    check_for_ip    =models.BooleanField('Проверять IP',default=False)    
+    dealer          =models.ForeignKey('self',related_name='parent', null=True, blank=True, verbose_name='Диллер')        
+    inn             =models.CharField('ИНН',max_length=12,blank=True)
     ipaddresses     = generic.GenericRelation( IpAddress, null=True, blank=True )
-    kopf            =models.ForeignKey(Kopf)
-    limit           =models.FloatField(blank=True)
-    #login           =models.CharField(max_length=20,unique=True)
-    #name            =models.CharField(max_length=50)
-    overdraft       =models.FloatField(blank=True)
-    #password        =models.CharField(max_length=100)
-    tel             =models.CharField(max_length=20,blank=True)    
-    state           =models.ForeignKey(Status)
-    summa           =models.FloatField(blank=True)
-    user            =models.OneToOneField(User, blank=True)
+    kopf            =models.ForeignKey( Kopf,  verbose_name='Код ОПФ')
+    limit           =models.FloatField('Лимит',blank=True)    
+    overdraft       =models.FloatField('Овердрафт',blank=True)    
+    tel             =models.CharField('Телефон',max_length=20,blank=True)    
+    state           =models.ForeignKey(Status, verbose_name='Статус')
+    summa           =models.FloatField('Сумма',blank=True)
+    user            =models.OneToOneField(User, blank=True, verbose_name='Пользователь')
     
     def __unicode__(self):
         return self.user.username
@@ -75,21 +69,21 @@ class Dealer(models.Model):
 
 class Agent(models.Model):
     addresses       = generic.GenericRelation( Addres, null=True, blank=True )    
-    check_for_ip    =models.BooleanField(default=False)    
-    dealer          =models.ForeignKey(Dealer, null=True, blank= True)    
-    name            =models.CharField(max_length=50)
-    imei            =models.CharField(max_length=20,blank=True)
+    check_for_ip    =models.BooleanField('Проверить IP',default=False)    
+    dealer          =models.ForeignKey(Dealer, null=True, blank= True, verbose_name='Диллер')    
+    name            =models.CharField('Наименование',max_length=50)
+    imei            =models.CharField('IMEI',max_length=20,blank=True)
     ipaddresses     = generic.GenericRelation( IpAddress, null=True, blank=True )    
-    opservices      =models.ManyToManyField(OpService, null=True, blank=True)
-    opservice_group =models.ManyToManyField(OpServiceGroup)    
+    opservices      =models.ManyToManyField(OpService, null=True, blank=True, verbose_name='Операторы услуг')
+    opservice_group =models.ManyToManyField(OpServiceGroup, verbose_name='Группы операторов услуг')    
     tarif_profile_arr=models.ManyToManyField(TarifProfile)
-    tel             =models.CharField(max_length=20,blank=True)
-    type            =models.CharField(max_length=1,choices=AGENT_TYPE)
-    state           =models.ForeignKey(Status)
-    user            =models.OneToOneField(User, blank=True)
-    key_hash        =models.CharField(max_length=40, blank=True, null=True)
+    tel             =models.CharField('Телефон',max_length=20,blank=True)
+    type            =models.CharField('Тип',max_length=1,choices=AGENT_TYPE)
+    state           =models.ForeignKey(Status, verbose_name='Статус')
+    user            =models.OneToOneField(User, blank=True, verbose_name='Пользователь')
+    key_hash        =models.CharField('Хеш ключа',max_length=40, blank=True, null=True)
     hardware        =models.CharField(max_length=150, blank=True, null=True)
-    cashcode_capacity=models.IntegerField(blank=True, null=True)
+    cashcode_capacity=models.IntegerField('Емкость купюроприемника',blank=True, null=True)
     
     def __unicode__(self):
         return self.name
@@ -122,7 +116,7 @@ class Transaction(models.Model):
     return_reason   =models.CharField(max_length=100)                           # Причина отказа и служ отметки    
     seans_number    =models.CharField(max_length=20,null=True, blank=True)      # Номер сеанса обработки
     processed       =models.NullBooleanField(null=True, blank=True)             # Признак успешной обработки
-    blocked         =models.NullBooleanField(null=True, blank=True)             # Признак блокировки процессом
+    locked          =models.NullBooleanField(null=True, blank=True)             # Признак блокировки процессом
     try_count       =models.FloatField(null=True, blank=True)                   # Количество попыток
     file_name       =models.CharField(max_length=20,null=True, blank=True)
     user_proc       =models.OneToOneField(User,null=True, blank=True)
