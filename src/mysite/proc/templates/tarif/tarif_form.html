@@ -1,0 +1,99 @@
+{%extends "base.html"%}
+{%block content%}
+
+   
+
+    {% if form.errors %}
+        <p style="color: red;">
+            Please correct the error{{ form.errors|pluralize }} below.
+        </p>
+    {% endif %}
+
+
+	<form action="" method="post">
+    	{% csrf_token %}       
+        <table class="tbl_frm">
+            <tbody>            
+	        	<tr>
+					<th>{{ form.code.label_tag }}
+					</th>
+					<td>{{ form.code.errors }}
+						{{ form.code }}
+					</td>	        	
+	        	</tr>
+	        	<tr>
+					<th>{{ form.name.label_tag }}
+					</th>
+					<td>{{ form.name.errors }}
+						{{ form.name }}
+					</td>	        	
+	        	</tr>
+	        	<tr>
+					<th><label for="id_op_service">Оператор услуг</label>
+					</th>
+					<td>{{ form.op_service.errors }}
+						{{ form.instance.op_service }}
+					</td>	        	
+	        	</tr>
+	        	<tr>
+					<th><label for="id_prc">Процент</label>
+					</th>
+					<td>{{ form.prc.errors }}
+						{{ form.instance.prc }}
+					</td>	        	
+	        	</tr>
+	        	<tr>
+					<th><label for="id_summa">Сумма</label>
+					</th>
+					<td>{{ form.summa.errors }}
+						{{ form.instance.summa }}
+					</td>	        	
+	        	</tr>
+	        	<tr>
+					<th><label for="id_min">Минимальная сумма комисии</label>
+					</th>
+					<td>{{ form.min.errors }}
+						{{ form.instance.min }}
+					</td>	        	
+	        	</tr>
+	        	<tr>
+					<th><label for="id_max">Максимальная сумма комисии</label>
+					</th>
+					<td>{{ form.max.errors }}
+						{{ form.instance.max }}
+					</td>	        	
+	        	</tr>
+	        	<tr>
+					<th><label for="id_tarif_plan">Тарифный план</label>
+					</th>
+					<td>{{ form.tarif_plan.errors }}
+						{{ form.instance.tarif_plan }}
+					</td>	        	
+	        	</tr>	        	
+	        	<tr>
+					<th>{{ form.summa_own.label_tag }}
+					</th>
+					<td>{{ form.summa_own.errors }}
+						{{ form.summa_own }}
+					</td>	        	
+	        	</tr>
+	        	
+	        
+	        {% if arr_url %}
+	        	<tr>
+	        		<td>Сетка тарифа</td>
+	        		<td><div><a href="{{arr_url}}">***</a></div></td>
+	        	</tr>
+	        {% endif %}
+	        
+	        </tbody>
+        </table>
+        {% if del_url %}
+        	<ul class="object-tools">
+				<li><a href="{{del_url}}">Удалить</a></li>
+			</ul>
+        {% endif %}
+        <input type="submit" value="Сохранить">
+    </form>
+
+{%endblock%}

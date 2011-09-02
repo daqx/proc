@@ -7,6 +7,24 @@ from mysite.proc.tarif_model import *
 from mysite.proc.models import *
 
 
+'''***********************************************************************************'''
+# I used this instead of lambda expression after scope problems
+def _get_cleaner(form, field):
+    def clean_field():
+         return getattr(form.instance, field, None)
+    return clean_field
+
+class ROFormMixin(forms.BaseForm):
+    def __init__(self, *args, **kwargs):
+        super(ROFormMixin, self).__init__(*args, **kwargs)
+        if hasattr(self, "read_only"):
+            if self.instance and self.instance.pk:
+                for field in self.read_only:
+                    self.fields[field].widget.attrs['readonly'] = True
+                    setattr(self, "clean_" + field, _get_cleaner(self, field))
+
+
+'''***********************************************************************************'''
 class AddressForm(forms.ModelForm):    
     class Meta:
         model=Addres
@@ -89,18 +107,35 @@ class TarifArrForm(forms.ModelForm):
     class Meta:
         model=TarifArr
         
-class TarifForm(forms.ModelForm):    
+class TarifForm(forms.ModelForm):   
+    
+    #def clean(self):
+    #   cleaned_data = self.cleaned_data
+    #   domain = cleaned_data.get("domain")
+    #   extension = cleaned_data.get("extension")
+        #return cleaned_data
+    
     class Meta:
         model=Tarif
+        exclude=('op_service','summa','prc','min','max','tarif_plan')
+
+class TarifPlanForm(forms.ModelForm):    
+    class Meta:
+        model=TarifPlan
+
+class TarifArrBaseForm(forms.ModelForm):    
+    class Meta:
+        model=TarifArrBase
+        
+class TarifBaseForm(forms.ModelForm):    
+    class Meta:
+        model=TarifBase
         #exclude=('op_service',)
 
-class TarifGroupForm(forms.ModelForm):    
+class TarifPlanBaseForm(forms.ModelForm):    
     class Meta:
-        model=TarifGroup
+        model=TarifPlanBase
 
-class TarifProfileForm(forms.ModelForm):    
-    class Meta:
-        model=TarifProfile
 
 
 

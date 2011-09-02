@@ -1,0 +1,26 @@
+{%extends "base.html"%}
+{%block content%}
+
+   
+
+    {% if form.errors %}
+        <p style="color: red;">
+            Please correct the error{{ form.errors|pluralize }} below.
+        </p>
+    {% endif %}
+
+
+	<form action="{{id}}" method="post">
+    	{% csrf_token %}       
+        <table class="tbl_frm">
+            {{ form.as_table }}
+        </table>
+        {% if del_url %}
+        	<ul class="object-tools">
+				<li><a href="{{del_url}}">Удалить</a></li>
+			</ul>
+        {% endif %}
+        <input type="submit" value="Сохранить">
+    </form>
+
+{%endblock%}

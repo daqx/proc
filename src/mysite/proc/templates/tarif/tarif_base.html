@@ -9,7 +9,7 @@ $(function(){
 {% if perms.proc.add_tarif %}
 	<ul class="object-tools">
 		<li>
-			<a href="add">	Добавить</a>
+			<a href="{{add_url}}">	Добавить</a>
 		</li>
 	</ul>
 {% endif %}
@@ -24,18 +24,20 @@ $(function(){
     <th>Максимум</th>
     <th>Процент</th>
     <th>Оператор услуг</th>
+    <th>Тарифный план</th>
     
   </tr>
 
 {%for s in s_list  %}
   <tr>
-  	<td><a href="{{s.id}}">{{s.code}}</a></td>
+  	<td><a href="{{tp}}/{{s.id}}">{{s.code}}</a></td>
     <td>{{s.name}}</td>
     <td>{{s.summa}}</td>
     <td>{{s.min}}</td>
     <td>{{s.max}}</td>
     <td>{{s.prc}}</td>
     <td>{{s.op_service.name}}</td>
+    <td>{{s.tarif_plan.name}}</td>
   </tr>
 
 {%endfor %}

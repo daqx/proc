@@ -13,8 +13,14 @@
 
 	<form action="" method="post">
     	{% csrf_token %}       
-        <table  class="tbl_frm">
+        <table class="tbl_frm">
             {{ form.as_table }}
+            
+            {% if arr_url %}
+	        	<tr>
+	        		<td>Массив тарифов</td>
+	        		<td><div><a href="{{arr_url}}">***</a></div></td>
+	        {% endif %}
 	        
         </table>
         {% if del_url %}

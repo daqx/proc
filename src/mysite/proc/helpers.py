@@ -57,3 +57,19 @@ def json_encode(data):
     ret = _any(data)
 
     return json.dumps(ret, cls=DateTimeAwareJSONEncoder)
+
+
+def _digest( *args):
+        """
+        Generates a 32-bit digest of a set of arguments that can be used to
+        shorten identifying names.
+        """
+        return '%x' % (abs(hash(args)) % 4294967296L)  # 2**32
+
+def hash_for_constraint():
+    r_table ='proc_agent_tarif_profile_arr'
+    table = 'proc_agent'
+    r_col = 'agent_id'
+    col = 'id'
+    r_name = '%s_refs_%s_%s' % (r_col, col, _digest(r_table, table))
+    

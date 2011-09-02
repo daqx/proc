@@ -64,12 +64,13 @@ $(document).ready(function () {
 		</DIV>
 		
 		<div class="ui-layout-west">
-		
-			<ul>
-				{% for s in request.session.menu_list  %}					  					
-			  			<li><a href="{{s.url}}">{{s.name}}</a> </li>					
-				{%endfor %}
-			</ul>							
+			<div class="mnu">
+				<ul>
+					{% for s in request.session.menu_list  %}					  					
+				  			<li class="mnu"><a class="mnu" href="{{s.url}}">{{s.name}}</a> </li>					
+					{%endfor %}
+				</ul>		
+			</div>					
 		
 		</div>
 			

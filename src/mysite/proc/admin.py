@@ -46,7 +46,7 @@ class MenuAdmin(admin.ModelAdmin):
     get_perms_name.short_description="perm"
     
 class OpServiceAdmin(admin.ModelAdmin):
-    list_display=('code','name')
+    list_display=('code','name','state','order','type','need_check','mask')
     raw_id_fields = ('type',)
 
 class OpServiceGroupAdmin(admin.ModelAdmin):
@@ -58,7 +58,7 @@ class RegionAdmin(admin.ModelAdmin):
     list_display=('country','name')
     
 class ServiceTypeAdmin(admin.ModelAdmin):
-    list_display=('code','name','parent')
+    list_display=('code','name','parent','order')
     search_fields = ('code', 'name')
 
 class StatusAdmin(admin.ModelAdmin):
@@ -77,12 +77,27 @@ class TarifAdmin(admin.ModelAdmin):
     list_display=('name','code','op_service','summa','min','max',"prc")
     raw_id_fields = ('op_service',)
 
-class TarifGroupAdmin(admin.ModelAdmin):
-    list_display=('name','code')
+#class TarifGroupAdmin(admin.ModelAdmin):
+#    list_display=('name','code')
     #raw_id_fields = ('tarif',)
     
-class TarifProfileAdmin(admin.ModelAdmin):
+class TarifPlanAdmin(admin.ModelAdmin):
     list_display=('name','code','date_begin','date_end')
+
+class TarifArrBaseAdmin(admin.ModelAdmin):
+    list_display=('tarif','summa','min','max',"prc")
+    
+class TarifBaseAdmin(admin.ModelAdmin):
+    list_display=('name','code','op_service','summa','min','max',"prc")
+    raw_id_fields = ('op_service',)
+
+#class TarifGroupAdmin(admin.ModelAdmin):
+#    list_display=('name','code')
+    #raw_id_fields = ('tarif',)
+    
+class TarifPlanBaseAdmin(admin.ModelAdmin):
+    list_display=('name','code','date_begin','date_end')
+
     
 class TownAdmin(admin.ModelAdmin):
     list_display=('get_country','region','name')
@@ -117,7 +132,10 @@ admin.site.register(Status, StatusAdmin)
 admin.site.register(SostAgent, SostAgentAdmin)
 admin.site.register(Tarif, TarifAdmin)
 admin.site.register(TarifArr, TarifArrAdmin)
-admin.site.register(TarifGroup, TarifGroupAdmin)
-admin.site.register(TarifProfile, TarifProfileAdmin)
+#admin.site.register(TarifGroup, TarifGroupAdmin)
+admin.site.register(TarifPlan, TarifPlanAdmin)
+admin.site.register(TarifBase, TarifAdmin)
+admin.site.register(TarifArrBase, TarifArrAdmin)
+admin.site.register(TarifPlanBase, TarifPlanAdmin)
 admin.site.register(Town, TownAdmin)
 admin.site.register(Transaction, TransactionAdmin)

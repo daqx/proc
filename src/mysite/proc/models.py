@@ -18,6 +18,18 @@ AGENT_TYPE = (
         ('W', 'Web'),
     )
 
+
+class TarifPlanM2M(models.Model):    
+    tarif_plan  =models.ForeignKey(TarifPlan)
+    
+    content_type = models.ForeignKey(ContentType, related_name='TarifPlanM2Ms')
+    object_id = models.IntegerField()
+    content_object = generic.GenericForeignKey()
+    
+    def __unicode__(self):
+        return self.id
+
+
 class Dealer(models.Model):
     account         =models.CharField('Счет',max_length=8,blank=True)
     addresses       = generic.GenericRelation( Addres, null=True, blank=True )        
@@ -26,8 +38,9 @@ class Dealer(models.Model):
     inn             =models.CharField('ИНН',max_length=12,blank=True)
     ipaddresses     = generic.GenericRelation( IpAddress, null=True, blank=True )
     kopf            =models.ForeignKey( Kopf,  verbose_name='Код ОПФ')
-    limit           =models.FloatField('Лимит',blank=True)    
-    overdraft       =models.FloatField('Овердрафт',blank=True)    
+    limit           =models.FloatField('Лимит',null=True,blank=True)    
+    overdraft       =models.FloatField('Овердрафт',null=True,blank=True) 
+    tarif_plan_arr  =generic.GenericRelation(TarifPlanM2M, null=True, blank=True)   
     tel             =models.CharField('Телефон',max_length=20,blank=True)    
     state           =models.ForeignKey(Status, verbose_name='Статус')
     summa           =models.FloatField('Сумма',blank=True)
@@ -45,6 +58,7 @@ class Dealer(models.Model):
         arc.saldo = self.get_saldo(datetime.now()) 
         arc.save()
         
+        self.summa = arc.saldo
         super(Dealer, self).save()
     
     def get_saldo(self, cdate):
@@ -61,9 +75,9 @@ class Dealer(models.Model):
             return 0
         
         if arc.dt:
-            return arc.saldo+arc.summa
-        else:
             return arc.saldo-arc.summa
+        else:
+            return arc.saldo+arc.summa
             
         
 
@@ -76,7 +90,7 @@ class Agent(models.Model):
     ipaddresses     = generic.GenericRelation( IpAddress, null=True, blank=True )    
     opservices      =models.ManyToManyField(OpService, null=True, blank=True, verbose_name='Операторы услуг')
     opservice_group =models.ManyToManyField(OpServiceGroup, verbose_name='Группы операторов услуг')    
-    tarif_profile_arr=models.ManyToManyField(TarifProfile)
+    tarif_plan_arr  =generic.GenericRelation(TarifPlanM2M, null=True, blank=True)
     tel             =models.CharField('Телефон',max_length=20,blank=True)
     type            =models.CharField('Тип',max_length=1,choices=AGENT_TYPE)
     state           =models.ForeignKey(Status, verbose_name='Статус')
@@ -97,7 +111,7 @@ class Agent(models.Model):
                                            
             return tr.calc_tarif(summa)
             
-        except(IndexError, TarifProfile.DoesNotExist) :
+        except(IndexError, TarifPlan.DoesNotExist) :
             return 0
     
 class Transaction(models.Model):
@@ -180,7 +194,7 @@ class HistoryState(models.Model):
     trans       =models.ForeignKey(Transaction, related_name="trans")
     
     def __unicode__(self):
-        return "%s %s" % (self.status.name, self.date)
+        return "%s %s" % (self.state.name, self.date)
 
 class Encashment(models.Model):
     ''' Инкасация
@@ -194,4 +208,6 @@ class Encashment(models.Model):
     agent       =models.ForeignKey(Agent)
     
     def __unicode__(self):
-        return "%s" % self.date    
+        return "%s" % self.date   
+    
+

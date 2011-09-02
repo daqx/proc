@@ -9,7 +9,7 @@ $(function(){
 {% if perms.proc.add_tarif %}
 	<ul class="object-tools">
 		<li>
-			<a href="add">	Добавить</a>
+			<a href="gen_from_base">Сгенерировать с базовой</a>
 		</li>
 	</ul>
 {% endif %}
@@ -19,7 +19,8 @@ $(function(){
   <tr>
     <th>Код</th>    
     <th>Наименование</th>
- 
+    <th>Дата начала</th>    
+    <th>Дата окончания</th>
     
   </tr>
 
@@ -27,7 +28,9 @@ $(function(){
   <tr>
   	<td><a href="{{s.id}}">{{s.code}}</a></td>
     <td>{{s.name}}</td>
-  
+    <td>{{s.date_begin}}</td>
+    <td>{{s.date_end}}</td>
+    
   </tr>
 
 {%endfor %}

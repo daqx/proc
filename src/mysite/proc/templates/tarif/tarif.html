@@ -1,0 +1,44 @@
+{%extends "base.html"%}
+{%block content%}
+<script type="text/javascript">
+
+$(function(){
+	$('#tarif tr:odd').css('backgroung-colour','#eeeeee');
+});
+</script>
+{% if perms.proc.add_tarif %}
+	<ul class="object-tools">
+		<li>
+			<a href="add">	Добавить</a>
+		</li>
+	</ul>
+{% endif %}
+<br/>
+
+<table id='tarif' class='tbl'>
+  <tr>
+    <th>Код</th>    
+    <th>Наименование</th>
+    <th>Сумма</th>    
+    <th>Минимум</th>
+    <th>Максимум</th>
+    <th>Процент</th>
+    <th>Оператор услуг</th>
+    
+  </tr>
+
+{%for s in s_list  %}
+  <tr>
+  	<td><a href="{{tp}}/{{s.id}}">{{s.code}}</a></td>
+    <td>{{s.name}}</td>
+    <td>{{s.summa}}</td>
+    <td>{{s.min}}</td>
+    <td>{{s.max}}</td>
+    <td>{{s.prc}}</td>
+    <td>{{s.op_service.name}}</td>
+  </tr>
+
+{%endfor %}
+</table>
+
+{%endblock%}

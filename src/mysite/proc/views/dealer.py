@@ -57,7 +57,10 @@ def dealer_form_add(request,id_=0):
         if form.is_valid():
             d=form.save(commit=False)
             u=User.objects.create_user(form.cleaned_data["username"], '', form.cleaned_data["password"])
+            u.first_name = form.cleaned_data["first_name"]
+            u.last_name = form.cleaned_data["last_name"]
             u.save()
+            
             d.user = u
             d.save()
             return HttpResponseRedirect('/proc/dealer/')
@@ -110,6 +113,7 @@ def agent_form(request,id_):
             u.last_name =form.cleaned_data["last_name"]            
             u.save()
             a.save()
+            form.save_m2m()
             return HttpResponseRedirect('/proc/agent/')
         else:
             return render(request,'agent_form.html', {'form': form})
@@ -118,9 +122,14 @@ def agent_form(request,id_):
         
         hdd_id = None
         cashcode_id = None
+        hardware = {}
         
         if s.hardware != None:
-            hardware = simplejson.loads(s.hardware)
+            try:
+                hardware = simplejson.loads(s.hardware)
+            except Exception as inst:
+                pass
+                
             if "hdd_id" in hardware:
                 hdd_id = hardware["hdd_id"]
                 
@@ -162,9 +171,12 @@ def agent_form_add(request,id_=0):
                 d.hardware = hardware
             
             u=User.objects.create_user(form.cleaned_data["username"], '', form.cleaned_data["password"])
+            u.first_name = form.cleaned_data["first_name"]
+            u.last_name = form.cleaned_data["last_name"]
             u.save()
             d.user = u
             d.save()
+            form.save_m2m()
             return HttpResponseRedirect('/proc/agent/')
         else:
             return render(request,'agent_form.html', {'form': form})
@@ -172,4 +184,6 @@ def agent_form_add(request,id_=0):
         
         form=AgentForm(initial={'password':'', 'username' : ''})      
         return render(request,'agent_form.html', {'form': form})
-       
+    
+    
+    

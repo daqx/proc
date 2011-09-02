@@ -15,13 +15,15 @@ ADDRES_TYPE = (
     )
 
 class TarifArr(models.Model):    
-    
+    parent      =models.BooleanField(default=True)                          # Признак родительского тарифа
     prc         =models.BooleanField(default=True)
     summa       =models.FloatField(default=0)
     min         =models.FloatField(default=0)
     max         =models.FloatField(default=0)
     tarif       =models.ForeignKey("Tarif",  verbose_name="tarif", related_name="tarifs")
-    
+    beg_time    =models.TimeField(blank=True, null=True)
+    end_time    =models.TimeField(blank=True, null=True)
+        
     def __unicode__(self):
         return "%s | %s | %s |"%(self.summa,self.min,self.max)
     
@@ -29,15 +31,30 @@ class TarifArr(models.Model):
         app_label = "proc"
 
 
+class TarifPlan(models.Model):
+    code        =models.CharField(max_length=20,unique=True)
+    name        =models.CharField(max_length=50)    
+    date_begin  =models.DateTimeField()
+    date_end    =models.DateTimeField(blank=True, null=True)
+    
+    def __unicode__(self):
+        return self.name
+    
+    class Meta:
+        app_label = "proc"
+    
+
+
 class Tarif(models.Model):
     code        =models.CharField(max_length=20,unique=True)
     name        =models.CharField(max_length=50)
     op_service  =models.ForeignKey(OpService)
     prc         =models.BooleanField(default=True)
-    summa       =models.FloatField(default=0)
+    summa       =models.FloatField(default=0)    
+    summa_own   =models.FloatField(default=0)
     min         =models.FloatField(default=0)
     max         =models.FloatField(default=0)
-    
+    tarif_plan  =models.ForeignKey(TarifPlan)
     
     def __unicode__(self):
         return self.name
@@ -71,29 +88,54 @@ class Tarif(models.Model):
     class Meta:
         app_label = "proc"
         
+
+
+class TarifArrBase(models.Model):    
+    prc         =models.BooleanField(default=True)
+    summa       =models.FloatField(default=0)
+    min         =models.FloatField(default=0)
+    max         =models.FloatField(default=0)
+    tarif       =models.ForeignKey("TarifBase",  verbose_name="tarifbase", related_name="tarifs")
+    beg_time    =models.TimeField(blank=True, null=True)
+    end_time    =models.TimeField(blank=True, null=True)
         
-        
-class TarifGroup(models.Model):
-    code        =models.CharField(max_length=20,unique=True)
-    name        =models.CharField(max_length=50)
-    tarif       =models.ManyToManyField(Tarif)
-    
     def __unicode__(self):
-        return self.name
+        return "%s | %s | %s |"%(self.summa,self.min,self.max)
     
     class Meta:
         app_label = "proc"
-    
-class TarifProfile(models.Model):
+
+
+class TarifPlanBase(models.Model):
     code        =models.CharField(max_length=20,unique=True)
-    name        =models.CharField(max_length=50)
-    tarif_group =models.ManyToManyField(TarifGroup)
+    name        =models.CharField(max_length=50)    
     date_begin  =models.DateTimeField()
-    date_end    =models.DateTimeField()
+    date_end    =models.DateTimeField(blank=True, null=True)
     
     def __unicode__(self):
         return self.name
     
     class Meta:
         app_label = "proc"
+
+class TarifBase(models.Model):
+    code        =models.CharField(max_length=20,unique=True)
+    name        =models.CharField(max_length=50)
+    op_service  =models.ForeignKey(OpService)
+    prc         =models.BooleanField(default=True)
+    summa       =models.FloatField(default=0)
+    min         =models.FloatField(default=0)
+    max         =models.FloatField(default=0)
+    tarif_plan  =models.ForeignKey(TarifPlanBase)
+    
+    
+    def __unicode__(self):
+        return self.name
+    
+    
+    class Meta:
+        app_label = "proc"
+
+
+
     
