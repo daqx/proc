@@ -49,6 +49,8 @@ class AgentEditForm(forms.ModelForm):
         error_messages = {'invalid': ("Обязательный. 30 символов или менньше. Только буквы, цифры и @/./+/-/_ .")})    
     first_name = forms.CharField(label='Имя', max_length=30)
     last_name = forms.CharField(label='Фамилия',max_length=30)
+    #opservices = forms.ModelMultipleChoiceField(widget=forms.CheckboxSelectMultiple(),required=True)
+
     cashcode_id = forms.CharField(label='№ купюроприемника', max_length=30, required=False)
     hdd_id= forms.CharField(label='№ жесткого диска', max_length=30, required=False)
     class Meta:
@@ -106,6 +108,7 @@ class OpServiceGroupForm(forms.ModelForm):
 class TarifArrForm(forms.ModelForm):    
     class Meta:
         model=TarifArr
+        exclude =('parent','tarif')
         
 class TarifForm(forms.ModelForm):   
     

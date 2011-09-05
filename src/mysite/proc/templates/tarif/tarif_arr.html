@@ -23,17 +23,27 @@ $(function(){
     <th>Минимум</th>
     <th>Максимум</th>
     <th>Процент</th>
-    <th>Тариф</th>
+    
     
   </tr>
 
 {%for s in s_list  %}
   <tr>
-    <td><a href="{{tr}}/{{s.id}}">{{s.summa}}</a></td>
+    <td>
+    	{% if s.parent %}
+    		{{s.summa}}
+    	{% else %}
+    		<a href="{{tr}}/{{s.id}}">{{s.summa}}</a>
+    	{% endif %}
+    </td>
     <td>{{s.min}}</td>
     <td>{{s.max}}</td>
     <td>{{s.prc}}</td>
-    <td>{{s.tarif.name}}</td>
+    <td>
+    	{% if s.parent %}    	
+    		<a href="{{tr}}/copy/{{s.id}}">копировать</a>
+    	{% endif %}
+    </td>
   </tr>
 
 {%endfor %}

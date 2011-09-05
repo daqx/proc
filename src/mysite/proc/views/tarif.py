@@ -51,7 +51,10 @@ def tarif_arr_form_add(request,tr,id_=0):
     if request.method=='POST':
         form=TarifArrForm(request.POST)
         if form.is_valid():
-            form.save()
+            tr_obj = Tarif.objects.get(pk=tr)
+            ta = form.save(commit=False)
+            ta.tarif = tr_obj
+            ta.save()
             return HttpResponseRedirect('/proc/tarif_arr/%s'%tr)
         else:
             return render( request,'tarif/tarif_arr_form.html', {'form': form})
@@ -61,6 +64,16 @@ def tarif_arr_form_add(request,tr,id_=0):
            
         return render( request,'tarif/tarif_arr_form.html', {'form': form})
     
+def tarif_arr_copy(request,tr,id_=0):    
+    ''' Копирование массива сетки '''
+    ta = TarifArr.objects.get(id=id_)
+    ta.parent = False
+    ta.id = None
+    ta.save()
+        
+    return HttpResponseRedirect('/proc/tarif_arr/%s'%tr)
+    
+        
 ''' ================================ TARIF ========================'''
 
 @permission_required('proc.view_tarif')
@@ -120,13 +133,22 @@ def tarif_form_add(request, tp, id_=0):
 ''' ================================ TARIF profile ========================'''
 
 @permission_required('proc.view_tarif')
-def tarif_plan(request):
-    s_list = TarifPlan.objects.all()
-    form=TarifPlanForm
-    return render( request,'tarif/tarif_plan.html', {'s_list': s_list})
+def tarif_plan(request, oid, content):
+    obj_ct = get_object_or_404(ContentType,app_label='proc', model=content)  # Проверим есть ли такой content
+    tp_m2m = TarifPlanM2M.objects.filter(content_type = obj_ct, object_id = oid)
+    s_list = []
+    for t in tp_m2m:
+        s_list.append(t.tarif_plan)    
+    
+    if content == 'agent':
+        gen_from_base_url = "%s/gen" % content
+    else:
+        gen_from_base_url = "%s/gen_from_base" % content
+    #form=TarifPlanForm
+    return render( request,'tarif/tarif_plan.html', {'s_list': s_list, 'gen_from_base_url': gen_from_base_url, 'content': content})
 
 @permission_required('proc.change_tarif')
-def tarif_plan_form(request,id_):
+def tarif_plan_form(request, oid, content, id_):
     if request.method=='POST':
         a = TarifPlan.objects.get(pk=id_)
 
@@ -146,10 +168,10 @@ def tarif_plan_form(request,id_):
         return render( request,'tarif/tarif_plan_form.html', {'form': form,'del_url': del_url, 'arr_url': arr_url})
 
 @permission_required('proc.delete_tarif')
-def tarif_plan_delete(request,id_):
+def tarif_plan_delete(request, oid, content,id_):
         s = TarifPlan.objects.get(id=id_)
         s.delete()
-        return HttpResponseRedirect('/proc/tarif_plan')
+        return HttpResponseRedirect('/proc/tarif_plan/%s/%s' % (oid, content))
 
 @permission_required('proc.add_tarif')
 def tarif_plan_form_add(request,id_=0):
@@ -166,7 +188,7 @@ def tarif_plan_form_add(request,id_=0):
         return render( request,'tarif/tarif_plan_form.html', {'form': form})
 
 
-def gen_tarifarr_from_tarif(tr, tr_new):
+def gen_tarifarr_from_tarif_base(tr, tr_new):
     ''' копирование массива тарифа с базового тарифа
     '''
     tr_arr_list = TarifArrBase.objects.filter(tarif = tr)
@@ -184,14 +206,15 @@ def gen_tarif_from_tarifplan_base(tpb, tp):
     tr_list = TarifBase.objects.filter(tarif_plan = tpb)
     # В цикле создадим все тарифы которые принадлежат базовому тарифу
     for tr in tr_list:        
-        tr_new = Tarif(code=tr.code, name=tr.name, op_service = tr.op_service, prc = tr.prc, summa = tr.summa, min=tr.min, max=tr.max, tarif_plan=tp)
+        tr_new = Tarif(code=tr.code, name=tr.name, op_service = tr.op_service, prc = tr.prc, summa = tr.summa, min=tr.min, max=tr.max
+                       , tarif_plan=tp, ru_text=tr.ru_text, tj_text=tr.tj_text, en_text=tr.en_text)
         tr_new.save()
         # Сгенерируем массив
-        gen_tarifarr_from_tarif(tr, tr_new)
+        gen_tarifarr_from_tarif_base(tr, tr_new)
         
         
 @permission_required('proc.add_tarif')
-def tarif_plan_gen_from_base(request,id_=0):
+def tarif_plan_gen_from_base(request, oid, content,id_=0):
     ''' генерация тарифного плана на основе базового тарифного плана '''
     
     if request.method=='POST':
@@ -201,9 +224,15 @@ def tarif_plan_gen_from_base(request,id_=0):
         
         if form.is_valid() and tp_id!='':
             tpb = get_object_or_404(TarifPlanBase, id =tp_id)
+            obj_ct = get_object_or_404(ContentType,app_label='proc', model=content)  # Проверим есть ли такой content
+            
             tp=form.save()
+            
+            tp_m2m = TarifPlanM2M(tarif_plan=tp, content_type = obj_ct, object_id = oid)
+            tp_m2m.save()
+            
             gen_tarif_from_tarifplan_base(tpb, tp)              # Сгенерируем тарифы
-            return HttpResponseRedirect('/proc/tarif_plan/')
+            return HttpResponseRedirect('/proc/tarif_plan/%s/%s' % (oid, content))
         else:
             return render( request,'tarif/tarif_plan_form.html', {'form': form})
     else:        
@@ -212,20 +241,69 @@ def tarif_plan_gen_from_base(request,id_=0):
         return render( request,'tarif/tarif_plan_gen.html', {'s_list': s_list, 'form' : form})
 
 
+def gen_tarifarr_from_tarif(tr, tr_new):
+    ''' копирование массива тарифа с тарифа
+    '''
+    tr_arr_list = TarifArr.objects.filter(tarif = tr)
+    
+    for ta in tr_arr_list:
+        ta_new = TarifArr(parent=ta.parent, prc = ta.prc, summa = ta.summa, min=ta.min, max=ta.max, tarif=tr_new, beg_time=ta.beg_time,end_time=ta.end_time)
+        ta_new.save()
+
+
+def gen_tarif_from_tarifplan(tpb, tp):
+    ''' копирование тарифов ТП с ТП
+        tpb - тарифный план источник
+        tp  - новый тарифный план для которого необходимо сгенерировать тарифы ТП  
+    '''
+    tr_list = Tarif.objects.filter(tarif_plan = tpb)
+    # В цикле создадим все тарифы которые принадлежат тарифному плану
+    for tr in tr_list:        
+        tr_new = Tarif(code=tr.code, name=tr.name, op_service = tr.op_service, prc = tr.prc, summa = tr.summa, min=tr.min,
+                         max=tr.max, tarif_plan=tp, ru_text=tr.ru_text, tj_text=tr.tj_text, en_text=tr.en_text)
+        tr_new.save()
+        # Сгенерируем массив
+        gen_tarifarr_from_tarif(tr, tr_new)
+
+
 @permission_required('proc.add_tarif')
-def tarif_plan_gen(request,id_=0):
-    ''' генерация тарифного плана на основе другогово тарифного плана '''
+def tarif_plan_gen(request, oid, content,id_=0):
+    ''' генерация тарифного плана на основе другогово тарифного плана '''    
+    
     if request.method=='POST':
+        tp_id = request.POST.get("tarif_plan",'')
+        
         form=TarifPlanForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return HttpResponseRedirect('/proc/tarif_plan/')
+        
+        if form.is_valid() and tp_id!='':
+            tpb = get_object_or_404(TarifPlan, id =tp_id)
+            obj_ct = get_object_or_404(ContentType,app_label='proc', model=content)  # Проверим есть ли такой content
+            
+            tp=form.save()
+            
+            tp_m2m = TarifPlanM2M(tarif_plan=tp, content_type = obj_ct, object_id = oid)
+            tp_m2m.save()
+            
+            gen_tarif_from_tarifplan(tpb, tp)              # Сгенерируем тарифы
+            return HttpResponseRedirect('/proc/tarif_plan/%s/%s' % (oid, content))
         else:
             return render( request,'tarif/tarif_plan_form.html', {'form': form})
     else:        
-        s_list = TarifPlan.objects.all()      
-        return render( request,'tarif/tarif_plan_gen.html', {'s_list': s_list})
-
+        d = None
+        if content == 'agent':
+            d = get_object_or_404(Agent, id = oid)
+            d = d.dealer
+        else:
+            d = get_object_or_404(Dealer, id = oid)
+            
+        obj_ct = get_object_or_404(ContentType,app_label='proc', model='dealer')  # Проверим есть ли такой content
+        tp_m2m = TarifPlanM2M.objects.filter(content_type = obj_ct, object_id = d.id)
+        s_list = []
+        for t in tp_m2m:
+            s_list.append(t.tarif_plan)
+                
+        form=TarifPlanForm()      
+        return render( request,'tarif/tarif_plan_gen.html', {'s_list': s_list, 'form' : form})
 
 ''' ================================ TARIF_ARR_BASE ========================'''
 

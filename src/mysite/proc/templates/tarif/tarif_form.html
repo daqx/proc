@@ -77,7 +77,27 @@
 						{{ form.summa_own }}
 					</td>	        	
 	        	</tr>
-	        	
+	        	<tr>
+					<th><label for="id_ru_text">Текст на русском</label>
+					</th>
+					<td>{{ form.ru_text.errors }}
+						{{ form.ru_text }}
+					</td>	        	
+	        	</tr>
+	        	<tr>
+					<th><label for="id_tj_text">Текст на таджикском</label>
+					</th>
+					<td>{{ form.tj_text.errors }}
+						{{ form.tj_text }}
+					</td>	        	
+	        	</tr>
+	        	<tr>
+					<th><label for="id_ru_text">Текст на английском</label>
+					</th>
+					<td>{{ form.en_text.errors }}
+						{{ form.en_text }}
+					</td>	        	
+	        	</tr>
 	        
 	        {% if arr_url %}
 	        	<tr>

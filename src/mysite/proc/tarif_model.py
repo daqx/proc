@@ -15,7 +15,7 @@ ADDRES_TYPE = (
     )
 
 class TarifArr(models.Model):    
-    parent      =models.BooleanField(default=True)                          # Признак родительского тарифа
+    parent      =models.BooleanField(default=False)                          # Признак родительского тарифа
     prc         =models.BooleanField(default=True)
     summa       =models.FloatField(default=0)
     min         =models.FloatField(default=0)
@@ -32,7 +32,7 @@ class TarifArr(models.Model):
 
 
 class TarifPlan(models.Model):
-    code        =models.CharField(max_length=20,unique=True)
+    code        =models.CharField(max_length=20)
     name        =models.CharField(max_length=50)    
     date_begin  =models.DateTimeField()
     date_end    =models.DateTimeField(blank=True, null=True)
@@ -46,7 +46,7 @@ class TarifPlan(models.Model):
 
 
 class Tarif(models.Model):
-    code        =models.CharField(max_length=20,unique=True)
+    code        =models.CharField(max_length=20)
     name        =models.CharField(max_length=50)
     op_service  =models.ForeignKey(OpService)
     prc         =models.BooleanField(default=True)
@@ -55,6 +55,9 @@ class Tarif(models.Model):
     min         =models.FloatField(default=0)
     max         =models.FloatField(default=0)
     tarif_plan  =models.ForeignKey(TarifPlan)
+    ru_text     =models.TextField( blank=True, null=True)
+    tj_text     =models.TextField( blank=True, null=True)
+    en_text     =models.TextField( blank=True, null=True)
     
     def __unicode__(self):
         return self.name
@@ -127,7 +130,9 @@ class TarifBase(models.Model):
     min         =models.FloatField(default=0)
     max         =models.FloatField(default=0)
     tarif_plan  =models.ForeignKey(TarifPlanBase)
-    
+    ru_text     =models.TextField( blank=True, null=True)
+    tj_text     =models.TextField( blank=True, null=True)
+    en_text     =models.TextField( blank=True, null=True)
     
     def __unicode__(self):
         return self.name
@@ -137,5 +142,3 @@ class TarifBase(models.Model):
         app_label = "proc"
 
 
-
-    
