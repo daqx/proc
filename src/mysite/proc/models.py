@@ -3,11 +3,13 @@ import datetime
 
 from django.db import models
 from django.contrib import admin
-from django.contrib.auth.models import User 
+from django.contrib.auth.models import User
+from django.shortcuts import * 
 from mysite.proc.service_model import *
 from mysite.proc.addres_model import *
 from mysite.proc.sys_model import *
 from mysite.proc.tarif_model import *
+from mysite.proc.gateway import *
 from datetime import datetime
 from django.db import connection, transaction
 
@@ -104,10 +106,18 @@ class Agent(models.Model):
 
     def calc_commiss(self,op_serv,summa):
         try:
-            #cursor = connection.cursor()
-            
-            query = 'select t.* from proc_agent_tarif_profile_arr ata, proc_tarifprofile tp, proc_tarifgroup tg,proc_tarifprofile_tarif_group tptg, proc_tarifgroup_tarif tgt, proc_tarif t,proc_opservice os where ata.agent_id=12 and tp.id=ata.tarifprofile_id and tptg.tarifprofile_id=tp.id and tptg.tarifgroup_id=tg.id and tgt.tarifgroup_id=tg.id and tgt.tarif_id=t.id and os.id=t.op_service_id and os.id=%s' % op_serv.id
-            tr = Tarif.objects.raw(query)[0]
+            obj_ct = get_object_or_404(ContentType,app_label='proc', model='agent')  # Проверим есть ли такой content
+            tp_m2m = TarifPlanM2M.objects.filter(content_type = obj_ct, object_id = self.id)
+            s_list = []
+            cur_date = datetime.now()
+            tp = None
+            for t in tp_m2m:
+                if t.tarif_plan.date_begin < cur_date and (t.tarif_plan.date_end is None or t.tarif_plan.date_end> cur_date):
+                    tp = t.tarif_plan
+                    break                
+                    
+            #query = 'select t.* from proc_agent_tarif_profile_arr ata, proc_tarifprofile tp, proc_tarifgroup tg,proc_tarifprofile_tarif_group tptg, proc_tarifgroup_tarif tgt, proc_tarif t,proc_opservice os where ata.agent_id=12 and tp.id=ata.tarifprofile_id and tptg.tarifprofile_id=tp.id and tptg.tarifgroup_id=tg.id and tgt.tarifgroup_id=tg.id and tgt.tarif_id=t.id and os.id=t.op_service_id and os.id=%s' % op_serv.id
+            tr = Tarif.objects.filter(tarif_plan = tp, op_service = op_serv)[0]
                                            
             return tr.calc_tarif(summa)
             
@@ -211,3 +221,74 @@ class Encashment(models.Model):
         return "%s" % self.date   
     
 
+class Transaction2(models.Model):
+    agent           =models.ForeignKey(Agent, verbose_name='Агент')    
+    date            =models.DateTimeField(auto_now_add=True, verbose_name='Дата')  # Время появления платежа на сервере
+    date_state      =models.DateTimeField()                                     # Дата последнего изменения статуса
+    date_input      =models.DateTimeField(null=True, blank=True)                # Дата платежа на терминале
+    encashment      =models.IntegerField(null=True, blank=True)                 # инкасация 
+    opservices      =models.ForeignKey(OpService)
+    number_key      =models.CharField(max_length=100, verbose_name='Номер')
+    summa           =models.FloatField(verbose_name='Сумма')
+    summa_commiss   =models.FloatField(verbose_name='Комиссия')
+    summa_pay       =models.FloatField(verbose_name='Сумма платежа')    
+    state           =models.ForeignKey(State)
+    ticket          =models.IntegerField(null=True, blank=True)                 # номер чека
+    return_reason   =models.CharField(max_length=100)                           # Причина отказа и служ отметки    
+    seans_number    =models.CharField(max_length=20,null=True, blank=True)      # Номер сеанса обработки
+    processed       =models.NullBooleanField(null=True, blank=True)             # Признак успешной обработки
+    locked          =models.NullBooleanField(null=True, blank=True)             # Признак блокировки процессом
+    try_count       =models.FloatField(null=True, blank=True)                   # Количество попыток
+    file_name       =models.CharField(max_length=20,null=True, blank=True)
+    user_proc       =models.OneToOneField(User,null=True, blank=True)
+    hesh_id         =models.CharField(max_length=40,null=True, blank=True)
+    
+    def __unicode__(self):
+        return '%s  %s  %s' % (self.agent.user.username, self.summa , self.date) 
+
+            
+
+    def delete(self):
+        ''' Удаление транзакций '''
+        for item in self.arcmove_set.all():                                 # удалим сначала выписку
+            item.delete()
+        super(Transaction2, self).delete()                                   # потом и сам документ
+        
+
+class ArcMove2(models.Model):
+    date            =models.DateTimeField(auto_now_add=True)
+    dealer          =models.ForeignKey(Dealer)
+    dt              =models.BooleanField()    
+    saldo           =models.FloatField()
+    summa           =models.FloatField()
+    transaction     =models.ForeignKey(Transaction2,null=True, blank=True)
+    
+    def __unicode__(self):
+        return '%s  %s  %s' % (self.dealer.user.username, self.summa , self.date)
+
+
+class HistoryState2(models.Model):
+    ''' История изменения состояний транзакций
+    '''    
+    date        =models.DateTimeField()
+    user        =models.OneToOneField(User, blank=True, null=True)    
+    state       =models.ForeignKey(State)
+    description =models.CharField(max_length=200,null=True, blank=True)
+    trans       =models.ForeignKey(Transaction2, related_name="trans")
+    
+    def __unicode__(self):
+        return "%s %s" % (self.state.name, self.date)
+
+
+class Gatelog(models.Model):
+    transaction = models.ForeignKey(Transaction, null=True, blank=True)
+    transaction2 = models.ForeignKey(Transaction2, null=True, blank=True)
+    text        = models.TextField()
+    date        = models.DateTimeField(auto_now_add=True)
+    sending     = models.BooleanField()
+    
+    def __unicode__(self):
+        return self.name
+    
+    class Meta:
+        app_label = "proc"

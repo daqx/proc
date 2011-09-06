@@ -65,17 +65,27 @@ class Tarif(models.Model):
     def calc_tarif(self,summa):
         s=0
         if self.prc==True:              #Расчет по процентам
-           s=summa*self.summa/100
-           if s < self.min and self.min!=0:
-               s=self.min               
-           if s > self.max and self.max!=0:
-               s=self.max               
+            s=summa*self.summa/100
+           
+            # Если сумма переопределена, то следует прибавить и добавочную комиссию
+            if self.summa_own is not None and self.summa_own>0:
+                s = s + (summa * self.summa_own/100) 
+           
+            if s < self.min and self.min!=0:
+                s=self.min               
+            if s > self.max and self.max!=0:
+                s=self.max               
         else:
             if self.summa!=0:           #Расчет по сумме
                 s=self.summa                
+                # Если сумма переопределена, то следует прибавить и добавочную комиссию
+                if self.summa_own>0:
+                    s = s + self.summa_own
             else:                       #Если сумма 0 тариф вычисляется по массиву сумм тарифа
+                
+                # 1.Сначала рассчитаем комисию по базовому (унаследованному) массиву
                 try:                
-                    ta = TarifArr.objects.filter( tarif=self, min__lte = summa, max__gt = summa)[0]
+                    ta = TarifArr.objects.filter( tarif=self, min__lte = summa, max__gt = summa, parent = True)[0]
                     
                     if ta.prc:
                         s = summa * ta.summa/100
@@ -83,7 +93,17 @@ class Tarif(models.Model):
                         s = ta.summa
                 except(IndexError, TarifArr.DoesNotExist) :
                     pass
-                #TODO: Здесь необходимо реализовать расчет по массиву сумм
+                
+                # 2.Теперь прибавим добавочную комисию (praent = False)
+                try:                
+                    ta = TarifArr.objects.filter( tarif=self, min__lte = summa, max__gt = summa, parent = False)[0]
+                    
+                    if ta.prc:
+                        s = s + summa * ta.summa/100
+                    else:
+                        s = s + ta.summa
+                except(IndexError, TarifArr.DoesNotExist) :
+                    pass
         
         return s
         

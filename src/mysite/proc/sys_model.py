@@ -34,7 +34,7 @@ class IpAddress(models.Model):
     object_id = models.IntegerField()
     content_object = generic.GenericForeignKey()
     
-    ip=models.IPAddressField()
+    ip  =models.IPAddressField()
     
     def __unicode__(self):
         return self.ip
