@@ -22,6 +22,7 @@ def show(request):
 @permission_required('proc.view_actualstate')
 def journal(request, id_):
     s_list = JourSostAgent.objects.filter( agent__id = id_).order_by('-date')  
-    return render(request,'journal.html', {'s_list': s_list})
+    agent = get_object_or_404(Agent, id=id_)
+    return render(request,'journal.html', {'s_list': s_list, 'ag_id': id_, "agent": agent })
 
 

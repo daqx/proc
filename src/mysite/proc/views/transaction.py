@@ -94,6 +94,11 @@ def fill_ac_list(request):
     return render( request,'pay.html', {'s_list': s_list})
 '''    
 
+@permission_required('proc.view_arcmove')
+def fill_ac_list(request):
+    s_list = ArcMove.objects.filter(transaction = None, dt = False)
+    return render( request,'fill_ac.html', {'s_list': s_list})
+
 @permission_required('proc.add_arcmove')
 def fill_ac_form_add(request,id_=0):
     if request.method=='POST':

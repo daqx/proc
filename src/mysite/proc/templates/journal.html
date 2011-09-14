@@ -23,10 +23,10 @@ $(function () {
             	"gridview": true, 
             	"colModel": [
             	             {"index": "id", "name": "id", "editable": false, "label": "№", 
-            	            	 "formatoptions": {"baseLinkUrl": "jur/"}, "width": 40, 
-            	            	 "formatter": "showlink"}, 
+            	            	  "width": 40            	            	 }, 
             	             {"index": "date", "width": 130, "editable": false, 
             	            		 "name": "date", "label": "Время"},
+            	             {"index": "agent__id", "hidden": true},
             	             {"index": "agent__user__username", "width": 250, "editable": false, 
             	            		 "name": "agent__user__username", "label": "Агент"}, 
             	             {"index": "link", "name": "link", "editable": false, 
@@ -42,7 +42,7 @@ $(function () {
                             	            		 "name": "terminal__name", "label": "терминал"}
             	            ], 
             	 "sortorder": "desc", 
-            	 "url": "/proc/grid/monitor/", 
+            	 "url": "/proc/grid/journal/{{ag_id}}", 
             	 "rowNum": 10, 
             	 "pager": "#pager", 
             	 "jsonReader": {"repeatitems": false}
@@ -56,6 +56,8 @@ $(function () {
         ).filterToolbar({stringResult: true,searchOnEnter : false});
     
 });
+
+$("#mygrid").jqGrid('setGridParam',{ search: true, postData: { filters: '{ "groupOp": "AND", "rules": [{ "field": "agent__id", "op": "eq", "data": "12"}] }'}});
 
 function extFormatBoolLink(cellvalue, options, rowObject) {
 	var s = '';
@@ -74,7 +76,7 @@ jQuery(document).ready(function() {
 
 	function refreshGrid()
 	{		
-		t=setTimeout("refreshGrid()",5000);
+		t=setTimeout("refreshGrid()",30000);
 		$("#mygrid").trigger("reloadGrid");
 	}	
 </script>
@@ -82,7 +84,8 @@ jQuery(document).ready(function() {
 
 {%block content%}
 
-
+Журнал агента: {{agent.name}}({{agent.user.username}})
+<br/><br/>
 <table class="grid" id="mygrid"></table>
 <div id="pager"></div>
 

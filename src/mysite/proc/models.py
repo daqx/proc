@@ -33,10 +33,8 @@ class TarifPlanM2M(models.Model):
 
 
 class Dealer(models.Model):
-    account         =models.CharField('Счет',max_length=8,blank=True)
-    addresses       = generic.GenericRelation( Addres, null=True, blank=True )        
     check_for_ip    =models.BooleanField('Проверять IP',default=False)    
-    dealer          =models.ForeignKey('self',related_name='parent', null=True, blank=True, verbose_name='Диллер')        
+    dealer          =models.ForeignKey('self',related_name='parent', null=True, blank=True, verbose_name='Диллер (для субдиллера)')        
     inn             =models.CharField('ИНН',max_length=12,blank=True)
     ipaddresses     = generic.GenericRelation( IpAddress, null=True, blank=True )
     kopf            =models.ForeignKey( Kopf,  verbose_name='Код ОПФ')
@@ -45,8 +43,10 @@ class Dealer(models.Model):
     tarif_plan_arr  =generic.GenericRelation(TarifPlanM2M, null=True, blank=True)   
     tel             =models.CharField('Телефон',max_length=20,blank=True)    
     state           =models.ForeignKey(Status, verbose_name='Статус')
-    summa           =models.FloatField('Сумма',blank=True)
+    summa           =models.FloatField('Сумма', null=True,blank=True)
     user            =models.OneToOneField(User, blank=True, verbose_name='Пользователь')
+    account         =models.CharField('Счет',max_length=8,blank=True)
+    addresses       = generic.GenericRelation( Addres, null=True, blank=True )        
     
     def __unicode__(self):
         return self.user.username
@@ -86,12 +86,12 @@ class Dealer(models.Model):
 class Agent(models.Model):
     addresses       = generic.GenericRelation( Addres, null=True, blank=True )    
     check_for_ip    =models.BooleanField('Проверить IP',default=False)    
-    dealer          =models.ForeignKey(Dealer, null=True, blank= True, verbose_name='Диллер')    
+    dealer          =models.ForeignKey(Dealer, verbose_name='Диллер')    
     name            =models.CharField('Наименование',max_length=50)
-    imei            =models.CharField('IMEI',max_length=20,blank=True)
+    imei            =models.CharField('IMEI',max_length=20, null=True,blank=True)
     ipaddresses     = generic.GenericRelation( IpAddress, null=True, blank=True )    
     opservices      =models.ManyToManyField(OpService, null=True, blank=True, verbose_name='Операторы услуг')
-    opservice_group =models.ManyToManyField(OpServiceGroup, verbose_name='Группы операторов услуг')    
+    opservice_group =models.ManyToManyField(OpServiceGroup, null=True, blank=True, verbose_name='Группы операторов услуг')    
     tarif_plan_arr  =generic.GenericRelation(TarifPlanM2M, null=True, blank=True)
     tel             =models.CharField('Телефон',max_length=20,blank=True)
     type            =models.CharField('Тип',max_length=1,choices=AGENT_TYPE)
@@ -281,6 +281,8 @@ class HistoryState2(models.Model):
 
 
 class Gatelog(models.Model):
+    ''' Модель для хранения отправленных и принятых со шлюза сообщений
+    '''
     transaction = models.ForeignKey(Transaction, null=True, blank=True)
     transaction2 = models.ForeignKey(Transaction2, null=True, blank=True)
     text        = models.TextField()

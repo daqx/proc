@@ -25,7 +25,9 @@ class ROFormMixin(forms.BaseForm):
 
 
 '''***********************************************************************************'''
-class AddressForm(forms.ModelForm):    
+class AddressForm(forms.ModelForm):
+    
+    required_css_class = 'required'    
     class Meta:
         model=Addres
         exclude=('content_type', 'object_id')
@@ -39,9 +41,13 @@ class AgentForm(forms.ModelForm):
     last_name = forms.CharField(label='Фамилия',max_length=30)
     cashcode_id = forms.CharField(label='№ купюроприемника', max_length=30, required=False)
     hdd_id= forms.CharField(label='№ жесткого диска', max_length=30, required=False)
+    
+    required_css_class = 'required'
     class Meta:
         model=Agent
         exclude=('user','hardware')
+        fields =('name', 'type','state','username','password','first_name','last_name','dealer','opservices','opservice_group','check_for_ip','imei',
+                 'tel','key_hash','cashcode_capacity','cashcode_id','hdd_id')
 
 class AgentEditForm(forms.ModelForm):    
     username = forms.RegexField(label=("Имя пользователя"), max_length=30, regex=r'^[\w.@+-]+$',
@@ -53,9 +59,13 @@ class AgentEditForm(forms.ModelForm):
 
     cashcode_id = forms.CharField(label='№ купюроприемника', max_length=30, required=False)
     hdd_id= forms.CharField(label='№ жесткого диска', max_length=30, required=False)
+    
+    required_css_class = 'required'
     class Meta:
         model=Agent
         exclude=('user','hardware')
+        fields =('name', 'type','state','username','first_name','last_name','dealer','opservices','opservice_group'
+                 ,'check_for_ip','imei','tel','key_hash','cashcode_capacity','cashcode_id','hdd_id')
 
 '''=====================DEALER==========================='''
 class DealerForm(forms.ModelForm):    
@@ -66,10 +76,13 @@ class DealerForm(forms.ModelForm):
     first_name = forms.CharField(label='Имя', max_length=30)
     last_name = forms.CharField(label='Фамилия',max_length=30)
     
+    required_css_class = 'required'
+    
     class Meta:
         model=Dealer
-        exclude=('user')
-
+        exclude=('user','summa')
+        fields =('kopf','state','username','password','first_name','last_name','dealer','inn','check_for_ip','limit','overdraft','account','tel')
+        
 class DealerEditForm(forms.ModelForm):    
     username = forms.RegexField(label=("Имя пользователя"), max_length=30, regex=r'^[\w.@+-]+$',
         help_text = ("Обязательный. 30 символов или менньше. Только буквы, цифры и @/./+/-/_ ."),
@@ -77,12 +90,16 @@ class DealerEditForm(forms.ModelForm):
     first_name = forms.CharField(label='Имя', max_length=30)
     last_name = forms.CharField(label='Фамилия',max_length=30)
     
+    required_css_class = 'required'
+    
     class Meta:
         model=Dealer
-        exclude=('user')
+        exclude=('user', 'summa')
+        fields =('kopf','state','username','first_name','last_name','dealer','inn','check_for_ip','limit','overdraft','account','tel')
         
 class IpAddressForm(forms.ModelForm):
     
+    required_css_class = 'required'
     class Meta:
         model=IpAddress
         exclude=('content_type', 'object_id')
@@ -90,22 +107,29 @@ class IpAddressForm(forms.ModelForm):
 
 class ServiceTypeForm(forms.ModelForm):   
     parent = forms.ModelChoiceField(queryset=ServiceType.objects.filter(parent=None)
-                                    ,widget=forms.Select,required=False)
+                                    ,widget=forms.CheckboxSelectMultiple,required=False)
+    
+    required_css_class = 'required'
     class Meta:
         model=ServiceType
         #exclude=pare
 
 class OpServiceForm(forms.ModelForm):   
     #type = forms.ModelChoiceField(queryset=OpService.objects.all() ,widget=forms.Select)
+    required_css_class = 'required'
     class Meta:
         model=OpService
         
-class OpServiceGroupForm(forms.ModelForm):    
+class OpServiceGroupForm(forms.ModelForm):
+    
+    required_css_class = 'required'    
     class Meta:
         model=OpServiceGroup
         
 '''=====================TARIFS==========================='''
-class TarifArrForm(forms.ModelForm):    
+class TarifArrForm(forms.ModelForm):
+    
+    required_css_class = 'required'    
     class Meta:
         model=TarifArr
         exclude =('parent','tarif')
@@ -117,25 +141,33 @@ class TarifForm(forms.ModelForm):
     #   domain = cleaned_data.get("domain")
     #   extension = cleaned_data.get("extension")
         #return cleaned_data
-    
+    required_css_class = 'required'
     class Meta:
         model=Tarif
         exclude=('op_service','summa','prc','min','max','tarif_plan')
 
-class TarifPlanForm(forms.ModelForm):    
+class TarifPlanForm(forms.ModelForm):
+    
+    required_css_class = 'required'    
     class Meta:
         model=TarifPlan
 
-class TarifArrBaseForm(forms.ModelForm):    
+class TarifArrBaseForm(forms.ModelForm):
+    
+    required_css_class = 'required'    
     class Meta:
         model=TarifArrBase
         
-class TarifBaseForm(forms.ModelForm):    
+class TarifBaseForm(forms.ModelForm):
+    
+    required_css_class = 'required'    
     class Meta:
         model=TarifBase
         #exclude=('op_service',)
 
-class TarifPlanBaseForm(forms.ModelForm):    
+class TarifPlanBaseForm(forms.ModelForm):
+    
+    required_css_class = 'required'    
     class Meta:
         model=TarifPlanBase
 
@@ -145,18 +177,22 @@ class TarifPlanBaseForm(forms.ModelForm):
         
 class TransactionForm(forms.ModelForm):    
     
+    required_css_class = 'required'
     class Meta:
         model=Transaction
         exclude=('agent','state','date_state','summa_commiss','summa_pay','blocked','return_reason','date_proc','seans_number','processed','blocked','try_count','file_name','user_proc')
 
 class TransactionAdminForm(forms.ModelForm):    
     
+    required_css_class = 'required'
     class Meta:
         model=Transaction
         exclude=('state','date_state','summa_commiss','summa_pay','blocked','return_reason','date_proc','seans_number','processed','blocked','try_count','file_name','user_proc')
 
 
-class FillAcForm(forms.ModelForm):    
+class FillAcForm(forms.ModelForm):
+    
+    required_css_class = 'required'    
     class Meta:
         model=ArcMove
         exclude=('transaction','saldo','dt','date')

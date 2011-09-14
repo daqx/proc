@@ -18,6 +18,8 @@ from mysite.proc.views import grids
 
 urlpatterns=patterns('',
     #url(r'^$', system.main),    
+    url (r'^journal/(\d+)$', grids.journal_handler, name='jurnal_handler'), 
+    url (r'^journal/cfg/$', grids.grid_config, name='grid_config'),
     
     url (r'^monitor/$', grids.grid_handler, name='grid_handler'), 
     url (r'^monitor/cfg/$', grids.grid_config, name='grid_config'),

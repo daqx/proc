@@ -1,0 +1,46 @@
+
+{%extends "base.html"%}
+{%block content%}
+<script type="text/javascript">
+
+$(function(){
+	$('#dealer tr:odd').css('backgroung-colour','#eeeeee');
+});
+</script>
+{% if perms.proc.add_transaction %}
+	<ul class="object-tools">
+		<li>
+			<a href="add">	Добавить</a>
+		</li>
+	</ul>
+{% endif %}<br/><br/><br/>
+<table id='pay' class='tbl'>
+  <tr>
+    <th>агент</th>
+    <th>номер</th>
+    <th>сумма</th>
+    <th>сумма платежа</th>
+    <th>комиссия</th>
+    <th>дата</th>    
+    <th>диллер</th>
+    <th>статус</th>
+    
+  </tr>
+
+{%for s in s_list  %}
+  <tr>
+    <td><a href="{{s.id}}">{{s.agent.user.username}}</a></td>
+    <td>{{s.number_key}}</td>
+    <td>{{s.summa}}</td>
+    <td>{{s.summa_pay}}</td>
+    <td>{{s.summa_commiss}}</td>
+    <td>{{s.date|date:"j F Y"}}</td>
+    <td>{{s.agent.dealer.user.username}}</td>
+    <td>{{s.state.name}}</td>
+    
+  </tr>
+
+{% endfor %}
+</table>
+
+{% endblock%}

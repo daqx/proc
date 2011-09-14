@@ -96,6 +96,11 @@ text .h2 {color: #bf8ddd; border-top: 1px dotted #fff; margin-top: 2em}
 
 /************************************************************/
 
+.required label, label.required {
+    color: #FF8080 !important;
+    font-weight: bold !important;
+}
+
 ul.error_list li {
 	color: #FF0000;
 }

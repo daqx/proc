@@ -34,6 +34,7 @@ urlpatterns=patterns('',
     (r'^pay/add/(\d+)$', transaction.pay_form),
     (r'^pay/add/(\d+)/delete$', transaction.pay_delete),        
 
+    (r'^fill_ac/$', transaction.fill_ac_list),
     (r'^fill_ac/add$', transaction.fill_ac_form_add),
     
     (r'^service_type/$', service.service_type),
@@ -133,8 +134,8 @@ urlpatterns=patterns('',
     (r'^monitor/$', monitor.show),
     (r'^monitor/logs/(\d+)$', monitor.journal),
     
-    url (r'^gridmonitor/$', grids.grid_handler, name='grid_handler'), 
-    url (r'^gridmonitor/cfg/$', grids.grid_config, name='grid_config'),
+    #url (r'^gridmonitor/$', grids.grid_handler, name='grid_handler'), 
+    #url (r'^gridmonitor/cfg/$', grids.grid_config, name='grid_config'),
     
     #(r'^login/$', login_view),
     #(r'^contact/$', contact),

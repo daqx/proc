@@ -29,6 +29,10 @@ class DealerAdmin(admin.ModelAdmin):
 class EncashmentAdmin(admin.ModelAdmin):
     list_display=('date','agent')
 
+class GatewayAdmin(admin.ModelAdmin):
+    list_display=('code','name','opservice', 'status')
+
+
 class HistoryStateAdmin(admin.ModelAdmin):
     list_display=('date','state',)
     
@@ -119,6 +123,7 @@ admin.site.register(ActualState, ActualStateAdmin)
 admin.site.register(Country, CountryAdmin)
 admin.site.register(Dealer, DealerAdmin)
 admin.site.register(Encashment, EncashmentAdmin)
+admin.site.register(Gateway, GatewayAdmin)
 admin.site.register(JourSostAgent, JourSostAgentAdmin)
 admin.site.register(Kopf, KopfAdmin)
 admin.site.register(Menu, MenuAdmin)

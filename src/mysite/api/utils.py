@@ -4,6 +4,8 @@ from piston.handler import BaseHandler
 from mysite.proc.models import *
 from mysite.proc.sys_class import *
 from django.utils import simplejson
+from datetime import datetime;
+import time;
 
 def isNoneId(obj):
     ''' Возвращает ID объекта если он не пустой(None)
@@ -13,6 +15,14 @@ def isNoneId(obj):
         return obj.id
     else:
         return None
+
+def date_to_timestamp(d):
+    ''' Переводит datetime в timestamp    
+    '''
+    if d is None:
+        return None
+    else:
+        return time.mktime(d.timetuple())
 
 def get_tarif_arr(t):
     ''' Возвращает в виде JSON строки массив тарифа'''
@@ -169,6 +179,12 @@ def get_opservices(login_, retval_):
     retval_["body"] = data
     return 0
      
+def get_tarif_from_tarifplan(tp):
+    ''' Возвращает в формате JSON тарифы для заданного тарифного плана tp
+    '''
+    data = simplejson.dumps([{"id": tr.id, "name": tr.name, "op_service_id": tr.op_service.id, "prc": tr.prc,
+                             "summa": tr.summa, "min": tr.min, "max": tr.max, "arr" : get_tarif_arr(tr)} for tr in Tarif.objects.filter(tarif_plan = tp)])
+    return data
 
 def get_tarif_all(login_, retval_):
     ''' Функция возвращает все тарифы для доступных операторов услуг, для заданного агента 
@@ -183,25 +199,24 @@ def get_tarif_all(login_, retval_):
         retval_["status"]="-1"
         return "-1"
     
-    query="select o.* from proc_opservice o, proc_agent_opservices ao where o.id=ao.opservice_id and ao.agent_id= %s  union   select o.* from proc_opservice o, proc_agent_opservice_group aog, proc_opservicegroup_opservice ogo where  aog.opservicegroup_id=ogo.opservicegroup_id and aog.agent_id = %s" % (id, id)
     
-    # Выберем список доступных операторов
-    op = OpService.objects.raw(query)
-    ar=[]
+    obj_ct = get_object_or_404(ContentType,app_label='proc', model='agent')  # Проверим есть ли такой content
+    tp_m2m = TarifPlanM2M.objects.filter(content_type = obj_ct, object_id = id)
+    s_list = []
     
-    # В цикле по операторам заполним массив ar[] тарифами этих операторов
-    for o in op:
-        query = 'select t.* from proc_agent_tarif_profile_arr ata, proc_tarifprofile tp, proc_tarifgroup tg,proc_tarifprofile_tarif_group tptg, proc_tarifgroup_tarif tgt, proc_tarif t,proc_opservice os where ata.agent_id=%s and tp.id=ata.tarifprofile_id and tptg.tarifprofile_id=tp.id and tptg.tarifgroup_id=tg.id and tgt.tarifgroup_id=tg.id and tgt.tarif_id=t.id and os.id=t.op_service_id and os.id=%s' % ( id, o.id)
+    curdate = datetime.now()                                # Текущее время
+    s_list = []
+    # Зачитаем в массив s_list актуальные тарифные планы
+    # у которых дата окончания пустая или меньше текущей даты
+    for t in tp_m2m:
+        if t.tarif_plan.date_end is None or t.tarif_plan.date_end > curdate:
+            s_list.append(t.tarif_plan)    
     
-        try:
-            tr =Tarif.objects.raw(query)[0]
-            ar.append(tr)
-        except(IndexError) :
-            pass
+    data = simplejson.dumps([{"id": t.id, "name": t.name, "code": t.code, "date_begin": date_to_timestamp(t.date_begin),
+                             "date_end": date_to_timestamp(t.date_end),"tarif":get_tarif_from_tarifplan(t)} for t in s_list])
+       
     
-    # сконвертируем выбранные тарифы в JSON строку
-    data = simplejson.dumps([{"id": tr.id, "name": tr.name, "op_service_id": tr.op_service.id, "prc": tr.prc,
-                             "summa": tr.summa, "min": tr.min, "max": tr.max, "arr" : get_tarif_arr(tr)} for tr in ar])
+
     retval_["body"] = data
     return 0
 

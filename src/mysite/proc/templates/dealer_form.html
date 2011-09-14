@@ -33,7 +33,7 @@
         </table>
         {% if del_url %}
         	<ul class="object-tools">
-        		<li><a href="addres">Адреса</a></li>
+        		<li><a href="{% url mysite.proc.views.address.address form.instance.id 'dealer' %}">Адреса</a></li>
 				<li><a href="{{del_url}}">Удалить</a></li>
 			</ul>
         {% endif %}

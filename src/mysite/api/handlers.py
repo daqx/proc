@@ -6,6 +6,12 @@ from piston.handler import BaseHandler
 from mysite.proc.models import *
 from mysite.proc.sys_class import *
 from mysite.api.utils import *
+import logging
+
+# Get an instance of a logger
+logger = logging.getLogger('proc')
+
+
 
 class AgentHandler(BaseHandler):
    allowed_methods = ('GET',)
@@ -23,20 +29,22 @@ class ListenHandler(BaseHandler):
     # Все запросы будут обрабатыватся здесь
     def read( self, request, expression ):
         
+        #expression = expression.replace('/','\\')
         retval = {}
-        
+        logger.info(expression)
+        print expression
         try:
             j_data = simplejson.loads(expression)               # Зачитаем в переменную объект сообщения (Message)
             
             user = auth.authenticate(username = j_data["login"], password = j_data["passw"])
             
+            retval["act"] = j_data["act"]                       # Зачитаем act для ответа
                         
             if j_data["body"]!="":
                 j_body = simplejson.loads(j_data["body"])       # Зачитаем объект тело сообшения
             else:
                 j_body = "1234"
             
-            retval["act"] = j_data["act"]                       # Зачитаем act для ответа
             
             if "hesh_id" in j_body:                             # Если есть hesh_id 
                 retval["hesh_id"] = j_body["hesh_id"]           # То зачитаем его для ответа
@@ -54,6 +62,7 @@ class ListenHandler(BaseHandler):
             print type(inst)     # the exception instance
             print inst.args      # arguments stored in .args
             print inst
+            print expression
             retval["status"]  = "-1"
         
         return retval
