@@ -64,6 +64,7 @@ class Dealer(models.Model):
         self.summa = arc.saldo + arc.summa
         super(Dealer, self).save()
     
+            
     def get_saldo(self, cdate):
         try:
             arc= self.arcmove_set.order_by('-date')[0]
@@ -81,6 +82,10 @@ class Dealer(models.Model):
             return arc.saldo-arc.summa
         else:
             return arc.saldo+arc.summa
+        
+    def delete(self, using=None):
+        self.user.delete()
+        models.Model.delete(self, using=using)
             
         
 
@@ -124,6 +129,10 @@ class Agent(models.Model):
             
         except(IndexError, TarifPlan.DoesNotExist) :
             return 0
+        
+    def delete(self, using=None):
+        self.user.delete()
+        models.Model.delete(self, using=using)
     
 class Transaction(models.Model):
     agent           =models.ForeignKey(Agent, verbose_name='Агент')    
@@ -163,14 +172,8 @@ class Transaction(models.Model):
             self.summa_commiss=com
             self.summa_pay=self.summa-self.summa_commiss
         
-        d = self.agent.dealer                                           # Находим диллера
-        
-        # проверим есть ли необходимые средства на счете диллера
-        # если нет то возвратим -1
-        sald =d.get_saldo( datetime.now())
-        if self.summa_pay > sald:
-            return -1
-        
+        d = self.agent.dealer                                             # Находим диллера
+                
         # статус
         self.state=State.objects.get(code="0")                            # Новый
         self.date_state = datetime.now()
@@ -183,8 +186,10 @@ class Transaction(models.Model):
         h = HistoryState(trans=self, date=self.date_state, state=self.state)
         h.save()
         
+        sald = d.get_saldo( datetime.now())
+        
         # Добавим запись в выписку
-        am=ArcMove(dealer = d,dt=True,summa=self.summa_pay,transaction=self,saldo=sald)
+        am=ArcMove( dealer = d, dt = True, summa = self.summa_pay, transaction = self, saldo = sald)
         am.save()
         
         # Вычтем из суммы диллера сумму к
@@ -192,6 +197,20 @@ class Transaction(models.Model):
         d.save()
         
         return 0
+    
+    def pay(self, date_ = datetime.now()):
+        ''' Оплата суммы платежа со счета диллера
+        '''
+        d=self.agent.dealer
+        sald = d.get_saldo( datetime.now())
+        
+        # Добавим запись в выписку
+        am=ArcMove( dealer = d, dt = True, summa = self.summa_pay, transaction = self, saldo = sald)
+        am.save()
+        
+        # Вычтем из суммы диллера сумму к
+        d.summa = d.summa - self.summa_pay 
+        d.save()
 
     def delete(self):
         ''' Удаление транзакций '''

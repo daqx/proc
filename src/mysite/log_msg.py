@@ -13,6 +13,7 @@ from mysite.proc.tarif_model  import *
 from mysite.proc.gateway  import *
 import urllib2;
 import xml.etree.ElementTree as xml;
+from datetime import datetime 
 
 #import datetime
 
@@ -56,7 +57,7 @@ def megafon_send_data(trans, url, gatew):
 				for error in er:
 					err_code = error.attrib["SQLCODE"]		#код ошибки
 					err_mes = error.attrib["SQLERRM"]		#собщ. ошибки
-	
+				
 	except Exception as inst:
 		print 'Error while send data or check reply of MEGAFON'
 		print inst
@@ -68,7 +69,6 @@ def megafon_err_desc(err_code_):
 		err_code = abs(int(err_code_));		
 	except ValueError:
 		err_code = 20820;
-	
 	
 	if err_code in (20800,20801):
 		err_desc = '8000'				#Клиент не найден
@@ -91,11 +91,6 @@ def megafon_err_desc(err_code_):
 	
 	return err_desc
 		
-	
-	
-	
-	
-	
 #функция для отправки в megafon
 def megafon_pay (trans, gatew):
 	#st_new=State.objects.get(code='0')  #статус на отправку
@@ -106,9 +101,7 @@ def megafon_pay (trans, gatew):
 		#и обновить статус в табл
 		
 		#изменяем статус на "В обработке"
-		st_process=State.objects.get(code='3000') 
-		trans.state=st_process
-		trans.date_state=datetime.now()
+		trans.set_state("3000")
 		trans.save()
 		
 		msisdn = trans.number_key       #номер абонента
@@ -125,10 +118,9 @@ def megafon_pay (trans, gatew):
 			trans.set_state("0")
 			return
 		
-		
 		trans.save()
 		
-		#если err_code не 0 то выходим из операции
+		#если err_code не 0 то выходим из операции, так как произошла ошибка при проверке абонента
 		if err_code != '0':
 			return 0
 		
@@ -136,57 +128,57 @@ def megafon_pay (trans, gatew):
 		reciept_num = trans.id      #уникальный номер платежа
 		amount = trans.summa_pay   #сумма платежа
 		
+		#проверям дату отправки на провайдер, если существует то отправляем её, а если нет, тек дату время
+		dt = trans.date_out
+		if dt == None:
+			dt = datetime.now() 	 
+			trans.date_out = dt
+		
+		dt = dt.strtime('%d%m%Y%H%M%S')  #дата время для отправки на провайдер
+		
 		url = 'https://%s/ttm_kkm_int/kkm_pg_gate/KKM_PG_GATE.HTTP_ADD_PAYMENT?P_MSISDN=%s&'%(ip, msisdn)
 		url += 'P_RECEIPT_NUM=%s&P_PAY_AMOUNT=%s&'%(reciept_num, amount)
-		dt = datetime.datetime.now() 	 
-		dt = dt.strtime('%d%m%Y%H%M%S')  #тек. дата время для отправки на провайдер
 		url += 'P_RECEIPT_GLOBALLY_UNIQUE=1&P_DATE=%s'%dt 
 		err_code, dt_oper, reciept_num = megafon_send_data(trans, url, gatew) #отправляем провайдеру	
 		
-		if err_code != '' and dt_oper != '' and reciept_num != '':  #если имеются параметры
-			err_desc = megafon_err_desc(err_code)	#получаем статус для обновление таблицы
+		if err_code != '' and dt_oper != '':  #если имеются параметры
 			
 			#обновляем статусы в таблице transaction
 			if err_code=='-20808':  #платеж существует. Закрываем транзакцию
-				st=State.objects.get(code='5000')
-				trans.state=st
+				trans.set_state("5000")
+				trans.pay
+			elif err_code == "0": 		#платеж принят
+				trans.set_state("0")
 			else:	
-				st=State.objects.get(code=err_desc)
-				trans.state=st
+				err_desc = megafon_err_desc(err_code)
+				trans.set_state(err_desc)
 		else:
-			#ответ от сервера не получен обновляем статус обратно на 7000 Абонент существует
-			st=State.objects.get(code='7000')
-			trans.state=st
-		trans.date_state=datetime.now()
-		trans.try_count+=1
+			#ответ от сервера не получен обновляем статус обратно 0
+			trans.set_state(code='0')
+			
 		trans.save()
 		
-		if err_code != '0':
+		if err_code != '-20808': #платеж существует
 			return 0
 		
 		#проверяем платеж на существование
 		url = 'https://%s/ttm_kkm_int/kkm_pg_gate/KKM_PG_GATE.HTTP_ADD_PAYMENT?P_RECEIPT_NUM=%s'%(ip,reciept_num)
 		url += '&P_RECEIPT_GLOBALLY_UNIQUE=1&P_DATE=%s'%dt
 		err_code, dt_oper, reciept_num = megafon_send_data(trans, url, gatew) #отправляем провайдеру
-		if err_code != '' and dt_oper != '' and reciept_num != '':  #если имеются параметры
-			err_desc = megafon_err_desc(err_code)	#получаем статус для обновление таблицы
-			
+		if err_code != '' and dt_oper != '':  #если имеются параметры
+						
 			#обновляем статусы в таблице transaction
 			if err_code=='-20808':  #платеж существует. Закрываем транзакцию
-				st=State.objects.get(code='5000')
-				trans.state=st
+				trans.stet_state("5000")
+				trans.pay
 			elif err_code=='0':   #платеж не существует устанавливаем статус на 0
-				st=State.objects.get(code='0')
-				trans.state=st			
+				trans.set_state("0")			
 			else:
-				st=State.objects.get(code=err_desc)
-				trans.state=st	
+				err_desc = megafon_err_desc(err_code)	#получаем статус ошибки
+				trans.set_state(err_desc)	
 		else:
-			#ответ от сервера не получен обновляем статус обратно на 2000 Принят
-			st=State.objects.get(code='2000')
-			trans.state=st
-		trans.date_state=datetime.now()
-		trans.try_count+=1
+			#ответ от сервера не получен обновляем статус обратно на 0
+			trans.set_state("0")
 		trans.save()
 
 #выбрать нужные данные и отправить провайдеру
@@ -194,15 +186,17 @@ def megafon_pay (trans, gatew):
 st_new=State.objects.get(code='0')  #статус на отправку
 tr=Transaction.objects.filter(try_count__lte=10, state = st_new)[:3] #лимит по 3
 for i in tr: #цыкл только по тем транзакциям у которых статус =0
-	op_ser = i.opservices #ссылка на провайдера
-	gatew = Gateway.objects.get(opservice=op_ser)
-	#st_gateway=Status.objects.get(code='WORKING')  #статус на активен
-	
-	if gatew.status.code == 'WORKING':
-		if gatew.code == 'MEGAFON':
-			megafon_pay(i, gatew)
-		elif gatew.name == 'tcell':
-			a=1
+	d = i.agent.dealer
+	saldo = d.get_saldo(datetime.now())
+	if saldo + d.overdraft - d.limit >= i.summa_pay:     #проверяем баланс диллера
+		op_ser = i.opservices #ссылка на провайдера
+		gatew = Gateway.objects.get(opservice=op_ser)
+		if gatew.status.code == 'WORKING':
+			if gatew.code == 'MEGAFON':
+				if i.number_key == '901000181':
+					megafon_pay(i, gatew)
+			elif gatew.name == 'tcell':
+				a=1
 
 #	if service.state=='true':
 #		
@@ -282,8 +276,3 @@ for i in tr: #цыкл только по тем транзакциям у кот
 #
 #response = urllib2.urlopen(url)
 #print(response.read())
-	
-	
-	
-	
-	

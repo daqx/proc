@@ -4,6 +4,9 @@ from mysite.proc.sys_model import *
 from mysite.proc.models import *
 from mysite.proc.tarif_model import *
 
+class ActionAdmin(admin.ModelAdmin):
+    list_display=('code','name')
+
 class ActualStateAdmin(admin.ModelAdmin):
     list_display=('date','agent')
 
@@ -17,6 +20,10 @@ class AgentAdmin(admin.ModelAdmin):
     list_display=('user','state')
     #raw_id_fields = ('addres',)
     
+class CommandAdmin(admin.ModelAdmin):
+    list_display=('act','agent','date','status')    
+
+
 class CountryAdmin(admin.ModelAdmin):
     list_display=('str_code','name')
     search_fields = ('str_code', 'name')
@@ -118,12 +125,13 @@ class TransactionAdmin(admin.ModelAdmin):
     
 
     
-
+admin.site.register(Action, ActionAdmin)
 admin.site.register(Agent, AgentAdmin)
 admin.site.register(ArcMove, ArcMoveAdmin)
 admin.site.register(Addres, AddresAdmin)
 admin.site.register(ActualState, ActualStateAdmin)
 admin.site.register(Country, CountryAdmin)
+admin.site.register(Command, CommandAdmin)
 admin.site.register(Dealer, DealerAdmin)
 admin.site.register(Encashment, EncashmentAdmin)
 admin.site.register(Gateway, GatewayAdmin)

@@ -106,8 +106,7 @@ class IpAddressForm(forms.ModelForm):
 
 
 class ServiceTypeForm(forms.ModelForm):   
-    parent = forms.ModelChoiceField(queryset=ServiceType.objects.filter(parent=None)
-                                    ,widget=forms.CheckboxSelectMultiple,required=False)
+    #parent = forms.ModelChoiceField(queryset=ServiceType.objects.filter(parent=None),widget=forms.CheckboxSelectMultiple,required=False)
     
     required_css_class = 'required'
     class Meta:

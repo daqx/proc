@@ -64,6 +64,7 @@ def transfer( body_, login_, retval_):
         tr.summa = body_["summa"]
         tr.summa_pay = body_["summa_zachis"]
         tr.hesh_id = body_["hesh_id"]
+        tr.encashment = body_["id_inkas"]
         
         # Дата платежа на терминале
         if "date" in body_:
@@ -153,9 +154,11 @@ def reg_sost( body_, login_, retval_):
 
 
 def get_time(retval_):
-    ''' Возвращает текущую дату '''
+    ''' Возвращает текущую дату
+        ACT = 2
+    '''
     retval_["status"] = "0"
-    retval_["body"] = str(datetime.now())
+    retval_["body"] = str(time())
 
 
 def get_optype(login_, retval_):
@@ -190,7 +193,7 @@ def get_opservices(login_, retval_):
         retval_["status"]="-1"
         return "-1"
     
-    query="select o.* from proc_opservice o, proc_agent_opservices ao where o.id=ao.opservice_id and ao.agent_id= %s  union   select o.* from proc_opservice o, proc_agent_opservice_group aog, proc_opservicegroup_opservice ogo where  aog.opservicegroup_id=ogo.opservicegroup_id and aog.agent_id = %s" % (id, id)
+    query="select o.* from proc_opservice o, proc_agent_opservices ao where o.id=ao.opservice_id and ao.agent_id = %s" % id
     
     op = OpService.objects.raw(query)[0:]
     data = simplejson.dumps([{"id": o.id,"code": o.code, "name": o.name, "need_check": o.need_check, "mask": o.mask, "state": o.state.id, "type": o.type.id, "order": o.order} for o in op])
