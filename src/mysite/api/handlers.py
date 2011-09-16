@@ -6,6 +6,7 @@ from piston.handler import BaseHandler
 from mysite.proc.models import *
 from mysite.proc.sys_class import *
 from mysite.api.utils import *
+from urllib import unquote_plus
 import logging
 
 # Get an instance of a logger
@@ -30,9 +31,21 @@ class ListenHandler(BaseHandler):
     def read( self, request, expression ):
         
         #expression = expression.replace('/','\\')
+        #logger.info(expression)
         retval = {}
-        logger.info(expression)
-        print expression
+        #print expression
+        #print "path - %s" % request.path
+        #b = request.path.find('/api/listen/')
+        #e = request.path.find('/api/listen/',20)
+        
+        #if e>0:        
+        #    expression = request.path[12:e]
+        #else:
+        #    expression = request.path[12:]
+        
+        # декодируем экранированную строку
+        expression = unicode(unquote_plus(str(expression)), 'utf-8')
+        #print "expression - %s" % expression
         try:
             j_data = simplejson.loads(expression)               # Зачитаем в переменную объект сообщения (Message)
             

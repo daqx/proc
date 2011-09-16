@@ -184,6 +184,7 @@ input, textarea, select, .form-row p {
     padding: 2px 3px;
     vertical-align: middle;
 }
+
 textarea {
     vertical-align: top !important;
 }

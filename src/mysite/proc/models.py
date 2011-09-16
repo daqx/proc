@@ -56,11 +56,12 @@ class Dealer(models.Model):
     
     def fill_ac(self, arc):        
         '''Пополнение счета диллера'''
-        arc.dt = False
-        arc.saldo = self.get_saldo(datetime.now()) 
+        arc.dt      = False
+        arc.date    = datetime.now()
+        arc.saldo   = self.get_saldo(arc.date) 
         arc.save()
         
-        self.summa = arc.saldo
+        self.summa = arc.saldo + arc.summa
         super(Dealer, self).save()
     
     def get_saldo(self, cdate):
@@ -88,12 +89,12 @@ class Agent(models.Model):
     check_for_ip    =models.BooleanField('Проверить IP',default=False)    
     dealer          =models.ForeignKey(Dealer, verbose_name='Диллер')    
     name            =models.CharField('Наименование',max_length=50)
-    imei            =models.CharField('IMEI',max_length=20, null=True,blank=True)
+    imei            =models.CharField('IMEI телефона',max_length=20, null=True,blank=True)
     ipaddresses     = generic.GenericRelation( IpAddress, null=True, blank=True )    
     opservices      =models.ManyToManyField(OpService, null=True, blank=True, verbose_name='Операторы услуг')
     opservice_group =models.ManyToManyField(OpServiceGroup, null=True, blank=True, verbose_name='Группы операторов услуг')    
     tarif_plan_arr  =generic.GenericRelation(TarifPlanM2M, null=True, blank=True)
-    tel             =models.CharField('Телефон',max_length=20,blank=True)
+    tel             =models.CharField('Контактный телефон',max_length=20,blank=True)
     type            =models.CharField('Тип',max_length=1,choices=AGENT_TYPE)
     state           =models.ForeignKey(Status, verbose_name='Статус')
     user            =models.OneToOneField(User, blank=True, verbose_name='Пользователь')
@@ -129,6 +130,7 @@ class Transaction(models.Model):
     date            =models.DateTimeField(auto_now_add=True, verbose_name='Дата')  # Время появления платежа на сервере
     date_state      =models.DateTimeField()                                     # Дата последнего изменения статуса
     date_input      =models.DateTimeField(null=True, blank=True)                # Дата платежа на терминале
+    date_out        =models.DateTimeField(null=True, blank=True)                # Дата отправки платежа на сервер оператора
     encashment      =models.IntegerField(null=True, blank=True)                 # инкасация 
     opservices      =models.ForeignKey(OpService)
     number_key      =models.CharField(max_length=100, verbose_name='Номер')
@@ -152,6 +154,8 @@ class Transaction(models.Model):
     def add(self, api = False):        
         '''Добавление новой записи'''
         
+        
+        
         #  Если не используем API то вычисляем комиссию и сумму платежа
         if not api:
             ag=self.agent
@@ -159,27 +163,49 @@ class Transaction(models.Model):
             self.summa_commiss=com
             self.summa_pay=self.summa-self.summa_commiss
         
+        d = self.agent.dealer                                           # Находим диллера
+        
+        # проверим есть ли необходимые средства на счете диллера
+        # если нет то возвратим -1
+        sald =d.get_saldo( datetime.now())
+        if self.summa_pay > sald:
+            return -1
+        
         # статус
         self.state=State.objects.get(code="0")                            # Новый
         self.date_state = datetime.now()
+        #self.set_state( "0")
         
         # Сохраним все данные
         super(Transaction, self).save()
         
-        # Добавим запись в выписку
-        am=ArcMove(dealer=self.agent.dealer,dt=True,summa=self.summa_pay,transaction=self,saldo=0)
-        am.save()
-        
         # Добавим новый статус в историю (HistoryState)
-        h = HistoryState(trans=self, date=self.date, state=self.state)
+        h = HistoryState(trans=self, date=self.date_state, state=self.state)
         h.save()
         
+        # Добавим запись в выписку
+        am=ArcMove(dealer = d,dt=True,summa=self.summa_pay,transaction=self,saldo=sald)
+        am.save()
+        
+        # Вычтем из суммы диллера сумму к
+        d.summa = d.summa - self.summa_pay 
+        d.save()
+        
+        return 0
 
     def delete(self):
         ''' Удаление транзакций '''
         for item in self.arcmove_set.all():                                 # удалим сначала выписку
             item.delete()
         super(Transaction, self).delete()                                   # потом и сам документ
+        
+    def set_state(self, st_code, date = datetime.now()):
+        # статус
+        self.state=State.objects.get(code = st_code)                        # Новый
+        self.date_state = date
+        # Добавим новый статус в историю (HistoryState)
+        h = HistoryState(trans=self, date=self.date_state, state=self.state)
+        h.save()
         
 
 class ArcMove(models.Model):
@@ -226,6 +252,7 @@ class Transaction2(models.Model):
     date            =models.DateTimeField(auto_now_add=True, verbose_name='Дата')  # Время появления платежа на сервере
     date_state      =models.DateTimeField()                                     # Дата последнего изменения статуса
     date_input      =models.DateTimeField(null=True, blank=True)                # Дата платежа на терминале
+    date_out        =models.DateTimeField(null=True, blank=True)                # Дата отправки платежа на сервер оператора
     encashment      =models.IntegerField(null=True, blank=True)                 # инкасация 
     opservices      =models.ForeignKey(OpService)
     number_key      =models.CharField(max_length=100, verbose_name='Номер')
@@ -290,7 +317,7 @@ class Gatelog(models.Model):
     sending     = models.BooleanField()
     
     def __unicode__(self):
-        return self.name
+        return "%s %s" % ( self.date, self.sending)
     
     class Meta:
         app_label = "proc"

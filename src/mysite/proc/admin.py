@@ -22,7 +22,7 @@ class CountryAdmin(admin.ModelAdmin):
     search_fields = ('str_code', 'name')
     
 class DealerAdmin(admin.ModelAdmin):
-    list_display=('account', 'user')
+    list_display=( 'user', 'account')
     #raw_id_fields = ('addres',)
     
     
@@ -31,6 +31,9 @@ class EncashmentAdmin(admin.ModelAdmin):
 
 class GatewayAdmin(admin.ModelAdmin):
     list_display=('code','name','opservice', 'status')
+
+class GatelogAdmin(admin.ModelAdmin):
+    list_display=('transaction','transaction2','date', 'sending')
 
 
 class HistoryStateAdmin(admin.ModelAdmin):
@@ -124,6 +127,7 @@ admin.site.register(Country, CountryAdmin)
 admin.site.register(Dealer, DealerAdmin)
 admin.site.register(Encashment, EncashmentAdmin)
 admin.site.register(Gateway, GatewayAdmin)
+admin.site.register(Gatelog, GatelogAdmin)
 admin.site.register(JourSostAgent, JourSostAgentAdmin)
 admin.site.register(Kopf, KopfAdmin)
 admin.site.register(Menu, MenuAdmin)

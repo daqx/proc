@@ -91,6 +91,16 @@ def agent_form(request,id_):
             a = form.save(commit = False)
             
             a.opservices = form.cleaned_data["opservices"]
+            opserv_group = form.cleaned_data["opservice_group"]
+            
+            # передадим все операторы услуг с массива групп операторов услуг в массив операторов услуг
+            for gr in opserv_group:
+                for op in gr.opservice.all():
+                    opc = a.opservices.filter(id=op.id).count()
+                    if opc == 0:
+                        a.opservices.add(op)
+              
+            a.opservice_group.clear()
             
             # Прочитаем номера HDD и Купюроприемника и запишем в JSON формате в переменную hardware
             if len(form.cleaned_data["hdd_id"])>0 :
@@ -113,7 +123,7 @@ def agent_form(request,id_):
             u.last_name =form.cleaned_data["last_name"]            
             u.save()
             a.save()
-            form.save_m2m()
+            #form.save_m2m()
             return HttpResponseRedirect('/proc/agent/')
         else:
             return render(request,'agent_form.html', {'form': form})

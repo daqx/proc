@@ -18,6 +18,7 @@ $(function(){
     <th>Наименование</th>
     <th>Копф</th>    
     <th>Диллер</th>
+    <th>Сумма</th>
     <th>Адрес</th>
   </tr>
 
@@ -26,6 +27,7 @@ $(function(){
     <td><a href="{{s.id}}">{{s.user.username}}</a></td>
     <td>{{s.kopf.name}}</td>
     <td>{{s.dealer.user.username}}</td>
+    <td>{{s.summa}}</td>
     <td><a href="{% url mysite.proc.views.address.address s.id 'dealer' %}">***</a></td>
   </tr>
 

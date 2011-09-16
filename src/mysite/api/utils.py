@@ -29,7 +29,8 @@ def get_tarif_arr(t):
     
     ar = TarifArr.objects.filter(tarif=t)           # выберем массив тарифа
     
-    data = simplejson.dumps([{"id": tr.id, "prc": tr.prc, "summa": tr.summa, "min": tr.min, "max": tr.max} for tr in ar])
+    data = simplejson.dumps([{"id": tr.id, "prc": tr.prc, "summa": tr.summa, "min": tr.min, "max": tr.max, 
+                              "parent": tr.parent, "beg_time": tr.beg_time, "end_time": tr.end_time} for tr in ar])
     
     return data
 
@@ -63,6 +64,15 @@ def transfer( body_, login_, retval_):
         tr.summa = body_["summa"]
         tr.summa_pay = body_["summa_zachis"]
         tr.hesh_id = body_["hesh_id"]
+        
+        # Дата платежа на терминале
+        if "date" in body_:
+            try:            
+                tr.date_input = datetime.fromtimestamp(float(body_["date"])) 
+            except ValueError:
+                pass
+    
+    
         
         #TODO: Пока оставим это так
         tr.summa_commiss = tr.summa - tr.summa_pay 
@@ -98,8 +108,16 @@ def reg_sost( body_, login_, retval_):
     
     
     if "date" in body_:
-        js.date = body_["date"] #datetime.strptime(body_["date"],'YYYY-MM-DD HH:MI:ss')
-        actS.date = js.date
+        try:
+            js.date = datetime.fromtimestamp(float(body_["date"])) #datetime.strptime(body_["date"],'YYYY-MM-DD HH:MI:ss')
+        except ValueError:
+            retval_["status"] = "-1"
+            return 0
+    
+    else:
+        js.date = datetime.now()
+        
+    actS.date = js.date
     
     if "cash_count" in body_:
         js.cash_count = body_["cash_count"]
@@ -182,8 +200,9 @@ def get_opservices(login_, retval_):
 def get_tarif_from_tarifplan(tp):
     ''' Возвращает в формате JSON тарифы для заданного тарифного плана tp
     '''
-    data = simplejson.dumps([{"id": tr.id, "name": tr.name, "op_service_id": tr.op_service.id, "prc": tr.prc,
-                             "summa": tr.summa, "min": tr.min, "max": tr.max, "arr" : get_tarif_arr(tr)} for tr in Tarif.objects.filter(tarif_plan = tp)])
+    data = simplejson.dumps([{"id": tr.id, "name": tr.name,"code": tr.code, "op_service_id": tr.op_service.id, "prc": tr.prc,
+                             "summa": tr.summa,"summa_own": tr.summa_own, "min": tr.min, "max": tr.max,"ru_text": tr.ru_text,
+                             "tj_text": tr.tj_text,"en_text": tr.en_text, "arr" : get_tarif_arr(tr)} for tr in Tarif.objects.filter(tarif_plan = tp)])
     return data
 
 def get_tarif_all(login_, retval_):

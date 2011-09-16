@@ -33,9 +33,9 @@ class AddressForm(forms.ModelForm):
         exclude=('content_type', 'object_id')
 
 class AgentForm(forms.ModelForm):    
-    username = forms.RegexField(label=("Имя пользователя"), max_length=30, regex=r'^[\w.@+-]+$',
-        help_text = ("Обязательный. 30 символов или менньше. Только буквы, цифры и @/./+/-/_ ."),
-        error_messages = {'invalid': ("Обязательный. 30 символов или менньше. Только буквы, цифры и @/./+/-/_ .")})
+    username = forms.RegexField(label=("Имя пользователя"), max_length=30, min_length= 6,regex=r'^[\w.@+-]+$',
+        help_text = ("Обязательный. От 6 до 30 символов.. Только буквы, цифры и @/./+/-/_ ."),
+        error_messages = {'invalid': ("Это значение может содержать только буквы, цифры и @/./+/-/_ символы.")})
     password = forms.CharField(label=("Пароль"), widget=forms.PasswordInput)
     first_name = forms.CharField(label='Имя', max_length=30)
     last_name = forms.CharField(label='Фамилия',max_length=30)
@@ -50,12 +50,12 @@ class AgentForm(forms.ModelForm):
                  'tel','key_hash','cashcode_capacity','cashcode_id','hdd_id')
 
 class AgentEditForm(forms.ModelForm):    
-    username = forms.RegexField(label=("Имя пользователя"), max_length=30, regex=r'^[\w.@+-]+$',
-        help_text = ("Обязательный. 30 символов или менньше. Только буквы, цифры и @/./+/-/_ ."),
-        error_messages = {'invalid': ("Обязательный. 30 символов или менньше. Только буквы, цифры и @/./+/-/_ .")})    
+    username = forms.RegexField(label=("Имя пользователя"), max_length=30, min_length= 6,regex=r'^[\w.@+-]+$',
+        help_text = ("Обязательный. От 6 до 30 символов.. Только буквы, цифры и @/./+/-/_ ."),
+        error_messages = {'invalid': ("Это значение может содержать только буквы, цифры и @/./+/-/_ символы.")})    
     first_name = forms.CharField(label='Имя', max_length=30)
     last_name = forms.CharField(label='Фамилия',max_length=30)
-    #opservices = forms.ModelMultipleChoiceField(widget=forms.CheckboxSelectMultiple(),required=True)
+    #opservices = forms.MultipleChoiceField()    #widget=forms.CheckboxSelectMultiple(),required=True
 
     cashcode_id = forms.CharField(label='№ купюроприемника', max_length=30, required=False)
     hdd_id= forms.CharField(label='№ жесткого диска', max_length=30, required=False)
@@ -69,8 +69,8 @@ class AgentEditForm(forms.ModelForm):
 
 '''=====================DEALER==========================='''
 class DealerForm(forms.ModelForm):    
-    username = forms.RegexField(label=("Имя пользователя"), max_length=30, regex=r'^[\w.@+-]+$',
-        help_text = ("Обязательный. 30 символов или менньше. Только буквы, цифры и @/./+/-/_ ."),
+    username = forms.RegexField(label=("Имя пользователя"), max_length=30,min_length= 6, regex=r'^[\w.@+-]+$',
+        help_text = ("Обязательный. От 6 до 30 символов. Только буквы, цифры и @/./+/-/_ ."),
         error_messages = {'invalid': ("Это значение может содержать только буквы, цифры и @/./+/-/_ символы.")})
     password = forms.CharField(label=("Пароль"), widget=forms.PasswordInput)
     first_name = forms.CharField(label='Имя', max_length=30)
@@ -84,8 +84,8 @@ class DealerForm(forms.ModelForm):
         fields =('kopf','state','username','password','first_name','last_name','dealer','inn','check_for_ip','limit','overdraft','account','tel')
         
 class DealerEditForm(forms.ModelForm):    
-    username = forms.RegexField(label=("Имя пользователя"), max_length=30, regex=r'^[\w.@+-]+$',
-        help_text = ("Обязательный. 30 символов или менньше. Только буквы, цифры и @/./+/-/_ ."),
+    username = forms.RegexField(label=("Имя пользователя"), max_length=30, min_length= 6,regex=r'^[\w.@+-]+$',
+        help_text = ("Обязательный. От 6 до 30 символов. Только буквы, цифры и @/./+/-/_ ."),
         error_messages = {'invalid': ("Это значение может содержать только буквы, цифры и @/./+/-/_ символы.")})    
     first_name = forms.CharField(label='Имя', max_length=30)
     last_name = forms.CharField(label='Фамилия',max_length=30)
@@ -180,14 +180,14 @@ class TransactionForm(forms.ModelForm):
     required_css_class = 'required'
     class Meta:
         model=Transaction
-        exclude=('agent','state','date_state','summa_commiss','summa_pay','blocked','return_reason','date_proc','seans_number','processed','blocked','try_count','file_name','user_proc')
+        exclude=('agent','state','date_state','summa_commiss','summa_pay','blocked','return_reason','date_proc','date_out','seans_number','processed','blocked','try_count','file_name','user_proc')
 
 class TransactionAdminForm(forms.ModelForm):    
     
     required_css_class = 'required'
     class Meta:
         model=Transaction
-        exclude=('state','date_state','summa_commiss','summa_pay','blocked','return_reason','date_proc','seans_number','processed','blocked','try_count','file_name','user_proc')
+        exclude=('state','date_state','summa_commiss','summa_pay','blocked','return_reason','date_proc','date_out','seans_number','processed','blocked','try_count','file_name','user_proc')
 
 
 class FillAcForm(forms.ModelForm):

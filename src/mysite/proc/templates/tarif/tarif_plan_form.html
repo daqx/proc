@@ -1,5 +1,18 @@
 # -*- coding: utf-8 -*-
 {%extends "base.html"%}
+
+{% block head %}  	
+  	<script type="text/javascript" src="/proc/static/js/jquery.maskedinput.js"></script> 
+  	
+  	<script type="text/javascript">
+  	$(function() {
+  		$("#id_date_begin").mask("99.99.9999 99:99:99");	
+  		$("#id_date_end").mask("99.99.9999 99:99:99");
+  	});
+  	</script>
+{% endblock %}	
+
+
 {%block content%}
 
    

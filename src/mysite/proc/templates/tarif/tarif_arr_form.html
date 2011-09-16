@@ -1,4 +1,18 @@
 {%extends "base.html"%}
+
+{% block head %}  	
+  	<script type="text/javascript" src="/proc/static/js/jquery.maskedinput.js"></script> 
+  	
+  	<script type="text/javascript">
+  	$(function() {
+  		$("#id_beg_time").mask("99:99:99");	
+  		$("#id_end_time").mask("99:99:99");
+  	});
+  	</script>
+{% endblock %}	
+
+
+
 {%block content%}
 
    

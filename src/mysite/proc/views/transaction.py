@@ -8,6 +8,7 @@ from django.template import loader,Context,RequestContext
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.context_processors import request
 from django.shortcuts import *
+from django.forms.util import ErrorList
 from mysite.proc.models import *
 from mysite.proc.views.forms import *
 from django.contrib.auth.decorators import permission_required
@@ -73,7 +74,11 @@ def pay_form_add(request,id_=0):
                 agent=user.agent                                        # агент берется с юзера
                 d.agent=agent
                                                                         # Иначе агент берется с формы
-            d.add()
+            ret = d.add()
+            if ret == -1:
+                form._errors["summa"]= ErrorList([u"Остаток диллера не позволяет оплатить эту сумму"])
+                return render( request,'pay_form.html', {'form': form})
+                        
             return HttpResponseRedirect('/proc/pay/')
         else:
             return render( request,'pay_form.html', {'form': form})
@@ -96,7 +101,7 @@ def fill_ac_list(request):
 
 @permission_required('proc.view_arcmove')
 def fill_ac_list(request):
-    s_list = ArcMove.objects.filter(transaction = None, dt = False)
+    s_list = ArcMove.objects.filter(transaction = None, dt = False).order_by('-date')
     return render( request,'fill_ac.html', {'s_list': s_list})
 
 @permission_required('proc.add_arcmove')
@@ -109,7 +114,7 @@ def fill_ac_form_add(request,id_=0):
             d=fa.dealer
                                                                         # Иначе агент берется с формы
             d.fill_ac(fa)
-            return HttpResponseRedirect('/proc/main/')
+            return HttpResponseRedirect('/proc/fill_ac/')
         else:
             return render( request,'fill_ac_form.html', {'form': form})
     else:        

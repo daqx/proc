@@ -122,4 +122,17 @@ class ActualState(models.Model):
     class Meta:             
         app_label = "proc"
       
-
+class Action(models.Model):
+    ''' 
+    '''
+    code        =models.CharField(max_length=10)
+    name        =models.CharField(max_length=50)
+    description =models.CharField(max_length=200)
+    
+    
+    def __unicode__(self):
+        return "%s" % self.date
+    
+    class Meta:             
+        app_label = "proc"
+      

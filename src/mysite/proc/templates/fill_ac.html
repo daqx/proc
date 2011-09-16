@@ -16,27 +16,21 @@ $(function(){
 {% endif %}<br/><br/><br/>
 <table id='pay' class='tbl'>
   <tr>
-    <th>агент</th>
-    <th>номер</th>
-    <th>сумма</th>
-    <th>сумма платежа</th>
-    <th>комиссия</th>
     <th>дата</th>    
-    <th>диллер</th>
-    <th>статус</th>
+    <th>диллер</th>        
+    <th>остаток на начало</th>    
+    <th>сумма</th>
+    
     
   </tr>
 
 {%for s in s_list  %}
   <tr>
-    <td><a href="{{s.id}}">{{s.agent.user.username}}</a></td>
-    <td>{{s.number_key}}</td>
-    <td>{{s.summa}}</td>
-    <td>{{s.summa_pay}}</td>
-    <td>{{s.summa_commiss}}</td>
-    <td>{{s.date|date:"j F Y"}}</td>
-    <td>{{s.agent.dealer.user.username}}</td>
-    <td>{{s.state.name}}</td>
+    <td>{{s.date|date:"d.m.y H:i:s"}}</td>
+    <td>{{s.dealer.user.username}}</td>    
+    <td>{{s.saldo}}</td>
+    <td>{{s.summa}}</td>    
+    
     
   </tr>
 
