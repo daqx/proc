@@ -14,7 +14,8 @@ from mysite.proc.gateway  import *
 import urllib2;
 import xml.etree.ElementTree as xml;
 from datetime import datetime 
-
+from django.db.models import Q
+from mysite.proc.helpers import *
 #import datetime
 
 def ins_log(trans, data, sending):
@@ -94,7 +95,8 @@ def megafon_err_desc(err_code_):
 #функция для отправки в megafon
 def megafon_pay (trans, gatew):
 	#st_new=State.objects.get(code='0')  #статус на отправку
-	trans.try_count+=1
+	trans.try_count = nvl(trans.try_count,0) + 1
+	
 	
 	if trans.state.code == '0':
 		#новый статус надо отправить запрос на уществование абонента
@@ -134,7 +136,7 @@ def megafon_pay (trans, gatew):
 			dt = datetime.now() 	 
 			trans.date_out = dt
 		
-		dt = dt.strtime('%d%m%Y%H%M%S')  #дата время для отправки на провайдер
+		dt = dt.strftime('%d%m%Y%H%M%S')  #дата время для отправки на провайдер
 		
 		url = 'https://%s/ttm_kkm_int/kkm_pg_gate/KKM_PG_GATE.HTTP_ADD_PAYMENT?P_MSISDN=%s&'%(ip, msisdn)
 		url += 'P_RECEIPT_NUM=%s&P_PAY_AMOUNT=%s&'%(reciept_num, amount)
@@ -184,10 +186,17 @@ def megafon_pay (trans, gatew):
 #выбрать нужные данные и отправить провайдеру
 
 st_new=State.objects.get(code='0')  #статус на отправку
-tr=Transaction.objects.filter(try_count__lte=10, state = st_new)[:3] #лимит по 3
+tr=Transaction.objects.filter(Q(try_count__isnull=True)|Q(try_count__lte=10), state = st_new)[:3] #лимит по 3
 for i in tr: #цыкл только по тем транзакциям у которых статус =0
 	d = i.agent.dealer
 	saldo = d.get_saldo(datetime.now())
+	
+	if d.overdraft == None:
+		d.overdraft = 0
+		
+	if d.limit == None:
+		d.limit = 0
+		
 	if saldo + d.overdraft - d.limit >= i.summa_pay:     #проверяем баланс диллера
 		op_ser = i.opservices #ссылка на провайдера
 		gatew = Gateway.objects.get(opservice=op_ser)

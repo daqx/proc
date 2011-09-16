@@ -72,4 +72,9 @@ def hash_for_constraint():
     r_col = 'agent_id'
     col = 'id'
     r_name = '%s_refs_%s_%s' % (r_col, col, _digest(r_table, table))
-    
+
+def nvl(arg,val):
+    if arg ==  None:
+        return val
+    else:
+        return arg   

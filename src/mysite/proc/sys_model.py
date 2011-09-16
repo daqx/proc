@@ -145,7 +145,7 @@ class Command(models.Model):
     date_send   =models.DateTimeField(null=True, blank=True)
     status      =models.ForeignKey(Status)
     description =models.CharField(max_length=200, null=True, blank=True)
-    
+     
     
     def __unicode__(self):
         return "%s %s" % (self.date, self.agent.name)

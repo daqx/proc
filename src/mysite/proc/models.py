@@ -185,17 +185,7 @@ class Transaction(models.Model):
         # Добавим новый статус в историю (HistoryState)
         h = HistoryState(trans=self, date=self.date_state, state=self.state)
         h.save()
-        
-        sald = d.get_saldo( datetime.now())
-        
-        # Добавим запись в выписку
-        am=ArcMove( dealer = d, dt = True, summa = self.summa_pay, transaction = self, saldo = sald)
-        am.save()
-        
-        # Вычтем из суммы диллера сумму к
-        d.summa = d.summa - self.summa_pay 
-        d.save()
-        
+                        
         return 0
     
     def pay(self, date_ = datetime.now()):
