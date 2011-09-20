@@ -65,11 +65,13 @@ def transfer( body_, login_, retval_):
         tr.summa_pay = body_["summa_zachis"]
         tr.hesh_id = body_["hesh_id"]
         tr.encashment = body_["id_inkas"]
+        #
+        tr.ticket = body_["chekn"]
         
         # Дата платежа на терминале
-        if "date" in body_:
+        if "date_create" in body_:
             try:            
-                tr.date_input = datetime.fromtimestamp(float(body_["date"])) 
+                tr.date_input = datetime.fromtimestamp(float(body_["date_create"])) 
             except ValueError:
                 pass
     
@@ -104,9 +106,13 @@ def reg_sost( body_, login_, retval_):
     js = JourSostAgent()
     actS = ActualState()
     
-    js.agent = ag
-    actS.agent = ag
+    try:
+        actS = ActualState.objects.get(agent = ag)
+    except( ActualState.DoesNotExist) :
+        actS.agent = ag
     
+    js.agent = ag
+      
     
     if "date" in body_:
         try:
@@ -117,8 +123,11 @@ def reg_sost( body_, login_, retval_):
     
     else:
         js.date = datetime.now()
-        
-    actS.date = js.date
+    
+    try:
+        actS.date = js.date        
+    except Exception as inst:
+        print type(inst)    
     
     if "cash_count" in body_:
         js.cash_count = body_["cash_count"]
@@ -158,7 +167,9 @@ def get_time(retval_):
         ACT = 2
     '''
     retval_["status"] = "0"
-    retval_["body"] = str(time())
+    dt = datetime.now()
+    dt = dt.strftime('%Y-%m-%d %H:%M:%S.%f') 
+    retval_["body"] = str(dt)
 
 
 def get_optype(login_, retval_):
@@ -278,6 +289,50 @@ def get_tarif( body_, login_, retval_):
     retval_["body"] = data
     return 0
 
+def get_encashment( body_, login_, retval_):
+    
+    retval_["status"] = "0"
+    
+    enc = Encashment()
+    
+    try:
+        id = Agent.objects.filter(user__username = login_)[0]        # Достанем id Агента
+        enc.agent = id
+    except(IndexError, Agent.DoesNotExist) :
+        retval_["status"]="-1"
+        return "-1"
+    
+    
+    
+    if "inkass_id" in body_:                             # Номер инкасации 
+        enc.number = body_["inkass_id"]                  # То зачитаем его
+        retval_["hesh_id"] = enc.number 
+        
+    if "summa" in body_:                                # Сумма 
+        enc.summa = body_["summa"]                     # То зачитаем его
+    
+    if "date_inkass" in body_:
+        try:
+            enc.date_encash = datetime.fromtimestamp(float(body_["date_inkass"])) #datetime.strptime(body_["date"],'YYYY-MM-DD HH:MI:ss')
+        except ValueError:
+            retval_["status"] = "-1"
+            return 0    
+    
+    
+    if "user" in body_:    
+        try:
+            us = User.objects.filter(username = body_["user"])[0]        # Достанем User -а
+            enc.user = us
+        except(IndexError, User.DoesNotExist) :
+            pass
+    try:
+        enc.save()
+    except Exception as inst:
+        print type(inst) 
+    
+    return 0
+
+
 def do_job(act_, body_, login_, retval_):
     ''' Функция обработки команд '''        
     
@@ -302,8 +357,8 @@ def do_job(act_, body_, login_, retval_):
     elif act_ == "7":                               # Запрос списка тарифов доступных операторов услуг
         ret = get_tarif_all(login_, retval_);
     
-    elif act_ == "8":                               # Запрос тарифа для оператора услуг
-        ret = get_tarif( body_, login_, retval_);
+    elif act_ == "8":                               # Инкасация
+        ret = get_encashment( body_, login_, retval_);
         
     
     

@@ -68,3 +68,20 @@ def grid_config(request):
     grid = JournalGrid()
     #grid.model = ActualState
     return HttpResponse(grid.get_config(), mimetype="application/json")
+
+class PayGrid(JqGrid):
+    model = Transaction # could also be a queryset    
+    #fields = ['id', 'date','agent__id','agent__user__username', 'link','cash_count', 'cash_code__name','printer__name', 'terminal__name'] # optional 
+    url = '/proc/examplegrid/' #reverse('grid_handler')
+    caption = 'Pay' # optional
+    
+    
+    def __init__(self, ag_id):        
+        self.queryset = Transaction.objects.all().values('id', 'date','agent__id','agent__user__username', 'agent__dealer__user__username','summa','summa_pay', 'state__name')
+        
+
+
+def pay_handler(request, id_=0):
+    
+    grid = PayGrid(id_)    
+    return HttpResponse(grid.get_json(request), mimetype="application/json")

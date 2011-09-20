@@ -24,6 +24,8 @@ urlpatterns=patterns('',
     url (r'^monitor/$', grids.grid_handler, name='grid_handler'), 
     url (r'^monitor/cfg/$', grids.grid_config, name='grid_config'),
     
+    url (r'^pay/$', grids.pay_handler, name='pay_handler'),
+    
     #(r'^login/$', login_view),
     #(r'^contact/$', contact),
     #(r'^contact_form/$', contact_form),

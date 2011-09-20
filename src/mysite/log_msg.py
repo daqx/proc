@@ -206,8 +206,8 @@ try :
 				gatew = Gateway.objects.get(opservice=op_ser)
 				if gatew.status.code == 'WORKING':
 					if gatew.code == 'MEGAFON':
-						if i.number_key == '(90) 100-01-81':
-							megafon_pay(i, gatew)
+						#if i.number_key == '(90) 100-01-81':
+						megafon_pay(i, gatew)
 		time.sleep(3)
 		print ('Informations are select from transactions')
 except Exception as inst:

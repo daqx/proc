@@ -147,7 +147,7 @@ class Transaction(models.Model):
     summa_commiss   =models.FloatField(verbose_name='Комиссия')
     summa_pay       =models.FloatField(verbose_name='Сумма платежа')    
     state           =models.ForeignKey(State)
-    ticket          =models.IntegerField(null=True, blank=True)                 # номер чека
+    ticket          =models.CharField(max_length=20,null=True, blank=True)      # номер чека
     return_reason   =models.CharField(max_length=100)                           # Причина отказа и служ отметки    
     seans_number    =models.CharField(max_length=20,null=True, blank=True)      # Номер сеанса обработки
     processed       =models.NullBooleanField(null=True, blank=True)             # Признак успешной обработки
@@ -269,7 +269,7 @@ class Transaction2(models.Model):
     summa_commiss   =models.FloatField(verbose_name='Комиссия')
     summa_pay       =models.FloatField(verbose_name='Сумма платежа')    
     state           =models.ForeignKey(State)
-    ticket          =models.IntegerField(null=True, blank=True)                 # номер чека
+    ticket          =models.CharField(max_length=20,null=True, blank=True)      # номер чека
     return_reason   =models.CharField(max_length=100)                           # Причина отказа и служ отметки    
     seans_number    =models.CharField(max_length=20,null=True, blank=True)      # Номер сеанса обработки
     processed       =models.NullBooleanField(null=True, blank=True)             # Признак успешной обработки
