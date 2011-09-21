@@ -76,12 +76,37 @@ class PayGrid(JqGrid):
     caption = 'Pay' # optional
     
     
-    def __init__(self, ag_id):        
-        self.queryset = Transaction.objects.all().values('id', 'date','agent__id','agent__user__username', 'agent__dealer__user__username','summa','summa_pay', 'state__name')
+    def __init__(self, ag_id, content):
+        if content == "":        
+            self.queryset = Transaction.objects.all().values('id', 'date','agent__id','agent__user__username', 'agent__dealer__user__username','summa','summa_pay', 'state__name', 'ticket')
+        elif  content == "agent":
+            self.queryset = Transaction.objects.filter(agent__id = ag_id).values('id', 'date','agent__id','agent__user__username', 'agent__dealer__user__username','summa','summa_pay', 'state__name', 'ticket')
+        elif  content == "dealer":
+            self.queryset = Transaction.objects.filter(agent__dealer__id = ag_id).values('id', 'date','agent__id','agent__user__username', 'agent__dealer__user__username','summa','summa_pay', 'state__name', 'ticket')
         
 
 
-def pay_handler(request, id_=0):
+def pay_handler(request, id_=0, content=""):
     
-    grid = PayGrid(id_)    
+    grid = PayGrid(id_, content)    
+    return HttpResponse(grid.get_json(request), mimetype="application/json")
+
+class NominalGrid(JqGrid):
+    model = Nominal # could also be a queryset    
+    #fields = ['id', 'date','agent__id','agent__user__username', 'link','cash_count', 'cash_code__name','printer__name', 'terminal__name'] # optional 
+    url = '/proc/examplegrid/' #reverse('grid_handler')
+    caption = 'Pay' # optional
+    
+    
+    def __init__(self, id_):
+        #query = 'select n.id as id, n.count as count, nv.number as value_number from proc_nominal n, proc_nominalval nv where n.value_id=nv.id and n.transaction_id in (select t.id from proc_transaction t where    (t.encashment is null    or t.encashment not in (select e.number from proc_encashment e where  e.agent_id = %s))  and t.agent_id = %s )' % (id_, id_)        
+        enc = Encashment.objects.filter(agent__id = id_).values('number')
+        #qs = Nominal.objects.raw(query)#.values('id', 'value__number','count')
+        self.queryset = Nominal.objects.filter(transaction__agent__id=id_).exclude(transaction__encashment__in = enc).values('id', 'value__number','count')
+        
+
+
+def nominal_handler(request, id_=0):
+    
+    grid = NominalGrid(id_)    
     return HttpResponse(grid.get_json(request), mimetype="application/json")

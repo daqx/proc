@@ -189,27 +189,23 @@ def megafon_pay (trans, gatew):
 #выбрать нужные данные и отправить провайдеру
 try :
 	while True:
-		st_new=State.objects.get(code='0')  #статус на отправку
-		tr=Transaction.objects.filter(Q(try_count__isnull=True)|Q(try_count__lte=10), state = st_new)[:3] #лимит по 3
-		for i in tr: #цыкл только по тем транзакциям у которых статус =0
-			d = i.agent.dealer
-			saldo = d.get_saldo(datetime.now())
-			
-			if d.overdraft == None:
-				d.overdraft = 0
+		gatew = Gateway.objects.get(code = 'MEGAFON')
+		if gatew.status.code == 'WORKING':
+			st_new=State.objects.get(code='0')  #статус на отправку
+			tr=Transaction.objects.filter(Q(try_count__isnull=True)|Q(try_count__lte=10), state = st_new, opservices__code = 'MEGAFON')[:3] #лимит по 3
+			for i in tr: #цыкл только по тем транзакциям у которых статус =0
+				d = i.agent.dealer
+				saldo = d.get_saldo(datetime.now())
 				
-			if d.limit == None:
-				d.limit = 0
-				
-			if saldo + d.overdraft - d.limit >= i.summa_pay:     #проверяем баланс диллера
-				op_ser = i.opservices #ссылка на провайдера
-				gatew = Gateway.objects.get(opservice=op_ser)
-				if gatew.status.code == 'WORKING':
-					if gatew.code == 'MEGAFON':
-						#if i.number_key == '(90) 100-01-81':
-						megafon_pay(i, gatew)
-		time.sleep(3)
-		print ('Informations are select from transactions')
+				if d.overdraft == None:
+					d.overdraft = 0
+					
+				if d.limit == None:
+					d.limit = 0
+				if saldo + d.overdraft - d.limit >= i.summa_pay:     #проверяем баланс диллера
+					megafon_pay(i, gatew)
+			time.sleep(3)
+			print ('Informations are select from transactions')
 except Exception as inst:
 		print 'Error while runnig log_msg'
 		print inst

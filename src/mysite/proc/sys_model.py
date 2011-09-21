@@ -152,3 +152,29 @@ class Command(models.Model):
     
     class Meta:             
         app_label = "proc"
+        
+class NominalVal(models.Model):
+    ''' 
+    '''
+    code        =models.CharField(max_length=10)
+    number      =models.IntegerField()
+    description =models.CharField(max_length=200, null=True, blank=True)
+    
+    def __unicode__(self):
+        return '%s' % self.number
+    
+    
+class Nominal(models.Model):
+    ''' 
+    '''
+    transaction =models.ForeignKey("Transaction")
+    value       =models.ForeignKey(NominalVal)
+    count       =models.IntegerField()     
+    
+    def __unicode__(self):
+        return "%s %s" % (self.value, self.count)
+    
+    class Meta:             
+        app_label = "proc"
+
+

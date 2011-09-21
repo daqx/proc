@@ -33,7 +33,7 @@ $(function () {
             	            		"label": "\u041a\u0430\u043d\u0430\u043b", "width": 60, 
             	            		"formatter": extFormatBoolLink},
             	            {"index": "cash_count", "width": 80, "editable": false, 
-                	            		 "name": "cash_count", "label": "кол-во купюр"},
+                	            		 "name": "cash_count", "label": "кол-во купюр",	 "formatter": extFormatNominalLink},
                 	        {"index": "cash_code__name", "width": 120, "editable": false, 
                     	            		 "name": "cash_code__name", "label": "купюроприемник"},
                     	    {"index": "printer__name", "width": 120, "editable": false, 
@@ -69,13 +69,15 @@ function extFormatBoolLink(cellvalue, options, rowObject) {
 }
 
 function extFormatLogLink(cellvalue, options, rowObject) {
-	var s = '';
-	
-	s = '<a href="logs/'+rowObject["agent__id"]+'" > '+cellvalue+'</a>';
-	
-		
+	var s = '';	
+	s = '<a href="logs/'+rowObject["agent__id"]+'" > '+cellvalue+'</a>';	
 	return s;
     
+}
+function extFormatNominalLink(cellvalue, options, rowObject) {
+	var s = '';	
+	s = '<a href="/proc/nominal/'+rowObject["agent__id"]+'" > '+cellvalue+'</a>';		
+	return s;    
 }
 
 

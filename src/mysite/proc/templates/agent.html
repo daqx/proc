@@ -20,6 +20,7 @@ $(function(){
     <th>Логин</th>    
     <th>Диллер</th>
     <th>Адрес</th>
+    <th>Платежи</th>
   </tr>
 
 {%for s in s_list  %}
@@ -28,6 +29,7 @@ $(function(){
     <td>{{s.login}}</td>
     <td>{{s.dealer.user.username}}</td>
     <td><a href="{% url mysite.proc.views.address.address s.id 'agent' %}">***</a></td>
+    <td><a href="{% url mysite.proc.views.transaction.pay_list s.id 'agent' %}">***</a></td>
   </tr>
 
 {%endfor %}

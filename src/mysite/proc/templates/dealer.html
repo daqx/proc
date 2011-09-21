@@ -20,6 +20,7 @@ $(function(){
     <th>Диллер</th>
     <th>Сумма</th>
     <th>Адрес</th>
+    <th>Платежи</th>
   </tr>
 
 {%for s in s_list  %}
@@ -29,6 +30,7 @@ $(function(){
     <td>{{s.dealer.user.username}}</td>
     <td>{{s.summa}}</td>
     <td><a href="{% url mysite.proc.views.address.address s.id 'dealer' %}">***</a></td>
+    <td><a href="{% url mysite.proc.views.transaction.pay_list s.id 'dealer' %}">***</a></td>
   </tr>
 
 {%endfor %}

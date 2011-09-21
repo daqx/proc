@@ -3,6 +3,7 @@
 from piston.handler import BaseHandler
 from mysite.proc.models import *
 from mysite.proc.sys_class import *
+from mysite.proc.sys_model import *
 from django.utils import simplejson
 from datetime import datetime;
 import time;
@@ -34,6 +35,20 @@ def get_tarif_arr(t):
     
     return data
 
+def add_nominal( body_, tr_, val_, nam_code_):
+    ''' Функция добавляет количество номиналов в массив транзакций
+    '''
+    if val_ in body_:
+            if body_[val_]>0:
+                try:
+                    nam = Nominal()
+                    v = NominalVal.objects.get(code = nam_code_)
+                    nam.count =body_[val_] 
+                    nam.value = v
+                    nam.transaction = tr_
+                    nam.save()
+                except(NominalVal.DoesNotExist) :
+                    pass
 
 def transfer( body_, login_, retval_):
     ''' Функция вставки нового платежа 
@@ -41,6 +56,7 @@ def transfer( body_, login_, retval_):
     '''    
     retval_["status"] = "0"
         
+
     tr = Transaction()                          # Инициируем новый объект Transaction
     
     
@@ -83,6 +99,17 @@ def transfer( body_, login_, retval_):
         tr.agent = ag 
         
         tr.add(api = True)
+        
+        add_nominal( body_, tr, "val1", "1_SOMONI")
+        add_nominal( body_, tr, "val3", "3_SOMONI")
+        add_nominal( body_, tr, "val5", "5_SOMONI")
+        add_nominal( body_, tr, "val10", "10_SOMONI")
+        add_nominal( body_, tr, "val20", "20_SOMONI")
+        add_nominal( body_, tr, "val50", "50_SOMONI")
+        add_nominal( body_, tr, "val100", "100_SOMONI")
+        add_nominal( body_, tr, "val200", "200_SOMONI")
+        add_nominal( body_, tr, "val500", "500_SOMONI")
+               
     except(IndexError, Agent.DoesNotExist, OpService.DoesNotExist) :
         retval_["status"] = "-1"
 
@@ -112,22 +139,26 @@ def reg_sost( body_, login_, retval_):
         actS.agent = ag
     
     js.agent = ag
-      
+    
+    if "id" in body_:                             # Если есть hesh_id 
+        retval_["hesh_id"] = body_["id"]           # То зачитаем его для ответа
+  
     
     if "date" in body_:
-        try:
-            js.date = datetime.fromtimestamp(float(body_["date"])) #datetime.strptime(body_["date"],'YYYY-MM-DD HH:MI:ss')
-        except ValueError:
-            retval_["status"] = "-1"
-            return 0
+        if body_["date"]!="0":
+            try:
+                js.date = datetime.fromtimestamp(float(body_["date"])) #datetime.strptime(body_["date"],'YYYY-MM-DD HH:MI:ss')
+            except ValueError:
+                retval_["status"] = "-1"
+                return 0
+        else:
+            js.date = datetime.now()        
     
     else:
         js.date = datetime.now()
     
-    try:
-        actS.date = js.date        
-    except Exception as inst:
-        print type(inst)    
+    
+    actS.date = js.date        
     
     if "cash_count" in body_:
         js.cash_count = body_["cash_count"]
@@ -156,7 +187,8 @@ def reg_sost( body_, login_, retval_):
     js.save()
     
     # Очистим статус этого агента в таблице для мониторинга
-    ActualState.objects.filter(agent=ag).delete()
+    #ActualState.objects.filter(agent=ag).delete()
+    
     
     # И сохраним новый статус агента
     actS.save()
@@ -256,7 +288,7 @@ def get_tarif_all(login_, retval_):
 
 def get_tarif( body_, login_, retval_):
     ''' Функция возвращает тарифы для оператора услуг, для заданного агента 
-        ACT = 8
+        
     '''
     
     retval_["status"] = "0"
@@ -290,7 +322,9 @@ def get_tarif( body_, login_, retval_):
     return 0
 
 def get_encashment( body_, login_, retval_):
-    
+    ''' Инкассация
+        ACT = 8
+    ''' 
     retval_["status"] = "0"
     
     enc = Encashment()
@@ -316,7 +350,7 @@ def get_encashment( body_, login_, retval_):
             enc.date_encash = datetime.fromtimestamp(float(body_["date_inkass"])) #datetime.strptime(body_["date"],'YYYY-MM-DD HH:MI:ss')
         except ValueError:
             retval_["status"] = "-1"
-            return 0    
+            return "-1"    
     
     
     if "user" in body_:    
@@ -324,12 +358,14 @@ def get_encashment( body_, login_, retval_):
             us = User.objects.filter(username = body_["user"])[0]        # Достанем User -а
             enc.user = us
         except(IndexError, User.DoesNotExist) :
-            pass
+            retval_["status"] = "-1"
+            return "-1" 
     try:
         enc.save()
     except Exception as inst:
         print type(inst) 
-    
+        retval_["status"] = "-1"
+        return "-1" 
     return 0
 
 

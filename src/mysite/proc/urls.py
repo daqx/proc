@@ -28,11 +28,16 @@ urlpatterns=patterns('',
     (r'^main/$', system.main),    
     
     (r'^pay/$', transaction.pay_list),
-    (r'^pay/(\d+)$', transaction.pay_form),
-    (r'^pay/(\d+)/delete$', transaction.pay_delete),
+    (r'^pay/(?P<aid_>\d+)$', transaction.pay_form),
+    (r'^pay/(?P<aid_>\d+)/delete$', transaction.pay_delete),
     (r'^pay/add$', transaction.pay_form_add),
-    (r'^pay/add/(\d+)$', transaction.pay_form),
-    (r'^pay/add/(\d+)/delete$', transaction.pay_delete),        
+    (r'^pay/add/(?P<aid_>\d+)$', transaction.pay_form),
+    (r'^pay/add/(?P<aid_>\d+)/delete$', transaction.pay_delete),        
+
+    (r'^pay/(?P<id_>\d+)/(?P<content>\w+)$', transaction.pay_list),                              # view
+    (r'^pay/add/(?P<id_>\d+)/(?P<content>\w+)$', transaction.pay_form_add),                 # add
+    (r'^pay/(?P<id_>\d+)/(?P<content>\w+)/(?P<aid_>\d+)$', transaction.pay_form),           # edit
+    (r'^pay/(?P<id_>\d+)/(?P<content>\w+)/(?P<aid_>\d+)/delete$', transaction.pay_delete),  # delete
 
     (r'^fill_ac/$', transaction.fill_ac_list),
     (r'^fill_ac/add$', transaction.fill_ac_form_add),
@@ -133,6 +138,7 @@ urlpatterns=patterns('',
     # ============== MONITORING ===============
     (r'^monitor/$', monitor.show),
     (r'^monitor/logs/(\d+)$', monitor.journal),
+    (r'^nominal/(\d+)$', monitor.nominal),
     
     #url (r'^gridmonitor/$', grids.grid_handler, name='grid_handler'), 
     #url (r'^gridmonitor/cfg/$', grids.grid_config, name='grid_config'),

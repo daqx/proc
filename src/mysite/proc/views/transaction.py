@@ -15,14 +15,14 @@ from django.contrib.auth.decorators import permission_required
 
 ''' ================================ PAY ========================'''
 @permission_required('proc.view_transaction')
-def pay_list(request):
+def pay_list(request, id_ = 0, content = ""):
     s_list = Transaction.objects.all()
-    return render( request,'pay.html', {'s_list': s_list})
+    return render( request,'pay.html', {'s_list': s_list,'content':content, 'id_':id_})
 
 @permission_required('proc.change_transaction')
-def pay_form(request,id_):
+def pay_form(request, id_ = 0, content = "", aid_=0):
     if request.method=='POST':
-        a = Transaction.objects.get(pk=id_)
+        a = Transaction.objects.get(pk=aid_)
 
         if request.session["is_admin"]:
             form=TransactionAdminForm(request.POST, instance=a)
@@ -34,30 +34,42 @@ def pay_form(request,id_):
             a = form.save(commit = False)
             
             a.save()
-            return HttpResponseRedirect('/proc/pay/')
+            if id_ != 0:
+                return HttpResponseRedirect('/proc/pay/%s/%s' % (id_, content))
+            else:            
+                return HttpResponseRedirect('/proc/pay/')
         else:
             return render( request,'pay_form.html', {'form': form})
     else:       
 
-        s = Transaction.objects.get(id=id_)
+        s = Transaction.objects.get(id=aid_)
         
-        if request.session["is_admin"]:
-            form=TransactionAdminForm(instance=s)
+        if content == "agent":
+            form=TransactionAdminForm()
+            form.fields["agent"].queryset = Agent.objects.filter(id = id_)
+        elif content == "dealer":
+            form=TransactionAdminForm()
+            form.fields["agent"].queryset = Agent.objects.filter(dealer = id_)
+        elif request.session["is_admin"]:
+            form=TransactionAdminForm(instance=s)        
         else:
             form=TransactionForm(instance=s)
             
-        del_url="%s/delete" % id_
+        del_url="%s/delete" % aid_
                 
         return render( request,'pay_form.html', {'form': form,'del_url': del_url})
 
 @permission_required('proc.delete_transaction')
-def pay_delete(request,id_):
-        s = Transaction.objects.get(id=id_)
+def pay_delete(request, id_ = 0, content = "", aid_=0):
+        s = Transaction.objects.get(id=aid_)
         s.delete()
-        return HttpResponseRedirect('/proc/pay')
+        if id_ != 0:
+            return HttpResponseRedirect('/proc/pay/%s/%s' % (id_, content))
+        else:            
+            return HttpResponseRedirect('/proc/pay/')
 
 @permission_required('proc.add_transaction')
-def pay_form_add(request,id_=0):
+def pay_form_add(request, id_ = 0, content = ""):
     if request.method=='POST':
         
         if request.session["is_admin"]:
@@ -78,15 +90,30 @@ def pay_form_add(request,id_=0):
             if ret == -1:
                 form._errors["summa"]= ErrorList([u"Остаток диллера не позволяет оплатить эту сумму"])
                 return render( request,'pay_form.html', {'form': form})
-                        
-            return HttpResponseRedirect('/proc/pay/')
+            
+            if id_ != 0:
+                return HttpResponseRedirect('/proc/pay/%s/%s' % (id_, content))
+            else:            
+                return HttpResponseRedirect('/proc/pay/')
         else:
             return render( request,'pay_form.html', {'form': form})
     else:        
-        if request.session["is_admin"]:
+        
+        if content == "agent":
+            form=TransactionAdminForm()
+            form.fields["agent"].queryset = Agent.objects.filter(id = id_)
+        elif content == "dealer":
+            form=TransactionAdminForm()
+            form.fields["agent"].queryset = Agent.objects.filter(dealer = id_)
+        elif request.session["is_admin"]:
+            form=TransactionAdminForm()
+        elif request.session["user_type"]=="dealer":
             form=TransactionAdminForm()
         else:
             form=TransactionForm()
+        
+        #query="select o.* from proc_opservice o, proc_agent_opservices ao where o.id=ao.opservice_id and ao.agent_id = %s" % id_    
+        #op = OpService.objects.raw(query)[0:]
             
         return render( request,'pay_form.html', {'form': form})          
 

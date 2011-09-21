@@ -140,7 +140,7 @@ class Transaction(models.Model):
     date_state      =models.DateTimeField()                                     # Дата последнего изменения статуса
     date_input      =models.DateTimeField(null=True, blank=True)                # Дата платежа на терминале
     date_out        =models.DateTimeField(null=True, blank=True)                # Дата отправки платежа на сервер оператора
-    encashment      =models.IntegerField(null=True, blank=True)                 # инкасация 
+    encashment      =models.CharField(max_length=20,null=True, blank=True)              # Номер инкасации 
     opservices      =models.ForeignKey(OpService)
     number_key      =models.CharField(max_length=100, verbose_name='Номер')
     summa           =models.FloatField(verbose_name='Сумма')
@@ -148,7 +148,7 @@ class Transaction(models.Model):
     summa_pay       =models.FloatField(verbose_name='Сумма платежа')    
     state           =models.ForeignKey(State)
     ticket          =models.CharField(max_length=20,null=True, blank=True)      # номер чека
-    return_reason   =models.CharField(max_length=100)                           # Причина отказа и служ отметки    
+    return_reason   =models.CharField(max_length=100,null=True, blank=True)                           # Причина отказа и служ отметки    
     seans_number    =models.CharField(max_length=20,null=True, blank=True)      # Номер сеанса обработки
     processed       =models.NullBooleanField(null=True, blank=True)             # Признак успешной обработки
     locked          =models.NullBooleanField(null=True, blank=True)             # Признак блокировки процессом
@@ -244,10 +244,11 @@ class HistoryState(models.Model):
 class Encashment(models.Model):
     ''' Инкасация
     '''
-    user        =models.OneToOneField(User, blank=True, null=True)
+    user        =models.ForeignKey(User, blank=True, null=True)
     date        =models.DateTimeField(auto_now_add=True)                            # Время появления инкасации на сервере
     date_encash =models.DateTimeField()                                             # Время инкасации    
-    number      =models.IntegerField(null=True, blank=True)                         # Номер инкасации
+    #number      =models.IntegerField(null=True, blank=True)                        
+    number      =models.CharField(max_length=20,null=True, blank=True)              # Номер инкасации
     summa       =models.FloatField(blank=True)                                      # Сумма инкасации
     description =models.CharField(max_length=200,null=True, blank=True)
     agent       =models.ForeignKey(Agent)
@@ -262,7 +263,7 @@ class Transaction2(models.Model):
     date_state      =models.DateTimeField()                                     # Дата последнего изменения статуса
     date_input      =models.DateTimeField(null=True, blank=True)                # Дата платежа на терминале
     date_out        =models.DateTimeField(null=True, blank=True)                # Дата отправки платежа на сервер оператора
-    encashment      =models.IntegerField(null=True, blank=True)                 # инкасация 
+    encashment      =models.CharField(max_length=20,null=True, blank=True)              # Номер инкасации 
     opservices      =models.ForeignKey(OpService)
     number_key      =models.CharField(max_length=100, verbose_name='Номер')
     summa           =models.FloatField(verbose_name='Сумма')
@@ -270,7 +271,7 @@ class Transaction2(models.Model):
     summa_pay       =models.FloatField(verbose_name='Сумма платежа')    
     state           =models.ForeignKey(State)
     ticket          =models.CharField(max_length=20,null=True, blank=True)      # номер чека
-    return_reason   =models.CharField(max_length=100)                           # Причина отказа и служ отметки    
+    return_reason   =models.CharField(max_length=100,null=True, blank=True)     # Причина отказа и служ отметки    
     seans_number    =models.CharField(max_length=20,null=True, blank=True)      # Номер сеанса обработки
     processed       =models.NullBooleanField(null=True, blank=True)             # Признак успешной обработки
     locked          =models.NullBooleanField(null=True, blank=True)             # Признак блокировки процессом

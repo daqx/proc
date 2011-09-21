@@ -25,6 +25,10 @@ urlpatterns=patterns('',
     url (r'^monitor/cfg/$', grids.grid_config, name='grid_config'),
     
     url (r'^pay/$', grids.pay_handler, name='pay_handler'),
+    url (r'^pay/(?P<id_>\d+)/(?P<content>\w+)$', grids.pay_handler, name='pay_handler'),
+    
+    url (r'^nominal/(\d+)$', grids.nominal_handler, name='nominal_handler'),
+    
     
     #(r'^login/$', login_view),
     #(r'^contact/$', contact),

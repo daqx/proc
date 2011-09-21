@@ -25,4 +25,7 @@ def journal(request, id_):
     agent = get_object_or_404(Agent, id=id_)
     return render(request,'journal.html', {'s_list': s_list, 'ag_id': id_, "agent": agent })
 
+@permission_required('proc.view_actualstate')
+def nominal(request, id_):    
+    return render(request,'nominal.html', {'id_': id_ })
 

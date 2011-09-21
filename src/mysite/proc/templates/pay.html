@@ -13,7 +13,7 @@ $(function () {
 	        $("#pay").jqGrid({
             	"altRows": true, 
             	"rowList": [ 10, 25, 50, 100], 
-            	"sortname": "id", 
+            	"sortname": "date", 
             	"viewrecords": true, 
             	"autowidth": false,            	
             	"forcefit": true, 
@@ -23,25 +23,30 @@ $(function () {
             	"datatype": "json", 
             	"gridview": true, 
             	"colModel": [
-            	             {"index": "id", "name": "id", "editable": false, "label": "№", 
-            	            	  "width": 40,	 "formatter": extFormatLogLink}, 
+            	             {"index": "id","hidden": true},
+            	             {"index": "ticket","name": "ticket", "editable": false, "label": "№ чека", 
+                	            	  "width": 100,	 "formatter": extFormatLogLink},
             	             {"index": "date", "width": 130, "editable": false, 
             	            		 "name": "date", "label": "Время"},
             	             {"index": "agent__id", "hidden": true},            	            		 
-            	             {"index": "agent__user__username", "width": 250, "editable": false, 
+            	             {"index": "agent__user__username", "width": 230, "editable": false, 
             	            		 "name": "agent__user__username", "label": "Агент"},
-            	             {"index": "agent__dealer__user__username", "width": 250, "editable": false, 
+            	             {"index": "agent__dealer__user__username", "width": 230, "editable": false, 
                 	            		 "name": "agent__dealer__user__username", "label": "Диллер"},
             	             
-            	            {"index": "summa", "width": 80, "editable": false, 
+            	            {"index": "summa", "width": 70, "editable": false, 
                 	            		 "name": "summa", "label": "сумма"},
-                	        {"index": "summa_pay", "width": 80, "editable": false, 
+                	        {"index": "summa_pay", "width": 70, "editable": false, 
                     	            		 "name": "summa_pay", "label": "к оплате"},
                     	    {"index": "state__name", "width": 180, "editable": false, 
                         	            		 "name": "state__name", "label": "статус"},                        	
             	            ], 
             	 "sortorder": "desc", 
-            	 "url": "/proc/grid/pay/", 
+            	 {% if id_%}
+	        		"url": "/proc/grid/pay/{{id_}}/{{content}}",
+	        	 {% else %}
+            	 	"url": "/proc/grid/pay/",            		
+            	 {% endif %}
             	 "rowNum": 10, 
             	 "pager": "#pager", 
             	 "jsonReader": {"repeatitems": false}
@@ -56,21 +61,15 @@ $(function () {
     
 });
 
-function extFormatBoolLink(cellvalue, options, rowObject) {
-	var s = '';
-	if (cellvalue)
-		s = '<img src="/proc/static/img/icon-yes.gif" />';
-	else
-		s = '<img src="/proc/static/img/icon-no.gif" />';
-		
-	return s;
-    
-}
 
 function extFormatLogLink(cellvalue, options, rowObject) {
 	var s = '';
 	
-	s = '<a href="logs/'+rowObject["agent__id"]+'" > '+cellvalue+'</a>';
+	{% if id_%}
+		s = '<a href="{{content}}/'+rowObject["id"]+'" > '+cellvalue+'</a>';
+	{% else %}	
+		s = '<a href="'+rowObject["id"]+'" > '+cellvalue+'</a>';
+	{% endif %}
 		
 	return s;    
 }
@@ -80,6 +79,18 @@ function extFormatLogLink(cellvalue, options, rowObject) {
 
 
 {%block content%}
+
+{% if perms.proc.add_transaction %}
+	<ul class="object-tools">
+		<li>
+			{% if id_%}
+				<a href="{% url mysite.proc.views.transaction.pay_form_add id_ content %}">	Добавить</a>
+			{% else %}	
+        		<a href="add">	Добавить</a>
+        	{% endif %}
+		</li>
+	</ul>
+{% endif %}<br/><br/><br/>
 
 <table class="grid" id="pay"></table>
 <div id="pager"></div>

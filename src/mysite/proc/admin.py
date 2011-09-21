@@ -59,6 +59,12 @@ class MenuAdmin(admin.ModelAdmin):
         return "proc.%s"%(obj.perms.codename)
     get_perms_name.short_description="perm"
     
+class NominalValAdmin(admin.ModelAdmin):
+    list_display=('code','number')
+
+class NominalAdmin(admin.ModelAdmin):
+    list_display=('transaction','value','count')
+
 class OpServiceAdmin(admin.ModelAdmin):
     list_display=('code','name','state','order','type','need_check','mask')
     raw_id_fields = ('type',)
@@ -139,6 +145,8 @@ admin.site.register(Gatelog, GatelogAdmin)
 admin.site.register(JourSostAgent, JourSostAgentAdmin)
 admin.site.register(Kopf, KopfAdmin)
 admin.site.register(Menu, MenuAdmin)
+admin.site.register(NominalVal, NominalValAdmin)
+admin.site.register(Nominal, NominalAdmin)
 admin.site.register(OpService, OpServiceAdmin)
 admin.site.register(OpServiceGroup, OpServiceGroupAdmin)
 admin.site.register(ServiceType, ServiceTypeAdmin)
