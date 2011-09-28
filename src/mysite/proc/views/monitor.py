@@ -15,7 +15,7 @@ from mysite.proc.views.forms import *
 
 @permission_required('proc.view_actualstate')
 def show(request):
-    s_list = ActualState.objects.all()   
+    s_list = ActualState.objects.all()  
     return render(request,'monitor.html', {'s_list': s_list})
 
 

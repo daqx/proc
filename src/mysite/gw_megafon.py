@@ -108,7 +108,10 @@ def megafon_pay (trans, gatew):
 		
 		msisdn = trans.number_key       #номер абонента
 		ip = gatew.ip					#ip провайдера
-		msisdn =  msisdn[1:3]+msisdn[5:]
+		#msisdn =  msisdn[1:3]+msisdn[5:]
+		msisdn = msisdn.replace('(','')
+		msisdn = msisdn.replace(')','')
+		msisdn = msisdn.replace(' ','')
 		msisdn = msisdn.replace('-','')
 #		url = 'https://%s/ttm_kkm_int/kkm_pg_gate/KKM_PG_GATE.HTTP_ADD_PAYMENT?P_MSISDN=%s' %(ip, msisdn)
 #		err_code, dt_oper, reciept_num = megafon_send_data(trans, url, gatew)

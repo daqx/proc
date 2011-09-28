@@ -44,12 +44,12 @@ def journal_handler(request, id_):
 
 class ActualStateGrid(JqGrid):
     model = ActualState # could also be a queryset
-    fields = ['id', 'date','agent__id','agent__user__username', 'link','cash_count', 'cash_code__name','printer__name', 'terminal__name'] # optional 
+    fields = ['id', 'date','agent__id','agent__name', 'link','cash_count', 'cash_code__name','printer__name', 'terminal__name'] # optional 
     url = '/proc/examplegrid/' #reverse('grid_handler')
     caption = 'State Grid' # optional
     colmodel_overrides = {
         'id': { 'label': ('№'), 'editable': False, 'width':10, 'formatter':'showlink', 'formatoptions':{'baseLinkUrl':'jur/'} },
-        'agent__user__username': {'index':'agent__user__username', 'label': 'Агент','editable': False, 'width':20 },
+        'agent__name': {'index':'agent__name', 'label': 'Агент','editable': False, 'width':20 },
         'link': { 'label': 'Канал','editable': False, 'width':10 , 'formatter':"extFormatBoolLink"},
     }
     

@@ -1,0 +1,59 @@
+{%extends "base.html"%}
+{% block head %}
+
+  	<link rel="stylesheet" type="text/css" media="screen" href="/proc/static/js/themes/jquery-ui.custom.css" />
+	<link rel="stylesheet" type="text/css" media="screen" href="/proc/static/js/themes/ui.jqgrid.css" />
+  	<script src="/proc/static/js/i18n/grid.locale-ru.js" type="text/javascript"></script>
+  	<script src="/proc/static/js/jquery.jqGrid.min.js" type="text/javascript"></script> 
+
+<script type="text/javascript">
+$(function () {
+	        $("#nominal").jqGrid({
+            	"altRows": true, 
+            	"rowList": [ 10, 25, 50, 100], 
+            	"sortname": "id", 
+            	"viewrecords": true, 
+            	"autowidth": false,            	
+            	"forcefit": true, 
+            	"shrinkToFit": true, 
+            	"height": "auto", 
+            	"caption": "Номиналы", 
+            	"datatype": "json", 
+            	"gridview": true, 
+            	"colModel": [
+            	             {"index": "id", "name": "id", "editable": false, "label": "№", 
+            	            	  "width": 40}, 
+            	             {"index": "count", "width": 130, "editable": false, 
+            	            		 "name": "count", "label": "Количество"},
+            	                   	            		 
+            	             {"index": "value__number", "width": 250, "editable": false, 
+            	            		 "name": "value__number", "label": "Номинал"},
+            	             
+            	            ], 
+            	 "sortorder": "desc", 
+            	 "url": "/proc/grid/nominal/{{id_}}", 
+            	 "rowNum": 10, 
+            	 "pager": "#pager", 
+            	 "jsonReader": {"repeatitems": false}
+            }).navGrid('#pager', 
+                {add: false, edit: false, del: false, view: true},
+        {}, // edit options
+        {}, // add options
+        {}, // del options 
+        { multipleSearch:true, closeOnEscape:true }, // search options 
+        { jqModal:true, closeOnEscape:true} // view options
+        ).filterToolbar({stringResult: true,searchOnEnter : false});
+    
+});
+
+
+</script>
+{%endblock%}
+
+
+{%block content%}
+
+<table class="grid" id="nominal"></table>
+<div id="pager"></div>
+
+{%endblock%}
