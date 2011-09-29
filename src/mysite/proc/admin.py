@@ -21,7 +21,7 @@ class AgentAdmin(admin.ModelAdmin):
     #raw_id_fields = ('addres',)
     
 class CommandAdmin(admin.ModelAdmin):
-    list_display=('act','agent','date','status')    
+    list_display=('act','agent','date','status','date_send','description')    
 
 
 class CountryAdmin(admin.ModelAdmin):
@@ -38,6 +38,9 @@ class EncashmentAdmin(admin.ModelAdmin):
 
 class GatewayAdmin(admin.ModelAdmin):
     list_display=('code','name','opservice', 'status')
+
+class RouteAdmin(admin.ModelAdmin):
+    list_display=('code','name','status')
 
 class GatelogAdmin(admin.ModelAdmin):
     list_display=('transaction','transaction2','date', 'sending')
@@ -128,6 +131,8 @@ class TownAdmin(admin.ModelAdmin):
     
 class TransactionAdmin(admin.ModelAdmin):
     list_display=('date','agent','summa', 'state')
+
+
     
 
     
@@ -141,6 +146,7 @@ admin.site.register(Command, CommandAdmin)
 admin.site.register(Dealer, DealerAdmin)
 admin.site.register(Encashment, EncashmentAdmin)
 admin.site.register(Gateway, GatewayAdmin)
+admin.site.register(Route, RouteAdmin)
 admin.site.register(Gatelog, GatelogAdmin)
 admin.site.register(JourSostAgent, JourSostAgentAdmin)
 admin.site.register(Kopf, KopfAdmin)

@@ -90,7 +90,7 @@ class Dealer(models.Model):
         
 
 class Agent(models.Model):
-    addresses       = generic.GenericRelation( Addres, null=True, blank=True )    
+    addresses       = generic.GenericRelation(Addres, null=True, blank=True )    
     check_for_ip    =models.BooleanField('Проверить IP',default=False)    
     dealer          =models.ForeignKey(Dealer, verbose_name='Диллер')    
     name            =models.CharField('Наименование',max_length=50)

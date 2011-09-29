@@ -1,10 +1,11 @@
-#Mon Sep 26 15:05:17 UZT 2011
+#Thu Sep 29 12:00:39 UZT 2011
 eclipse.preferences.version=1
 encoding//src/mysite/api/handlers.py=utf-8
 encoding//src/mysite/api/utils.py=utf-8
 encoding//src/mysite/gw_babilon-m.py=utf-8
 encoding//src/mysite/gw_megafon.py=utf-8
 encoding//src/mysite/gw_tcell92.py=utf-8
+encoding//src/mysite/pardokht.py=utf-8
 encoding//src/mysite/proc/addres_model.py=utf-8
 encoding//src/mysite/proc/gateway.py=utf-8
 encoding//src/mysite/proc/models.py=utf-8

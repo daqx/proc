@@ -10,7 +10,22 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 from mysite.proc.service_model import *
 
-
+class Route(models.Model):
+    code        = models.CharField(max_length=20, unique=True)
+    name        = models.CharField(max_length=50)
+    ip          = models.IPAddressField(null=True, blank=True)
+    port        = models.CharField(max_length=10, null=True, blank=True)
+    note        = models.CharField(max_length=300, null=True, blank=True)
+    login       = models.CharField(max_length=50, null=True, blank=True)
+    password    = models.CharField(max_length=50, null=True, blank=True)
+    wait_time   = models.IntegerField( null=True, blank=True)
+    status      = models.ForeignKey(Status)
+       
+    def __unicode__(self):
+        return self.name
+    
+    class Meta:
+        app_label = "proc"
 
 
 class Gateway(models.Model):
@@ -24,9 +39,11 @@ class Gateway(models.Model):
     password    = models.CharField(max_length=50, null=True, blank=True)
     wait_time   = models.IntegerField( null=True, blank=True)
     status      = models.ForeignKey(Status)
+    route       = models.ForeignKey(Route, related_name="Маршрутизация")
     
     def __unicode__(self):
         return self.name
     
     class Meta:
         app_label = "proc"
+

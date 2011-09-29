@@ -16,7 +16,6 @@ import xml.etree.ElementTree as xml;
 from datetime import datetime 
 from django.db.models import Q
 from mysite.proc.helpers import *
-from mysite.proc.pardokht import *
 #import datetime
 
 def ins_log(trans, data, sending):
@@ -28,7 +27,7 @@ def ins_log(trans, data, sending):
     a.save()
 
 #отправка всех данных и проверка ошибок
-def  tcell92_send_data(trans, url, gatew):
+def  pardokht_send_data(trans, url, gatew):
     pay_id = reciept = status_code = dt  = ''  #переменные которые возвращаются, если пустые, то нет ответа от сервера
     #произвести запись в справочник лог данные url
     ins_log(trans, url, True)
@@ -54,12 +53,12 @@ def  tcell92_send_data(trans, url, gatew):
                     reciept = item.find("reciept").text
                    
     except Exception as inst:
-        print 'Error while send data or check reply of tcell92'
+        print 'Error while send data or check reply of pardokht'
         print inst
         
     return pay_id, reciept, status_code, dt    
         
-def tcell92_err_desc(err_code_):
+def pardokht_err_desc(err_code_):
     
     try:
         err_code = int(err_code_);        
@@ -96,8 +95,8 @@ def tcell92_err_desc(err_code_):
     return err_desc
 
        
-#функция для отправки в tcell92
-def tcell92_pay (trans, gatew):
+#функция для отправки в pardokht
+def pardokht_pay (trans, gatew):
     #st_new=State.objects.get(code='0')  #статус на отправку
     trans.try_count = nvl(trans.try_count,0) + 1
     ip = gatew.ip                    #ip провайдера
@@ -127,7 +126,7 @@ def tcell92_pay (trans, gatew):
         url = 'https://%s:%s/?USERNAME=%s&PASSWORD=%s&ACT=0&MSISDN=%s&'%(ip, port, login, password, msisdn)
         url += 'PAY_AMOUNT=%s&SOURCE_TYPE=1&TRADE_POINT=%s&CURRENCY_CODE=1&PAYMENT_NUMBER=%s'%(amount, login, reciept_num)
         
-        pay_id, reciept, st, dt = tcell92_send_data(trans, url, gatew) #отправляем провайдеру    
+        pay_id, reciept, st, dt = pardokht_send_data(trans, url, gatew) #отправляем провайдеру    
         
         if st != '' and dt != '' and pay_id != '':  #если имеются параметры
             
@@ -136,7 +135,7 @@ def tcell92_pay (trans, gatew):
                 trans.seans_number = pay_id
                 trans.set_state("2000")
             else:    
-                err_desc = tcell92_err_desc(st)
+                err_desc = pardokht_err_desc(st)
                 trans.set_state(err_desc)
                 
             trans.date_out = datetime.strptime(dt,'%d.%m.%Y %H:%M:%S')
@@ -144,13 +143,13 @@ def tcell92_pay (trans, gatew):
             if st == "20":
                 #подтверждаем платеж
                 url = 'https://%s:%s/?USERNAME=%s&PASSWORD=%s&ACT=1&pay_id=%s'%(ip,port,login,password,pay_id)
-                pay_id, reciept, st, dt = tcell92_send_data(trans, url, gatew) #отправляем провайдеру
+                pay_id, reciept, st, dt = pardokht_send_data(trans, url, gatew) #отправляем провайдеру
                 if st != '' and dt != '' and pay_id != '':  #если имеются параметры
                     if st == '22' or st == '45': #платеж успешно проведен
                         trans.set_state("5000")
                         trans.pay()
                     else:
-                        err_desc = tcell92_err_desc(st)
+                        err_desc = pardokht_err_desc(st)
                         trans.set_state(err_desc)
                     trans.date_out = datetime.strptime(dt,'%d.%m.%Y %H:%M:%S')    
         else:
@@ -164,13 +163,13 @@ def tcell92_pay (trans, gatew):
             trans.set_state('0')
         else:
             url = 'https://%s:%s/?USERNAME=%s&PASSWORD=%s&ACT=1&pay_id=%s'%(ip,port,login,password,pay_id)
-            pay_id, reciept, st, dt = tcell92_send_data(trans, url, gatew) #отправляем провайдеру
+            pay_id, reciept, st, dt = pardokht_send_data(trans, url, gatew) #отправляем провайдеру
             if st != '' and dt != '' and pay_id != '':  #если имеются параметры
                 if st == '22' or st == '45': #платеж успешно проведен
                     trans.set_state("5000")
                     trans.pay()
                 else:
-                    err_desc = tcell92_err_desc(st)
+                    err_desc = pardokht_err_desc(st)
                     trans.set_state(err_desc)
                 trans.date_out = datetime.strptime(dt,'%d.%m.%Y %H:%M:%S')
             else:
@@ -178,48 +177,27 @@ def tcell92_pay (trans, gatew):
                 trans.set_state(code='2000')
         trans.save()
 
-#выбрать нужные данные и отправить провайдеру
-while True:
-    try :
-        gatew = Gateway.objects.get(code = 'TCELL92')
-        st_gatew = gatew.status.code 
-        if st_gatew == 'WORKING':
-            st_new=State.objects.get(code='0')  #статус на отправку
-            tr=Transaction.objects.filter(Q(try_count__isnull=True)|Q(try_count__lte=10), Q(state = st_new)|Q(state__code = '2000') , opservices__code = 'TCELL92')[:3] #лимит по 3
-            for i in tr: #цыкл только по тем транзакциям у которых статус =0
-                d = i.agent.dealer
-                saldo = d.get_saldo(datetime.now())
-                
-                if d.overdraft == None:
-                    d.overdraft = 0
-                    
-                if d.limit == None:
-                    d.limit = 0
-                if saldo + d.overdraft - d.limit >= i.summa_pay:     #проверяем баланс диллера
-                    tcell92_pay(i, gatew)
-        elif st_gatew == 'BLOCKED': #Статус блокирован проверяем маршрутизацию
-            st_route = gatew.route.code 
-            #Если st_route != self, то маршрутизация задана. Выбираем нужный маршрут и вызываем его 
-            if st_route != 'self':
-                if gatew.route.status == 'WORKING':
-                    code_route = gatew.route.code
-                    if code_route == 'Pardokht':
-                        st_new=State.objects.get(code='0')  #статус на отправку
-                        tr=Transaction.objects.filter(Q(try_count__isnull=True)|Q(try_count__lte=10), Q(state = st_new)|Q(state__code = '2000') , opservices__code = 'TCELL92')[:3] #лимит по 3
-                        for i in tr: #цыкл только по тем транзакциям у которых статус =0
-                            d = i.agent.dealer
-                            saldo = d.get_saldo(datetime.now())
-                            
-                            if d.overdraft == None:
-                                d.overdraft = 0
-                                
-                            if d.limit == None:
-                                d.limit = 0
-                            if saldo + d.overdraft - d.limit >= i.summa_pay:     #проверяем баланс диллера
-                                pardokht_pay(i, gatew)
-        time.sleep(3)
-        print ('Informations are select from transactions TCELL92')
-    except Exception as inst:
-        print 'Error while runnig log_msg'
-        print inst
-                    
+##выбрать нужные данные и отправить провайдеру
+#while True:
+#    try :
+#        gatew = Gateway.objects.get(code = 'pardokht')
+#        if gatew.status.code == 'WORKING':
+#            st_new=State.objects.get(code='0')  #статус на отправку
+#            tr=Transaction.objects.filter(Q(try_count__isnull=True)|Q(try_count__lte=10), Q(state = st_new)|Q(state__code = '2000') , opservices__code = 'pardokht')[:3] #лимит по 3
+#            for i in tr: #цыкл только по тем транзакциям у которых статус =0
+#                d = i.agent.dealer
+#                saldo = d.get_saldo(datetime.now())
+#                
+#                if d.overdraft == None:
+#                    d.overdraft = 0
+#                    
+#                if d.limit == None:
+#                    d.limit = 0
+#                if saldo + d.overdraft - d.limit >= i.summa_pay:     #проверяем баланс диллера
+#                    pardokht_pay(i, gatew)
+#            time.sleep(3)
+#            print ('Informations are select from transactions')
+#    except Exception as inst:
+#        print 'Error while runnig log_msg'
+#        print inst
+#                    
