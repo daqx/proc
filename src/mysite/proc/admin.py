@@ -37,7 +37,7 @@ class EncashmentAdmin(admin.ModelAdmin):
     list_display=('date','agent')
 
 class GatewayAdmin(admin.ModelAdmin):
-    list_display=('code','name','opservice', 'status')
+    list_display=('code','name','opservice', 'status', 'route')
 
 class RouteAdmin(admin.ModelAdmin):
     list_display=('code','name','status')
@@ -69,7 +69,7 @@ class NominalAdmin(admin.ModelAdmin):
     list_display=('transaction','value','count')
 
 class OpServiceAdmin(admin.ModelAdmin):
-    list_display=('code','name','state','order','type','need_check','mask')
+    list_display=('id','code','name','state','order','type','need_check','mask')
     raw_id_fields = ('type',)
 
 class OpServiceGroupAdmin(admin.ModelAdmin):

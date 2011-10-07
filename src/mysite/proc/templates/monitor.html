@@ -12,7 +12,7 @@ $(function () {
 	        $("#mongrid").jqGrid({
             	"altRows": true, 
             	"rowList": [ 10, 25, 50, 100], 
-            	"sortname": "id", 
+            	"sortname": "agent__name", 
             	"viewrecords": true, 
             	"autowidth": false,            	
             	"forcefit": true, 
@@ -24,13 +24,15 @@ $(function () {
             	"colModel": [
             	             {"index": "id", "name": "id", "editable": false, "label": "№", 
             	            	  "width": 40,	 "formatter": extFormatLogLink}, 
-            	             {"index": "date", "width": 130, "editable": false, 
-            	            		 "name": "date", "label": "Время"},
             	             {"index": "agent__id", "hidden": true},            	            		 
             	             {"index": "agent__name", "width": 150, "editable": false, 
-            	            		 "name": "agent__name", "label": "Агент"}, 
+            	            		 "name": "agent__name", "label": "Агент"},
+            	            {"index": "date", "width": 130, "editable": false, 
+                	            		 "name": "date", "label": "Время on-line"},
+                	         {"index": "date_link0", "width": 130, "editable": false, 
+                    	            		 "name": "date_link0", "label": "Время off-line"},    
             	             {"index": "link", "name": "link", "editable": false, 
-            	            		"label": "\u041a\u0430\u043d\u0430\u043b", "width": 60, 
+            	            		"label": "Связь", "width": 60, 
             	            		"formatter": extFormatBoolLink},
             	            {"index": "cash_count", "width": 80, "editable": false, 
                 	            		 "name": "cash_count", "label": "кол-во купюр",	 "formatter": extFormatNominalLink},
@@ -41,7 +43,7 @@ $(function () {
                         	{"index": "terminal__name", "width": 120, "editable": false, 
                             	            		 "name": "terminal__name", "label": "терминал"}
             	            ], 
-            	 "sortorder": "desc", 
+            	 "sortorder": "asc", 
             	 "url": "/proc/grid/monitor/", 
             	 "rowNum": 10, 
             	 "pager": "#pager", 
@@ -59,24 +61,30 @@ $(function () {
 
 function extFormatBoolLink(cellvalue, options, rowObject) {
 	var s = '';
-	if (cellvalue)
+	/*if (cellvalue)
 		s = '<img src="/proc/static/img/icon-yes.gif" />';
 	else
-		s = '<img src="/proc/static/img/icon-no.gif" />';
-		
+		s = '<img src="/proc/static/img/icon-no.gif" />';*/
+	if (cellvalue)
+		s = '<font color="green"><strong>True</strong></font>';
+	else
+		s = '<font color="red"><strong>False</strong></font>';	
 	return s;
     
 }
 
 function extFormatLogLink(cellvalue, options, rowObject) {
 	var s = '';	
-	s = '<a href="logs/'+rowObject["agent__id"]+'" > '+cellvalue+'</a>';	
+	s = ' <a href="logs/'+rowObject["agent__id"]+'" >'+cellvalue+'</a>';	
 	return s;
     
 }
 function extFormatNominalLink(cellvalue, options, rowObject) {
 	var s = '';	
-	s = '<a href="/proc/nominal/'+rowObject["agent__id"]+'" > '+cellvalue+'</a>';		
+	if (cellvalue == null){
+		cellvalue = 0; 
+	}
+	s = ' <a href="/proc/nominal/'+rowObject["agent__id"]+'" >'+cellvalue+'</a>';		
 	return s;    
 }
 

@@ -143,7 +143,10 @@ def reg_sost( body_, login_, retval_):
     if "id" in body_:                             # Если есть hesh_id 
         retval_["hesh_id"] = body_["id"]           # То зачитаем его для ответа
   
-    
+    if "link" in body_:
+        js.link = bool(int(body_["link"]))
+        actS.link = js.link
+        
     if "date" in body_:
         if body_["date"]!="0":
             try:
@@ -157,17 +160,17 @@ def reg_sost( body_, login_, retval_):
     else:
         js.date = datetime.now()
     
-    
-    actS.date = js.date        
+    if actS.link == False:
+        actS.date_link0 = js.date
+    else:
+        actS.date = js.date
+        actS.date_link0 = None        
     
     if "cash_count" in body_:
         js.cash_count = body_["cash_count"]
         actS.cash_count = js.cash_count
         
-    if "link" in body_:
-        js.link = bool(int(body_["link"]))
-        actS.link = js.link
-        
+            
     if "cash_code" in body_:
         sa = SostAgent.objects.filter(type = "C", code = body_["cash_code"])[0]
         js.cash_code = sa
@@ -185,13 +188,13 @@ def reg_sost( body_, login_, retval_):
     
     # сохраним новый статус агента в журнале состояний
     js.save()
-    
+    # И сохраним новый статус агента
+    actS.save()
     # Очистим статус этого агента в таблице для мониторинга
     #ActualState.objects.filter(agent=ag).delete()
     
     
-    # И сохраним новый статус агента
-    actS.save()
+   
 
 
 def get_time(retval_):
@@ -368,6 +371,26 @@ def get_encashment( body_, login_, retval_):
         return "-1" 
     return 0
 
+def get_info( body_, login_, retval_):
+    ''' Функция возвращает справочную информацию, для заданного агента 
+        act = 9
+    '''
+    retval_["status"] = "0"
+    
+    try:
+        agent = Agent.objects.filter(user__username = login_)[0]      # Достанем номер Агента
+        terminal_n = agent.terminal_n
+        call_center = agent.call_center
+        c=u'г. Худжанд, ул. Гагарина '
+        data = simplejson.dumps({"address": c+terminal_n,"terminal_n": terminal_n, "call_center": call_center})
+    
+        retval_["body"] = data
+    except Exception as inst :
+        #except(IndexError, Agent.DoesNotExist) :
+        retval_["status"]="-1"
+        retval_["body"] = inst
+        return "-1"
+
 
 def do_job(act_, body_, login_, retval_):
     ''' Функция обработки команд '''        
@@ -395,6 +418,9 @@ def do_job(act_, body_, login_, retval_):
     
     elif act_ == "8":                               # Инкасация
         ret = get_encashment( body_, login_, retval_);
+    
+    elif act_ == "9":                               # Запрос адреса, имени справочной инфы
+        ret = get_info( body_, login_, retval_);
         
     
     

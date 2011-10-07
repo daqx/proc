@@ -1,11 +1,17 @@
-#Thu Sep 29 12:00:39 UZT 2011
+#Mon Oct 03 10:07:09 UZT 2011
 eclipse.preferences.version=1
 encoding//src/mysite/api/handlers.py=utf-8
 encoding//src/mysite/api/utils.py=utf-8
 encoding//src/mysite/gw_babilon-m.py=utf-8
+encoding//src/mysite/gw_babilon_ngn.py=utf-8
+encoding//src/mysite/gw_beeline.py=utf-8
+encoding//src/mysite/gw_intercom_ngn.py=utf-8
 encoding//src/mysite/gw_megafon.py=utf-8
+encoding//src/mysite/gw_pardokht.py=utf-8
 encoding//src/mysite/gw_tcell92.py=utf-8
-encoding//src/mysite/pardokht.py=utf-8
+encoding//src/mysite/gw_tcell93.py=utf-8
+encoding//src/mysite/gw_tkmobile.py=utf-8
+encoding//src/mysite/gw_ttl_ngn.py=utf-8
 encoding//src/mysite/proc/addres_model.py=utf-8
 encoding//src/mysite/proc/gateway.py=utf-8
 encoding//src/mysite/proc/models.py=utf-8
@@ -25,4 +31,5 @@ encoding//src/mysite/proc/views/service.py=utf-8
 encoding//src/mysite/proc/views/system.py=utf-8
 encoding//src/mysite/proc/views/tarif.py=utf-8
 encoding//src/mysite/proc/views/transaction.py=utf-8
+encoding//src/mysite/route.py=utf-8
 encoding//src/mysite/settings.py=utf-8

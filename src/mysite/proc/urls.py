@@ -90,7 +90,7 @@ urlpatterns=patterns('',
     (r'^tarif/(\d+)/(\d+)/delete$', tarif.tarif_delete),
     (r'^tarif/(\d+)/add$', tarif.tarif_form_add),
     (r'^tarif/(\d+)/add/(\d+)$', tarif.tarif_form),
-    (r'^tarif/(\d+)/add/(\d+)/delete$', tarif.tarif_delete),    
+    (r'^tarif/(\d+)/add/(\d+)/delete$', tarif.tarif_delete),      
     # ============== TARIF PROFILE ===============
     (r'^tarif_plan/(?P<oid>\d+)/(?P<content>\w+)$', tarif.tarif_plan),
     (r'^tarif_plan/(?P<oid>\d+)/(?P<content>\w+)/(?P<id_>\d+)$', tarif.tarif_plan_form),

@@ -106,6 +106,9 @@ class Agent(models.Model):
     key_hash        =models.CharField('Хеш ключа',max_length=40, blank=True, null=True)
     hardware        =models.CharField(max_length=150, blank=True, null=True)
     cashcode_capacity=models.IntegerField('Емкость купюроприемника',blank=True, null=True)
+    terminal_n      =models.CharField(max_length=4, blank=True, null=True)
+    call_center     =models.CharField(max_length=15, blank=True, null=True)
+
     
     def __unicode__(self):
         return self.name
@@ -156,6 +159,7 @@ class Transaction(models.Model):
     file_name       =models.CharField(max_length=20,null=True, blank=True)
     user_proc       =models.OneToOneField(User,null=True, blank=True)
     hesh_id         =models.CharField(max_length=40,null=True, blank=True)
+    route           =models.CharField(max_length=20,null=True, blank=True, verbose_name="Маршрут")
     
     def __unicode__(self):
         return '%s  %s  %s' % (self.agent.user.username, self.summa , self.date) 

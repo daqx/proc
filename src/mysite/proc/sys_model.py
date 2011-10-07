@@ -114,7 +114,7 @@ class ActualState(models.Model):
     cash_code   =models.ForeignKey(SostAgent, related_name="ac_cash_code" ,null=True, blank=True)    # Состояние купюроприёмника
     printer     =models.ForeignKey(SostAgent, related_name="ac_printer", null=True, blank=True)      # Состояние термопринтера
     terminal    =models.ForeignKey(SostAgent, related_name="ac_terminal", null=True, blank=True)     # Состояние терминала
-    
+    date_link0  =models.DateTimeField()
     
     def __unicode__(self):
         return "%s" % self.date

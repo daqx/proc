@@ -16,16 +16,8 @@ import xml.etree.ElementTree as xml;
 from datetime import datetime 
 from django.db.models import Q
 from mysite.proc.helpers import *
-from mysite.proc.pardokht import *
+from mysite.route import *
 #import datetime
-
-def ins_log(trans, data, sending):
-    a=Gatelog()
-    a.transaction = trans
-    a.sending = sending
-    a.date = datetime.now()
-    a.text = data
-    a.save()
 
 #отправка всех данных и проверка ошибок
 def  tcell92_send_data(trans, url, gatew):
@@ -64,7 +56,7 @@ def tcell92_err_desc(err_code_):
     try:
         err_code = int(err_code_);        
     except ValueError:
-        err_code = 20820;
+        err_code = -50;
     
     if err_code in (-85,-84):
         err_desc = '1012'                #Ошибка аннулирования
@@ -91,7 +83,7 @@ def tcell92_err_desc(err_code_):
     elif err_code >= -112 and err_code <= -102:
         err_desc = '1001'                  #отклонен
     else:
-        err_desc = '1000'                #не опознанная ошибка    аааааааааа    
+        err_desc = '4004'                #не опознанная ошибка    аааааааааа    
     
     return err_desc
 
@@ -104,8 +96,9 @@ def tcell92_pay (trans, gatew):
     port = gatew.port
     login = gatew.login
     password = gatew.password
-    
-    if trans.state.code == '0':
+    a = trans.state.code
+
+    if a == '0' or a == '1023':
         #новый статус надо отправить запрос на уществование абонента
         #и обновить статус в табл
         
@@ -140,7 +133,8 @@ def tcell92_pay (trans, gatew):
                 trans.set_state(err_desc)
                 
             trans.date_out = datetime.strptime(dt,'%d.%m.%Y %H:%M:%S')
-            
+            trans.route = 'tcell92'
+            trans.save()
             if st == "20":
                 #подтверждаем платеж
                 url = 'https://%s:%s/?USERNAME=%s&PASSWORD=%s&ACT=1&pay_id=%s'%(ip,port,login,password,pay_id)
@@ -155,10 +149,10 @@ def tcell92_pay (trans, gatew):
                     trans.date_out = datetime.strptime(dt,'%d.%m.%Y %H:%M:%S')    
         else:
             #ответ от сервера не получен обновляем статус обратно 0
-            trans.set_state(code='0')
+            trans.set_state(code=a)
             
         trans.save()
-    elif  trans.state.code == '2000':  #латеж уже отправлен подтверждаем его
+    elif a == '2000':  #латеж уже отправлен подтверждаем его
         pay_id = trans.seans_number #номер платежа который надо проверить
         if pay_id == None:
             trans.set_state('0')
@@ -179,44 +173,48 @@ def tcell92_pay (trans, gatew):
         trans.save()
 
 #выбрать нужные данные и отправить провайдеру
+st_new=State.objects.get(code='0')  #статус на отправку
+st_no_money = State.objects.get(code='1023')#не достаточно средств на счете диллера
+st_accept = State.objects.get(code='2000')
+tcell92 = OpService.objects.get(code = 'tcell92')
 while True:
-    try :
-        gatew = Gateway.objects.get(code = 'TCELL92')
+    try :    
+        gatew = Gateway.objects.get(code = 'tcell92')
         st_gatew = gatew.status.code 
         if st_gatew == 'WORKING':
-            st_new=State.objects.get(code='0')  #статус на отправку
-            tr=Transaction.objects.filter(Q(try_count__isnull=True)|Q(try_count__lte=10), Q(state = st_new)|Q(state__code = '2000') , opservices__code = 'TCELL92')[:3] #лимит по 3
-            for i in tr: #цыкл только по тем транзакциям у которых статус =0
-                d = i.agent.dealer
-                saldo = d.get_saldo(datetime.now())
-                
-                if d.overdraft == None:
-                    d.overdraft = 0
-                    
-                if d.limit == None:
-                    d.limit = 0
-                if saldo + d.overdraft - d.limit >= i.summa_pay:     #проверяем баланс диллера
-                    tcell92_pay(i, gatew)
-        elif st_gatew == 'BLOCKED': #Статус блокирован проверяем маршрутизацию
             st_route = gatew.route.code 
             #Если st_route != self, то маршрутизация задана. Выбираем нужный маршрут и вызываем его 
-            if st_route != 'self':
-                if gatew.route.status == 'WORKING':
-                    code_route = gatew.route.code
-                    if code_route == 'Pardokht':
-                        st_new=State.objects.get(code='0')  #статус на отправку
-                        tr=Transaction.objects.filter(Q(try_count__isnull=True)|Q(try_count__lte=10), Q(state = st_new)|Q(state__code = '2000') , opservices__code = 'TCELL92')[:3] #лимит по 3
-                        for i in tr: #цыкл только по тем транзакциям у которых статус =0
-                            d = i.agent.dealer
-                            saldo = d.get_saldo(datetime.now())
+            if st_route == 'self':
+                tr=Transaction.objects.filter(Q(try_count__isnull=True)|Q(try_count__lte=10), Q(state = st_new)|Q(state = st_no_money)|Q(state = st_accept) , opservices = tcell92).order_by("state")[:3] #лимит по 3
+                for i in tr: #цыкл только по тем транзакциям у которых статус =0
+                    d = i.agent.dealer
+                    saldo = d.get_saldo(datetime.now())
+                    
+                    if d.overdraft == None:
+                        d.overdraft = 0
+                        
+                    if d.limit == None:
+                        d.limit = 0
+                    if saldo + d.overdraft - d.limit >= i.summa_pay:     #проверяем баланс диллера
+                        tcell92_pay(i, gatew)
+                    else:
+                        i.set_state('1023') #не достаточно средств
+            elif st_route == 'pardokht':
+                if gatew.route.status.code == 'WORKING':
+                    tr=Transaction.objects.filter(Q(try_count__isnull=True)|Q(try_count__lte=10), Q(state = st_new)|Q(state = st_no_money)|Q(state = st_accept) , opservices = tcell92).order_by("state")[:3] #лимит по 3
+                    for i in tr: #цыкл только по тем транзакциям у которых статус =0
+                        d = i.agent.dealer
+                        saldo = d.get_saldo(datetime.now())
+                        
+                        if d.overdraft == None:
+                            d.overdraft = 0
                             
-                            if d.overdraft == None:
-                                d.overdraft = 0
-                                
-                            if d.limit == None:
-                                d.limit = 0
-                            if saldo + d.overdraft - d.limit >= i.summa_pay:     #проверяем баланс диллера
-                                pardokht_pay(i, gatew)
+                        if d.limit == None:
+                            d.limit = 0
+                        if saldo + d.overdraft - d.limit >= i.summa_pay:     #проверяем баланс диллера
+                            pardokht_pay(i)
+                        else:
+                            i.set_state('1023') #не достаточно средств
         time.sleep(3)
         print ('Informations are select from transactions TCELL92')
     except Exception as inst:

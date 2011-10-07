@@ -44,7 +44,7 @@ def journal_handler(request, id_):
 
 class ActualStateGrid(JqGrid):
     model = ActualState # could also be a queryset
-    fields = ['id', 'date','agent__id','agent__name', 'link','cash_count', 'cash_code__name','printer__name', 'terminal__name'] # optional 
+    fields = ['id', 'date','agent__id','agent__name', 'link','cash_count', 'cash_code__name','printer__name', 'terminal__name','date_link0'] # optional 
     url = '/proc/examplegrid/' #reverse('grid_handler')
     caption = 'State Grid' # optional
     colmodel_overrides = {
@@ -78,11 +78,11 @@ class PayGrid(JqGrid):
     
     def __init__(self, ag_id, content):
         if content == "":        
-            self.queryset = Transaction.objects.all().values('id', 'date','agent__id','agent__user__username', 'agent__dealer__user__username','summa','summa_pay', 'state__name', 'ticket')
+            self.queryset = Transaction.objects.all().values('id', 'date','agent__id','agent__user__username', 'agent__dealer__user__username','summa','summa_pay', 'state__name', 'ticket', 'route','number_key', 'try_count')
         elif  content == "agent":
-            self.queryset = Transaction.objects.filter(agent__id = ag_id).values('id', 'date','agent__id','agent__user__username', 'agent__dealer__user__username','summa','summa_pay', 'state__name', 'ticket')
+            self.queryset = Transaction.objects.filter(agent__id = ag_id).values('id', 'date','agent__id','agent__user__username', 'agent__dealer__user__username','summa','summa_pay', 'state__name', 'ticket', 'route','number_key', 'try_count')
         elif  content == "dealer":
-            self.queryset = Transaction.objects.filter(agent__dealer__id = ag_id).values('id', 'date','agent__id','agent__user__username', 'agent__dealer__user__username','summa','summa_pay', 'state__name', 'ticket')
+            self.queryset = Transaction.objects.filter(agent__dealer__id = ag_id).values('id', 'date','agent__id','agent__user__username', 'agent__dealer__user__username','summa','summa_pay', 'state__name', 'ticket', 'route','number_key', 'try_count')
         
 
 
