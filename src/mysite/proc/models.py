@@ -196,7 +196,7 @@ class Transaction(models.Model):
         ''' Оплата суммы платежа со счета диллера
         '''
         d=self.agent.dealer
-        sald = d.get_saldo( datetime.now())
+        sald = d.get_saldo(datetime.now())
         
         # Добавим запись в выписку
         am=ArcMove( dealer = d, dt = True, summa = self.summa_pay, transaction = self, saldo = sald)

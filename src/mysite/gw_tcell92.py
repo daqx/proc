@@ -172,8 +172,70 @@ def tcell92_pay (trans, gatew):
                 trans.set_state(code='2000')
         trans.save()
 
+def annulment_tcell92():
+    gatew = Gateway.objects.get(code = 'tcell92')
+    tcell92 = OpService.objects.get(code = 'tcell92')
+    st_annul = State.objects.get(code = '16000')
+    ip = gatew.ip                    #ip провайдера
+    port = gatew.port
+    login = gatew.login
+    password = gatew.password
+    tr=Transaction.objects.filter(Q(try_count__isnull=True)|Q(try_count__lte=20), opservices = tcell92, state = st_annul)[:3] #лимит по 3
+    for trans in tr:
+        trans.try_count = nvl(trans.try_count,0) + 1
+        pay_id = trans.seans_number
+        if pay_id==None:
+            #Транзакция еще не отправлена, будемсчитать, что уже отмена успешна
+            st_copy = copy_trans(trans) #если возвращает 0, то новая транзакция создана
+            if st_copy != 0:
+                trans.set_state('14000')
+        else:
+            url = 'https://%s:%s/DEFAULT_BAL.ASPX?USERNAME=%s&PASSWORD=%s&ACT=2&PAY_ID=%s'%(ip, port, login, password, pay_id)
+            pay_id, reciept, st, dt = tcell92_send_data(trans, url, gatew) #отправляем провайдеру
+            if st!='':
+                if st=='23' or st=='-84':
+                    trans.set_state("14000")
+                    st_copy = copy_trans(trans) #если возвращает 0, то новая транзакция создана
+                    if st_copy != 0:
+                        trans.set_state('16001')
+                    else:
+                        #увеличить баланс диллера на сумму отмены
+                        a = dealer_pay(trans)   #Если a =0, то все нормально
+                        if a != 0:          
+                            trans.set_state('16002')  
+                    
+                else:
+                    err_desc = tcell92_err_desc(st)
+                    trans.set_state(err_desc)
+            else:
+                trans.set_state('16000')
+        
+        trans.save()          
+            
+def get_balance_tcell92():
+    page = ''
+    gatew = Gateway.objects.get(code = 'tcell92')
+    ip = gatew.ip                    #ip провайдера
+    port = gatew.port
+    login = gatew.login
+    password = gatew.password
+    wait_time = gatew.wait_time
+    url = 'https://%s:%s/DEFAULT_BAL.ASPX?USERNAME=%s&PASSWORD=%s&P_ACTION=GET_BALANCE'%(ip, port, login, password)
+    try:
+        resp=urllib2.urlopen(url, None, wait_time)
+        page=resp.read()    #ответ сервера провайдера  
+        b=string.index(page,'Balance')
+        page=page[b:]  
+    except Exception as inst:
+        print 'Error while send data or check reply of tcell92'
+        print inst
+        return inst
+    return page
+        
+    
 #выбрать нужные данные и отправить провайдеру
-st_new=State.objects.get(code='0')  #статус на отправку
+#get_balance_tcell92()
+st_new = State.objects.get(code='0')  #статус на отправку
 st_no_money = State.objects.get(code='1023')#не достаточно средств на счете диллера
 st_accept = State.objects.get(code='2000')
 tcell92 = OpService.objects.get(code = 'tcell92')

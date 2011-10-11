@@ -196,44 +196,44 @@ def pardokht_pay (trans):
             trans.save()    
                        
             
-            #проверяем статус платежа
-            if result_code == "90":   
-                xml_data = '''<?xml version="1.0" encoding="utf-8"?>
-                        <request>
-                            <protocol-version>4.00</protocol-version>
-                            <request-type>10</request-type>
-                            <terminal-id>%s</terminal-id>
-                            <extra name="login">%s</extra>
-                            <extra name="password-md5">%s</extra>
-                            <extra name="client-software">XML v1.1</extra>
-                            <extra name="user-agent">1.2.3456.7890</extra>
-                            <extra name="operating-system">Windows XP (Build 2600)</extra>
-                            <extra name="serial">ABC12345</extra>
-                            <status count="1">
-                                <payment>
-                                    <transaction-number>%s</transaction-number>
-                                </payment>
-                            </status>
-                        </request>'''%(terminal_id,login, password, reciept_num)
-                status_code, result_code, final_st, fatal_error  = pardokht_send_data(trans, url, xml_data, gatew) #отправляем провайдеру    
-       
-                if result_code != '' :  #если имеются параметры
-                
-                    if result_code == "0":         #платеж прошел
-                        trans.set_state("5000")
-                        trans.pay()
-                    elif result_code == "90":         #транзакция создана
-                        err_desc = pardokht_err_desc(status_code) 
-                        trans.set_state("2000")
-                    else:    
-                        err_desc = pardokht_err_desc(status_code) #берем код status_code_desc и пишем в базу
-                        trans.set_state(err_desc)
-                    trans.save()    
-        else:
-            #ответ от сервера не получен обновляем статус обратно 0
-            trans.set_state(code=a)
-            
-        trans.save()
+#            #проверяем статус платежа
+#            if result_code == "90":   
+#                xml_data = '''<?xml version="1.0" encoding="utf-8"?>
+#                        <request>
+#                            <protocol-version>4.00</protocol-version>
+#                            <request-type>10</request-type>
+#                            <terminal-id>%s</terminal-id>
+#                            <extra name="login">%s</extra>
+#                            <extra name="password-md5">%s</extra>
+#                            <extra name="client-software">XML v1.1</extra>
+#                            <extra name="user-agent">1.2.3456.7890</extra>
+#                            <extra name="operating-system">Windows XP (Build 2600)</extra>
+#                            <extra name="serial">ABC12345</extra>
+#                            <status count="1">
+#                                <payment>
+#                                    <transaction-number>%s</transaction-number>
+#                                </payment>
+#                            </status>
+#                        </request>'''%(terminal_id,login, password, reciept_num)
+#                status_code, result_code, final_st, fatal_error  = pardokht_send_data(trans, url, xml_data, gatew) #отправляем провайдеру    
+#       
+#                if result_code != '' :  #если имеются параметры
+#                
+#                    if result_code == "0":         #платеж прошел
+#                        trans.set_state("5000")
+#                        trans.pay()
+#                    elif result_code == "90":         #транзакция создана
+#                        err_desc = pardokht_err_desc(status_code) 
+#                        trans.set_state("2000")
+#                    else:    
+#                        err_desc = pardokht_err_desc(status_code) #берем код status_code_desc и пишем в базу
+#                        trans.set_state(err_desc)
+#                    trans.save()    
+#        else:
+#            #ответ от сервера не получен обновляем статус обратно 0
+#            trans.set_state(code=a)
+#            
+#        trans.save()
         
     elif  a == '2000':  #латеж уже отправлен проверяем статус
        
@@ -268,7 +268,69 @@ def pardokht_pay (trans):
                 trans.set_state(err_desc)
         else:
             trans.set_state(a)
-        trans.save()  
+        trans.save()
+     
+        
+def annulment_pardokht():
+    gatew = Route.objects.get(code = 'pardokht')
+    st_annul = State.objects.get(code = '16000')
+    url = gatew.note
+    terminal_id = gatew.port 
+    login = gatew.login
+    password = gatew.password
+    password = hashlib.md5(password).hexdigest()
+    tr=Transaction.objects.filter(Q(try_count__isnull=True)|Q(try_count__lte=20), route="pardokht", state = st_annul)[:3] #лимит по 3
+    for trans in tr: 
+        trans.try_count = nvl(trans.try_count,0) + 1
+        a = trans.state.code
+        
+        if a == '16000': #статус Отзыв
+            reciept_num = trans.id      #уникальный номер платежа
+            a = trans.state.code
+       
+    #        #проверям дату отправки на провайдер, если существует то отправляем её, а если нет, тек дату время
+    #        dt_ = trans.date_out
+    #        if dt_ == None:
+    #            dt_ = datetime.now()      
+    #            trans.date_out = dt_
+    #        
+            xml_data = '''<?xml version="1.0" encoding="utf-8"?>
+                        <request>
+                            <protocol-version>4.00</protocol-version>
+                            <request-type>10</request-type>
+                            <terminal-id>%s</terminal-id>
+                            <extra name="login">%s</extra>
+                            <extra name="password-md5">%s</extra>
+                            <extra name="client-software">XML v1.1</extra>
+                            <revoke-payment-list>
+                               <revoke-payment transaction-number="%s"/>
+                            </revoke-payment-list >
+                        </request>'''%(terminal_id,login, password, reciept_num)
+
+
+            
+            req_id, rrn, st  = babilon_send_data(trans, url, gatew) #отправляем провайдеру    
+            
+            if req_id != '' and st != '':  #если имеются параметры
+                if st == "OK":         #платеж отменен
+                    trans.set_state("14000")
+                    st_copy = copy_trans(trans) #если возвращает 0, то новая транзакция создана
+                    if st_copy != 0:
+                        trans.set_state('16001')
+                    else:
+                        #увеличить баланс диллера на сумму отмены
+                        a = dealer_pay(trans)   #Если a =0, то все нормально
+                        if a != 0:          
+                            trans.set_state('16002')  
+                    
+                else:    
+                    err_desc = babilon_err_desc(st)
+                    trans.set_state(err_desc)
+            else:
+                #ответ от сервера не получен обновляем статус обратно 0
+                trans.set_state(code=a)
+                
+            trans.save()
             
 def ins_log(trans, data, sending):
     a=Gatelog()
@@ -277,6 +339,52 @@ def ins_log(trans, data, sending):
     a.date = datetime.now()
     a.text = data
     a.save()
+    
+def copy_trans(trans):
+    try:
+        tr = Transaction()                          # Инициируем новый объект Transaction
+        tr.opservices = trans.opservices
+        tr.number_key = trans.number_key
+        tr.summa = trans.summa
+        tr.summa_pay = trans.summa_pay
+        tr.hesh_id = trans.hesh_id
+        tr.encashment = trans.encashment
+        tr.ticket = trans.ticket 
+        tr.summa_commiss = trans.summa_commiss 
+        tr.agent = trans.agent 
+        tr.return_reason = str(trans.date_input)+', Sozdana ot otmeni'
+        #tr.date_input = datetime.now()
+        
+        tr.add(api = True)
+        nominal = Nominal.objects.filter(transaction=trans)
+        for i in nominal:
+            nam = Nominal()
+            nam.value = i.value
+            nam.count = i.count
+            nam.transaction = tr
+            nam.save()
+        return 0
+    except Exception as inst:
+        return inst
+
+def dealer_pay(trans):
+    try:
+        
+        d=trans.agent.dealer
+        summa = trans.summa_pay
+        d.summa = d.summa + summa
+        d.save() 
+        
+#        arc = ArcMove
+#        arc.dt      = False
+#        arc.date    = datetime.now()
+#        arc.saldo   = d.get_saldo(arc.date) 
+#       
+#        arc.save()
+#        
+        return 0
+    except Exception as inst:
+        return inst
         
 
                     

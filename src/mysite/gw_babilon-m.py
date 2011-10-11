@@ -66,7 +66,7 @@ def babilon_send_data(trans, url, gatew):
                 st = item.find("status").text
                 
     except Exception as inst:
-        print 'Error while send data or check reply of MEGAFON'
+        print 'Error while send data or check reply of BabilonM'
         print inst
     return req_id, rrn, st   
         
@@ -148,13 +148,92 @@ def babilonm_pay (trans, gatew):
                 trans.set_state(err_desc)
         else:
             #ответ от сервера не получен обновляем статус обратно 0
-            trans.set_state(code='0')
+            trans.set_state(code=a)
             
         trans.save()
         
+def get_balance_babilonm():
+    page = ''
+    gatew = Gateway.objects.get(code = 'babilon-m')
+    ip = gatew.ip                    #ip провайдера
+    ps_id = gatew.password
+    pt = gatew.login
+    port = gatew.port
+    wait_time = gatew.wait_time
+    url = "https://%s:%s/PSBalance.aspx?psid=%s"%(ip, port, ps_id)
+    url=str(url)
+    cert = 'C:/cert/CA.cer'
+    key = 'C:/cert/key.pem'
+    #открытие соединения
+    try:
+        res = Response()
+        curl = pycurl.Curl()
+        curl.setopt(curl.WRITEFUNCTION, res.callback)
+        curl.setopt(curl.SSL_VERIFYHOST, 0)
+        curl.setopt(curl.SSL_VERIFYPEER, 0)
+        curl.setopt(curl.CAINFO, cert)
+        curl.setopt(curl.SSLCERT, key)
+        curl.setopt(curl.URL, url)
+        curl.perform()
+        page=res.content()   #ответ сервера провайдера
+    except Exception as inst:
+        print 'Error while get balance of BabilonM'
+        print inst
+    return page    
 
+
+def annulment_babilonm():
+    gatew = Gateway.objects.get(code = 'babilon-m')
+    st_annul = State.objects.get(code = '16000')
+    babilon98 = OpService.objects.get(code='babilon-m98')
+    babilon918 = OpService.objects.get(code='babilon-m918')
+    tr=Transaction.objects.filter(Q(try_count__isnull=True)|Q(try_count__lte=20), Q(opservices = babilon98)|Q(opservices = babilon918), state = st_annul)[:3] #лимит по 3
+    for trans in tr: 
+        trans.try_count = nvl(trans.try_count,0) + 1
+        a = trans.state.code
+        
+        if a == '16000': #статус Отзыв
+            ip = gatew.ip                    #ip провайдера
+            ps_id = gatew.password
+            pt = gatew.login
+            port = gatew.port
+            reciept_num = trans.id     #уникальный номер платежа
+            
+    #        #проверям дату отправки на провайдер, если существует то отправляем её, а если нет, тек дату время
+    #        dt_ = trans.date_out
+    #        if dt_ == None:
+    #            dt_ = datetime.now()      
+    #            trans.date_out = dt_
+    #        
+            url = "https://%s:%s/xmlinterface.asmx/Annulment?ps_id=%s&rrn=%s&pt=%s"%(ip, port, ps_id, reciept_num, pt)
+            req_id, rrn, st  = babilon_send_data(trans, url, gatew) #отправляем провайдеру    
+            
+            if req_id != '' and st != '':  #если имеются параметры
+                if st == "OK":         #платеж отменен
+                    trans.set_state("14000")
+                    st_copy = copy_trans(trans) #если возвращает 0, то новая транзакция создана
+                    if st_copy != 0:
+                        trans.set_state('16001')
+                    else:
+                        #увеличить баланс диллера на сумму отмены
+                        a = dealer_pay(trans)   #Если a =0, то все нормально
+                        if a != 0:          
+                            trans.set_state('16002')  
+                    
+                else:    
+                    err_desc = babilon_err_desc(st)
+                    trans.set_state(err_desc)
+            else:
+                #ответ от сервера не получен обновляем статус обратно 0
+                trans.set_state(code=a)
+                
+            trans.save()
+        
 #выбрать нужные данные и отправить провайдеру
 #Во всех транзакциях при выборке сотрировка идет сначала по статусу 0 потом 1023
+
+#annulment_babilonm()
+#bal = get_balance_babilonm()
 st_new=State.objects.get(code='0')  #статус на отправку
 st_no_money = State.objects.get(code='1023')
 babilon98 = OpService.objects.get(code='babilon-m98')
