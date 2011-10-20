@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import sys;
 import time;
-import pycurl
+#import pycurl
 
 sys.path.append('D:/work/python/proc/src/')
 from django.core import management;

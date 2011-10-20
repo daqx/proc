@@ -335,3 +335,15 @@ class Gatelog(models.Model):
     
     class Meta:
         app_label = "proc"
+
+#class Annulment(models.Model):
+#    date1           =models.DateTimeField(auto_now_add=True)
+#    date2           =models.DateTimeField(null=True)
+#    state           =models.ForeignKey(State, null=True, blank=True)
+#    transaction     =models.ForeignKey(Transaction)
+#    number_key      =models.CharField(max_length=100, verbose_name='Номер')   
+#    comment         =models.CharField(max_length=100, verbose_name='Комментарий')
+#    
+#    
+#    def __unicode__(self):
+#        return '%s  %s  %s' % (self.number_key, self.transaction.number_key, self.date1)

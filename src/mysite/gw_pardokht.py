@@ -32,7 +32,7 @@ while True:
                 if i.state==st_accept:
                     pardokht_pay(i)
                 elif i.state==st_annul:
-                    pardokht_pay(i)
+                    annulment_pardokht(i)
             time.sleep(3)
             print ('Informations are select from transactions pardokht')
     except Exception as inst:

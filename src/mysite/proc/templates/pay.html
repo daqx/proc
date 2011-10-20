@@ -7,6 +7,8 @@
 	<link rel="stylesheet" type="text/css" media="screen" href="/proc/static/js/themes/ui.jqgrid.css" />
   	<script src="/proc/static/js/i18n/grid.locale-ru.js" type="text/javascript"></script>
   	<script src="/proc/static/js/jquery.jqGrid.min.js" type="text/javascript"></script> 
+	<script type="text/javascript" src="/proc/static/js/jquery.maskedinput.js"></script> 
+  	
 
 <script type="text/javascript">
 $(function () {
@@ -19,7 +21,7 @@ $(function () {
             	"forcefit": true, 
             	"shrinkToFit": true, 
             	"height": "auto", 
-            	"caption": "Состояния агента", 
+            	"caption": "Платежи", 
             	"datatype": "json", 
             	"gridview": true, 
             	"colModel": [
@@ -80,11 +82,27 @@ function extFormatLogLink(cellvalue, options, rowObject) {
 	return s;    
 }
 	
+	$(function() {
+  		$("#id_date_begin").mask("99.99.9999 99:99:99");	
+  		$("#id_date_end").mask("99.99.9999 99:99:99");
+  	});
+
+
 </script>
 {%endblock%}
 
 
 {%block content%}
+
+	<form action="/proc/xls/pay/" method="post">
+    	{% csrf_token %}       
+        <table class="tbl_frm">
+			<tr class="required"><th><label for="id_date_begin">Дата от:</label></th><td><input type="text" name="date_begin"  id="id_date_begin" /></td></tr>
+			<tr class="required"><th><label for="id_date_end">Дата до:</label></th><td><input type="text" name="date_end" id="id_date_end" /></td></tr>				        
+        </table>
+        
+        <input type="submit" value="Выгрузить в Excel">
+    </form>
 
 {% if perms.proc.add_transaction %}
 	<ul class="object-tools">

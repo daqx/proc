@@ -131,6 +131,9 @@ class TownAdmin(admin.ModelAdmin):
     
 class TransactionAdmin(admin.ModelAdmin):
     list_display=('date','agent','summa', 'state')
+    
+#class AnnulmentAdmin(admin.ModelAdmin):
+#    list_display=('date1','date2','number_key', 'comment')
 
 
     
@@ -170,3 +173,4 @@ admin.site.register(TarifArrBase, TarifArrAdmin)
 admin.site.register(TarifPlanBase, TarifPlanAdmin)
 admin.site.register(Town, TownAdmin)
 admin.site.register(Transaction, TransactionAdmin)
+#admin.site.register(Annulment, AnnulmentAdmin)

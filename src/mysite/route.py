@@ -271,66 +271,66 @@ def pardokht_pay (trans):
         trans.save()
      
         
-def annulment_pardokht():
+def annulment_pardokht(trans):
     gatew = Route.objects.get(code = 'pardokht')
-    st_annul = State.objects.get(code = '16000')
+    #st_annul = State.objects.get(code = '16000')
     url = gatew.note
     terminal_id = gatew.port 
     login = gatew.login
     password = gatew.password
     password = hashlib.md5(password).hexdigest()
-    tr=Transaction.objects.filter(Q(try_count__isnull=True)|Q(try_count__lte=20), route="pardokht", state = st_annul)[:3] #лимит по 3
-    for trans in tr: 
-        trans.try_count = nvl(trans.try_count,0) + 1
+    #tr=Transaction.objects.filter(Q(try_count__isnull=True)|Q(try_count__lte=20), route="pardokht", state = st_annul)[:3] #лимит по 3
+    #for trans in tr: 
+    trans.try_count = nvl(trans.try_count,0) + 1
+    a = trans.state.code
+    
+    if a == '16000': #статус Отзыв
+        reciept_num = trans.id      #уникальный номер платежа
         a = trans.state.code
+   
+#        #проверям дату отправки на провайдер, если существует то отправляем её, а если нет, тек дату время
+#        dt_ = trans.date_out
+#        if dt_ == None:
+#            dt_ = datetime.now()      
+#            trans.date_out = dt_
+#        
+        xml_data = '''<?xml version="1.0" encoding="utf-8"?>
+                    <request>
+                        <protocol-version>4.00</protocol-version>
+                        <request-type>84</request-type>
+                        <terminal-id>%s</terminal-id>
+                        <extra name="login">%s</extra>
+                        <extra name="password-md5">%s</extra>
+                        <extra name="client-software">XML v1.1</extra>
+                        <revoke-payment-list>
+                           <revoke-payment transaction-number="%s"/>
+                        </revoke-payment-list >
+                    </request>'''%(terminal_id,login, password, reciept_num)
+
+
         
-        if a == '16000': #статус Отзыв
-            reciept_num = trans.id      #уникальный номер платежа
-            a = trans.state.code
-       
-    #        #проверям дату отправки на провайдер, если существует то отправляем её, а если нет, тек дату время
-    #        dt_ = trans.date_out
-    #        if dt_ == None:
-    #            dt_ = datetime.now()      
-    #            trans.date_out = dt_
-    #        
-            xml_data = '''<?xml version="1.0" encoding="utf-8"?>
-                        <request>
-                            <protocol-version>4.00</protocol-version>
-                            <request-type>10</request-type>
-                            <terminal-id>%s</terminal-id>
-                            <extra name="login">%s</extra>
-                            <extra name="password-md5">%s</extra>
-                            <extra name="client-software">XML v1.1</extra>
-                            <revoke-payment-list>
-                               <revoke-payment transaction-number="%s"/>
-                            </revoke-payment-list >
-                        </request>'''%(terminal_id,login, password, reciept_num)
-
-
+        status_code, result_code, final_st, fatal_error = pardokht_send_data(trans, url,xml_data, gatew) #отправляем провайдеру    
+        
+#        if req_id != '' and st != '':  #если имеются параметры
+#            if st == "OK":         #платеж отменен
+#                trans.set_state("14000")
+#                st_copy = copy_trans(trans) #если возвращает 0, то новая транзакция создана
+#                if st_copy != 0:
+#                    trans.set_state('16001')
+#                else:
+#                    #увеличить баланс диллера на сумму отмены
+#                    a = dealer_pay(trans)   #Если a =0, то все нормально
+#                    if a != 0:          
+#                        trans.set_state('16002')  
+#                
+#            else:    
+#                err_desc = pardokht_err_desc(st)
+#                trans.set_state(err_desc)
+#        else:
+#            #ответ от сервера не получен обновляем статус обратно 0
+#            trans.set_state(code=a)
             
-            req_id, rrn, st  = babilon_send_data(trans, url, gatew) #отправляем провайдеру    
-            
-            if req_id != '' and st != '':  #если имеются параметры
-                if st == "OK":         #платеж отменен
-                    trans.set_state("14000")
-                    st_copy = copy_trans(trans) #если возвращает 0, то новая транзакция создана
-                    if st_copy != 0:
-                        trans.set_state('16001')
-                    else:
-                        #увеличить баланс диллера на сумму отмены
-                        a = dealer_pay(trans)   #Если a =0, то все нормально
-                        if a != 0:          
-                            trans.set_state('16002')  
-                    
-                else:    
-                    err_desc = babilon_err_desc(st)
-                    trans.set_state(err_desc)
-            else:
-                #ответ от сервера не получен обновляем статус обратно 0
-                trans.set_state(code=a)
-                
-            trans.save()
+        trans.save()
             
 def ins_log(trans, data, sending):
     a=Gatelog()

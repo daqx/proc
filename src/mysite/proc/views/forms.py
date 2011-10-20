@@ -49,10 +49,10 @@ class AgentForm(forms.ModelForm):
         fields =('name', 'type','state','username','password','first_name','last_name','dealer','opservices','opservice_group','check_for_ip','imei',
                  'tel','key_hash','cashcode_capacity','cashcode_id','hdd_id')
 
-class AgentEditForm(forms.ModelForm):    
+class AgentEditForm(forms.ModelForm):
     username = forms.RegexField(label=("Имя пользователя"), max_length=30, min_length= 6,regex=r'^[\w.@+-]+$',
         help_text = ("Обязательный. От 6 до 30 символов.. Только буквы, цифры и @/./+/-/_ ."),
-        error_messages = {'invalid': ("Это значение может содержать только буквы, цифры и @/./+/-/_ символы.")})    
+        error_messages = {'invalid': ("Это значение может содержать только буквы, цифры и @/./+/-/_ символы.")})
     first_name = forms.CharField(label='Имя', max_length=30)
     last_name = forms.CharField(label='Фамилия',max_length=30)
     #opservices = forms.MultipleChoiceField()    #widget=forms.CheckboxSelectMultiple(),required=True

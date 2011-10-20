@@ -18,7 +18,8 @@ from mysite.proc.views import grids
 
 urlpatterns=patterns('',
     #url(r'^$', system.main),
-    (r'^grid/', include('mysite.proc.urls_grid')),    
+    (r'^grid/', include('mysite.proc.urls_grid')),
+    (r'^xls/', include('mysite.proc.urls_xls')),    
     (r'^static/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.STATIC_ROOT}),
 
     (r'^accounts/login/$',  account.login),
