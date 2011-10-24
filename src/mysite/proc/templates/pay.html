@@ -14,7 +14,7 @@
 $(function () {
 	        $("#pay").jqGrid({
             	"altRows": true, 
-            	"rowList": [ 10, 25, 50, 100], 
+            	"rowList": [ 25, 50, 100, 1000], 
             	"sortname": "date", 
             	"viewrecords": true, 
             	"autowidth": false,            	
@@ -55,7 +55,7 @@ $(function () {
 	        	 {% else %}
             	 	"url": "/proc/grid/pay/",            		
             	 {% endif %}
-            	 "rowNum": 10, 
+            	 "rowNum": 25, 
             	 "pager": "#pager", 
             	 "jsonReader": {"repeatitems": false}
             }).navGrid('#pager', 
@@ -83,8 +83,8 @@ function extFormatLogLink(cellvalue, options, rowObject) {
 }
 	
 	$(function() {
-  		$("#id_date_begin").mask("99.99.9999 99:99:99");	
-  		$("#id_date_end").mask("99.99.9999 99:99:99");
+  		$("#id_date_begin").mask("99.99.9999");	
+  		$("#id_date_end").mask("99.99.9999");
   	});
 
 

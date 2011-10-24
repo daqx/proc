@@ -260,7 +260,7 @@ def pardokht_pay (trans):
             if result_code == "0":         #платеж прошел
                 trans.set_state("5000")
                 trans.pay()
-            elif result_code == "90":         #транзакция создана
+            elif result_code == "90" and a!="2000":         #транзакция создана
                 err_desc = pardokht_err_desc(status_code) 
                 trans.set_state("2000")
             else:    
