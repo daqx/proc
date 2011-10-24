@@ -78,11 +78,11 @@ class PayGrid(JqGrid):
     
     def __init__(self, ag_id, content):
         if content == "":        
-            self.queryset = Transaction.objects.all().values('id', 'date','agent__id','agent__user__username', 'agent__dealer__user__username','summa','summa_pay', 'state__name', 'ticket', 'route','number_key', 'try_count')
+            self.queryset = Transaction.objects.all().values('id', 'date','agent__id','agent__user__username', 'agent__dealer__user__username','summa','summa_pay', 'state__name', 'ticket', 'route','number_key', 'try_count','opservices__name')
         elif  content == "agent":
-            self.queryset = Transaction.objects.filter(agent__id = ag_id).values('id', 'date','agent__id','agent__user__username', 'agent__dealer__user__username','summa','summa_pay', 'state__name', 'ticket', 'route','number_key', 'try_count')
+            self.queryset = Transaction.objects.filter(agent__id = ag_id).values('id', 'date','agent__id','agent__user__username', 'agent__dealer__user__username','summa','summa_pay', 'state__name', 'ticket', 'route','number_key', 'try_count','opservices__name')
         elif  content == "dealer":
-            self.queryset = Transaction.objects.filter(agent__dealer__id = ag_id).values('id', 'date','agent__id','agent__user__username', 'agent__dealer__user__username','summa','summa_pay', 'state__name', 'ticket', 'route','number_key', 'try_count')
+            self.queryset = Transaction.objects.filter(agent__dealer__id = ag_id).values('id', 'date','agent__id','agent__user__username', 'agent__dealer__user__username','summa','summa_pay', 'state__name', 'ticket', 'route','number_key', 'try_count','opservices__name')
         
 
 

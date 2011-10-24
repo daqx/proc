@@ -86,8 +86,21 @@ class Dealer(models.Model):
     def delete(self, using=None):
         self.user.delete()
         models.Model.delete(self, using=using)
-            
+    
+    def recalc(self):
+        s = 0
+        a = ArcMove.objects.filter(dealer = self).order_by('date')
         
+        for t in a:            
+            t.saldo = s
+            t.save()
+            if t.dt:
+                s = s - t.summa                
+            else:
+                s = s + t.summa
+        # Обновим остаток диллера
+        self.summa = s
+        self.save()
 
 class Agent(models.Model):
     addresses       = generic.GenericRelation(Addres, null=True, blank=True )    
@@ -143,6 +156,7 @@ class Transaction(models.Model):
     date_state      =models.DateTimeField()                                     # Дата последнего изменения статуса
     date_input      =models.DateTimeField(null=True, blank=True)                # Дата платежа на терминале
     date_out        =models.DateTimeField(null=True, blank=True)                # Дата отправки платежа на сервер оператора
+    date_last_check =models.DateTimeField(null=True, blank=True)                # Дата последней проверки платежа на сервере оператора
     encashment      =models.CharField(max_length=20,null=True, blank=True)              # Номер инкасации 
     opservices      =models.ForeignKey(OpService)
     number_key      =models.CharField(max_length=100, verbose_name='Номер')
@@ -151,7 +165,8 @@ class Transaction(models.Model):
     summa_pay       =models.FloatField(verbose_name='Сумма платежа')    
     state           =models.ForeignKey(State)
     ticket          =models.CharField(max_length=20,null=True, blank=True)      # номер чека
-    return_reason   =models.CharField(max_length=100,null=True, blank=True)                           # Причина отказа и служ отметки    
+    trans_id        =models.IntegerField(null=True, blank=True)                 # ID транзакции для шлюза
+    return_reason   =models.CharField(max_length=100,null=True, blank=True)     # Причина отказа и служ отметки    
     seans_number    =models.CharField(max_length=20,null=True, blank=True)      # Номер сеанса обработки
     processed       =models.NullBooleanField(null=True, blank=True)             # Признак успешной обработки
     locked          =models.NullBooleanField(null=True, blank=True)             # Признак блокировки процессом
@@ -216,9 +231,23 @@ class Transaction(models.Model):
         # статус
         self.state=State.objects.get(code = st_code)                        # Новый
         self.date_state = date
+        self.save()
         # Добавим новый статус в историю (HistoryState)
         h = HistoryState(trans=self, date=self.date_state, state=self.state)
         h.save()
+    
+    def gen_trans_id(self):
+        ''' Операция генерирует и записывает новую '''
+        
+        from django.db import connection
+        cursor = connection.cursor()
+        cursor.execute("SELECT nextval(%s)", ["proc_transaction_trans_id"])
+        row = cursor.fetchone()
+        self.trans_id = row[0]
+        
+        # Сохраним все данные
+        super(Transaction, self).save()
+        
         
 
 class ArcMove(models.Model):

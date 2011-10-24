@@ -24,6 +24,7 @@ urlpatterns=patterns('',
 
     (r'^accounts/login/$',  account.login),
     (r'^accounts/logout/$', account.logout),
+    (r'^accounts/invalid/$', account.login),
 
     (r'^$', system.to_main),
     (r'^main/$', system.main),    

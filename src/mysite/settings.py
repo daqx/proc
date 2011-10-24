@@ -13,15 +13,16 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'postgresql_psycopg2', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
+        #'NAME': 'sproc',                      # Or path to database file if using sqlite3.
         'NAME': 'django',                      # Or path to database file if using sqlite3.
         'USER': 'postgres',                      # Not used with sqlite3.
         'PASSWORD': 'postgres',                  # Not used with sqlite3.
         'HOST': '192.168.7.225',                      # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '5432',
-        
     }
 }
 
+#DATABASE_SCHEMA = 'SProc'
 
         #NAME': 'django',                      # Or path to database file if using sqlite3.
         #'USER': 'postgres',                      # Not used with sqlite3.
